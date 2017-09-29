@@ -111,19 +111,13 @@ public class MeasureImpl implements Measure{
 					queryRel = (Query)itQueryRel.next();
 					queryPIR = (Query)itQueryPIR.next();
 					qPrecisionK = calculatePK(queryRel, queryPIR, k);
-					qPK = "UserID" + userRel.getId() + " TopicID: "+ topicRel.getId() + " QueryID: " + queryRel.getId() + 
-							" Query-Precision@" + k + ": " + String.valueOf(qPrecisionK) + "\n";
-					
+					qPK = printMeasure(userRel.getId(), topicRel.getId(), queryRel.getId(), k, qPrecisionK);
 					measures.put(userRel.getId() + topicRel.getId() + queryRel.getId(), qPK);
-					//System.out.println(qPK);
 					qPrecisionKMean += qPrecisionK;
 				}
 				
-				tPrecisionK = qPrecisionKMean / topicRel.getQueries().size();
-				tPK = "UserID" + userRel.getId() + " TopicID: "+ topicRel.getId() + 
-						" Topic-Precision@" + k + ": " + String.valueOf(tPrecisionK) + "\n";
-				
-				
+				tPrecisionK = qPrecisionKMean / topicRel.getQueries().size();				
+				tPK = printMeasure(userRel.getId(), topicRel.getId(), "", k, tPrecisionK);
 				measures.put(userRel.getId() + topicRel.getId(), tPK);
 				tPrecisionKMean += tPrecisionK;		
 				
@@ -131,8 +125,7 @@ public class MeasureImpl implements Measure{
 			}
 			
 			uPrecisionK = tPrecisionKMean / userRel.getTopics().size();
-			uPK = "UserID" + userRel.getId() + 
-					" User-Precision@" + k + ": " + String.valueOf(uPrecisionK) + "\n";
+			uPK = printMeasure(userRel.getId(), "", "", k, uPrecisionK);
 			measures.put(userRel.getId(), uPK);
 			uPrecisionKMean += uPrecisionK;
 			
@@ -141,6 +134,20 @@ public class MeasureImpl implements Measure{
 		
 		measures.put("TOT - Precision@" + k , String.valueOf(uPrecisionKMean / relevanceDoc.size()));
 		
+	}
+	
+	
+	/**
+	 * @param userID
+	 * @param topicId
+	 * @param queryId
+	 * @param k
+	 * @param measure
+	 * @return the text with the measure's info
+	 */
+	public String printMeasure(String userID, String topicId, String queryId, int k, Double measure) {
+		return "UserID: " + userID + (topicId.equalsIgnoreCase("") ? "" : " TopicID: " + topicId)
+				+ (queryId.equalsIgnoreCase("") ? "" : " QueryID: " + queryId) + " Precision@" + k + ": " + String.valueOf(measure);  
 		
 	}
 	
@@ -172,7 +179,6 @@ public class MeasureImpl implements Measure{
 			Map.Entry pair = (Map.Entry)it.next();
 			stringMeasures += (String)pair.getValue() + "\n";
 		}
-		System.out.println(measures.size());
 		return "Measures: \n" + stringMeasures;
 	}
 	
