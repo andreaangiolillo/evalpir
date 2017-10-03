@@ -18,9 +18,9 @@ import ie.dcu.evalpir.exceptions.InvalidInputException;
 public class InputCreatorImpl implements InputCreator{
 	
 	static final int MAX_TOPIC = 13; // max number of topics
-	static final int MAX_EVAL_DOC = 20; // number of documents evaluated for each query
-	static final int MAX_RETR_DOC = 20; // number of retrieved documents for each query in the result file
-	static final int MAX_QUERY = 5; // number of queries for each topics 
+	static final int MAX_EVAL_DOC = 10; // number of documents evaluated for each query
+	static final int MAX_RETR_DOC = 10; // number of retrieved documents for each query in the result file
+	static final int MAX_QUERY = 3; // number of queries for each topics 
 	static final String[] TOPIC_ID = {"MOVS-AP","MOVS-YP","SPRT-YP", "SPRT-KS", "TRVL-BT", "TRVL-VT","ART-Y","ART-A","BKS-A", "BKS-Y","MSC-Y","MSC-A"};
 	
 	

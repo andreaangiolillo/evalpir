@@ -66,6 +66,7 @@ public class InputReaderImpl implements InputReader{
 		    		
 		    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
 		    				query = new Query(queryKey, docs);
+		    															
 				    		queries.add(query);
 				    		docs =  new HashMap<String,Document>();
 		    			}

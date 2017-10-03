@@ -1,10 +1,15 @@
 package ie.dcu.evalpir.elements;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 /**
  * @author Andrea Angiolillo
  * @version 1.0
@@ -47,9 +52,15 @@ public class Query {
 		super();
 		this.id = id;
 		this.docs = new HashMap<String, Document>();
+				
 	}
 
+	
 
+	
+	
+	
+	
 	
 	/**
 	 * @param docId
@@ -100,7 +111,25 @@ public class Query {
 		this.docs = docs;
 	}
 
-
+	/**
+	 * This method return the number of relevant documents of this query. If the query contains DocumentOutputPIR object return 0.
+	 * @return nRelDoc
+	 * */
+	public int nRelevanteDoc() {
+		int nRelDoc = 0;
+		Iterator it = docs.entrySet().iterator();
+		boolean instance = true;
+		while(it.hasNext() && instance) {
+			Map.Entry pair = (Map.Entry)it.next();
+			if (!(pair.getValue() instanceof DocumentRelevanceFile)) {
+				instance = false;
+			}
+			nRelDoc += (instance && ((DocumentRelevanceFile)pair.getValue()).getIsRelevance()) ? 1 : 0;
+			
+		}
+		
+		return nRelDoc;
+	}
 
 	
 	

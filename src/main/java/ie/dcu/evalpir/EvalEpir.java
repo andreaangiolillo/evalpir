@@ -2,9 +2,15 @@ package ie.dcu.evalpir;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.swing.RowFilter.Entry;
+
 import ie.dcu.evalpir.checking.CheckInput;
 import ie.dcu.evalpir.checking.CheckInputImpl;
+import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.elements.User;
@@ -27,24 +33,29 @@ public class EvalEpir {
     public static void main( String[] args ) {
     	
 //    	InputCreator input = new InputCreatorImpl();
-//    	input.generateFilesInput(5, 6);
-//    	
-      
-    	InputReaderImpl reader = new InputReaderImpl();
-    
-		ArrayList<User>  qRel = reader.extract("src/main/resources/qrels.test.nUser.5.nTopic.6.Fri Sep 29 10:31:28 IST 2017.csv", true);
-    	ArrayList<User>  result = reader.extract("src/main/resources/result.test.nUser.5.nTopic.6.Fri Sep 29 10:31:28 IST 2017.csv", false);
+//    	input.generateFilesInput(2, 2);
     	
+      
+//    	InputReaderImpl reader = new InputReaderImpl();
+//    
+//		ArrayList<User>  qRel = reader.extract("src/main/resources/qrels.test.nUser.5.nTopic.6.Fri Sep 29 10:31:28 IST 2017.csv", true);
+//    	ArrayList<User>  result = reader.extract("src/main/resources/result.test.nUser.5.nTopic.6.Fri Sep 29 10:31:28 IST 2017.csv", false);
+//    	
 //    	System.out.println(result.get(0).getTopics().get(1).getQueries().get(0).getDocs().size());
 //    	System.out.println(result.get(4).toString());
 //    	System.out.println("Number of users:" + result.size() );
 //    	
-    	Query qRelevance = qRel.get(0).getTopics().get(0).findQuery("1");
-    	Query qResult = result.get(0).getTopics().get(0).findQuery("1");;
+//    	Query qRelevance = qRel.get(0).getTopics().get(0).findQuery("1");
+//    	Query qResult = result.get(0).getTopics().get(0).findQuery("1");;
+//
+//    	MeasureImpl m = new MeasureImpl();
+//    	m.evaluationProcess(qRel, result, 5);
+//    	System.out.println(m.calculateNDCG(qRelevance, qResult, 5));
+    	
 
-    	Measure m = new MeasureImpl();
-    	m.meanAverageMeasure(qRel, result, 5);
-    	System.out.println(m.toString());
+    	
+//    	System.out.print(qRelevance.entriesSortedByValues(qRelevance.getDocs()));
+    	
     	//System.out.println(m.calculatePK(qRelevance, qResult, 20));
     	//m.meanAverageMeasure(qRel, result, 10);
     	
