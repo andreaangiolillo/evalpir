@@ -1,7 +1,7 @@
 package ie.dcu.evalpir.measures;
 
 import java.util.ArrayList;
-import java.util.List;
+
 
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.User;

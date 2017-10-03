@@ -1,15 +1,9 @@
 package ie.dcu.evalpir.elements;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+
 /**
  * @author Andrea Angiolillo
  * @version 1.0
@@ -117,10 +111,10 @@ public class Query {
 	 * */
 	public int nRelevanteDoc() {
 		int nRelDoc = 0;
-		Iterator it = docs.entrySet().iterator();
+		Iterator<?> it = docs.entrySet().iterator();
 		boolean instance = true;
 		while(it.hasNext() && instance) {
-			Map.Entry pair = (Map.Entry)it.next();
+			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
 			if (!(pair.getValue() instanceof DocumentRelevanceFile)) {
 				instance = false;
 			}
@@ -138,10 +132,10 @@ public class Query {
 	@Override
 	public String toString() {
 		String stringDoc = "";
-		Iterator it = docs.entrySet().iterator();
+		Iterator<?> it = docs.entrySet().iterator();
 		
 		while(it.hasNext()) {
-			Map.Entry pair = (Map.Entry)it.next();
+			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
 			stringDoc += ((Document)pair.getValue()).toString() + "\n";
 		}
 		stringDoc += "] \nNumber of documents: " + docs.size() + " ]";

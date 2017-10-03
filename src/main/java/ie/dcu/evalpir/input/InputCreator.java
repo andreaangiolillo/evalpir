@@ -1,5 +1,5 @@
 package ie.dcu.evalpir.input;
-import java.io.IOException;
+
 import java.util.ArrayList;
 
 /**

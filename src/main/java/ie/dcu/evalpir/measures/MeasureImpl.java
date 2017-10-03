@@ -3,14 +3,10 @@ package ie.dcu.evalpir.measures;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelevanceFile;
@@ -51,7 +47,7 @@ public class MeasureImpl{
 		DocumentOutputPIR docOut;
 		
 		while (itDocOutputPIR.hasNext()) {
-			Map.Entry pairDocOUT = (Map.Entry)itDocOutputPIR.next();
+			Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
 			docOut = (DocumentOutputPIR)pairDocOUT.getValue();
 			docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
 			value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
@@ -126,7 +122,7 @@ public class MeasureImpl{
 		DocumentOutputPIR docOut;
 		
 		while (itDocOutputPIR.hasNext()) {
-			Map.Entry pairDocOUT = (Map.Entry)itDocOutputPIR.next();
+			Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
 			docOut = (DocumentOutputPIR)pairDocOUT.getValue();
 			docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
 			
@@ -242,10 +238,10 @@ public class MeasureImpl{
 	@Override
 	public String toString() {
 		String stringMeasures = "";
-		Iterator it = measures.entrySet().iterator();
+		Iterator<?> it = measures.entrySet().iterator();
 		
 		while(it.hasNext()) {
-			Map.Entry pair = (Map.Entry)it.next();
+			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
 			stringMeasures += (String)pair.getValue() + "\n";
 		}
 		return "Measures: \n" + stringMeasures;

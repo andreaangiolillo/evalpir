@@ -2,10 +2,6 @@ package ie.dcu.evalpir.extractor;
 
 
 import java.util.ArrayList;
-import java.util.Map;
-
-import ie.dcu.evalpir.elements.Query;
-import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.elements.User;
 
 public interface InputReader {
