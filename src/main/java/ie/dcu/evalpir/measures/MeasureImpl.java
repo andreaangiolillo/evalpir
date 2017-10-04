@@ -5,15 +5,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelevanceFile;
+import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.elements.User;
 
+/**
+ * @author Andrea Angiolillo
+ * @version 1.0
+ * 
+ * **/
 public class MeasureImpl{
 
 	private Map<String, String> measures;
@@ -38,6 +45,7 @@ public class MeasureImpl{
 	 * @input queryRel
 	 * @input queryOutputPIR
 	 * @return 
+	 * @Complexity O(n)
 	 * **/
 	public double precision(Query queryRel, Query queryOutputPIR){
 		return calculatePKRK(queryRel, queryOutputPIR, queryOutputPIR.getDocs().size(), false);
@@ -51,6 +59,7 @@ public class MeasureImpl{
 	 * @input queryRel
 	 * @input queryOutputPIR
 	 * @return 
+	 * @Complexity O(n)
 	 * **/
 	public double recall(Query queryRel, Query queryOutputPIR){
 		return calculatePKRK(queryRel, queryOutputPIR, queryOutputPIR.getDocs().size(), true);
@@ -62,7 +71,8 @@ public class MeasureImpl{
 	 * 
 	 * @input precision
 	 * @input recall
-	 * @return f_meausure 
+	 * @return f_meausure
+	 * @Complexity O(1) 
 	 * **/
 	public double fMeasure(double precision, double recall, double alpha) {
 		return (alpha > 0.0 && alpha <= 1.0 ) ? (1/((alpha * 1/precision) + (1 - alpha) * 1/recall)) : 0;
@@ -70,18 +80,78 @@ public class MeasureImpl{
 	
 	
 	/**
-	 * Mean Average Precision (MAP) is the average precision at k values
+	 * Average Precision (AP) is the average precision at k values
 	 * computed after each relevant document is retrieved for a given topic,
-	 * where the mean of all these averages is calculated across all the test
-	 * topics.
+	 *  
+	 * If the query doesn't have at least one relevant document it returns -1.
 	 * 
+	 * @input queryRel
+	 * @input queryOutputPIR
+	 * @input interpolation if it is true calculates the Interpolation Average Precision on 11 level (0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100).
+	 * @return AP
+	 * @Complexity O(n^2)
 	 * **/
-	public double map(Query queryRel, Query queryOutputPIR) {
-		int nRelevantDoc = queryRel.nRelevanteDoc();
-		if(nRelevantDoc != 0) {
+	public double ap(Query queryRel, Query queryOutputPIR, boolean interpolation) {
+		int nRelevantDoc = (queryRel.nRelevantDoc() == 0) ? -1 : queryRel.nRelevantDoc();
+		double aveP = 0.0;
+		if(nRelevantDoc != -1) {
+			Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
+			DocumentRelevanceFile docRel;
+			DocumentOutputPIR docOut;
+			ArrayList<Pair> listPair = new ArrayList<Pair>();
+			while (itDocOutputPIR.hasNext()) {
+				Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
+				docOut = (DocumentOutputPIR)pairDocOUT.getValue();
+				docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
+				if(docRel != null) {
+					aveP += calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false);
+					listPair.add(new Pair(docOut.getRank(), calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false)));
+
+				}
+			}
+			
+			if(interpolation) {
+				Collections.sort(listPair);
+				for (int i = 0; i < 11; i++) {
+					aveP += interpolation(i, listPair);
+				}
+				
+			}else {
+				for (Pair p : listPair) {
+					aveP += p.getValue();
+				}
+				
+			}
+			
+			aveP = (interpolation) ? aveP/11 : aveP/nRelevantDoc;
+		}else {
+			return nRelevantDoc; // return -1 if there isn't a relevant document
 			
 		}
-		return 0.0;
+		
+		return aveP;
+	}
+	
+	/**
+	 *  It implements an interpolated precision that takes the maximum precision 
+	 *  over all recalls greater than r.
+	 * 
+	 * @input r
+	 * @input listPair
+	 * @return interpolated precision
+	 * **/
+	
+	public double interpolation(int r, ArrayList<Pair> listPair) {
+		double max = 0.0;
+		
+		for (Pair p : listPair) {
+			if(p.getKey() >= r) {
+				max = (max >= p.getValue()) ? max : p.getValue();	
+			}
+			
+		}
+		
+		return max;
 	}
 	
 	/**
@@ -94,6 +164,7 @@ public class MeasureImpl{
 	 *@input predictionData
 	 *@input p
 	 *@return the NDCG for the given data
+	 *@Complexity O(n)
 	 */
 	public double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) {
 		ArrayList<Integer> idcg = new ArrayList<Integer>();
@@ -128,12 +199,11 @@ public class MeasureImpl{
 			rank ++;	
 		}
 		
-//		System.out.println("IDCG: " + idcgValue);
-//		System.out.println("DCG: " + dcg);
 		return dcg / idcgValue;
 	}
 	
-	/**Changing of base
+	/**
+	 * Changing of base
 	 * 
 	 * @input value
 	 * @input base
@@ -157,8 +227,7 @@ public class MeasureImpl{
 	 * @param k
 	 * @param recall : if it is true computes the recall@k otherwise precision@k
 	 * @return (relDoc / denominator)
-	 * @Complexity Average Complexity: O(numberDocs)
-	 * @Complexity Worst Complexity: O(numberDocs^2), It depends on HashTable
+	 * @Complexity Complexity: O(n)
 	 */
 	public double calculatePKRK(Query queryRel, Query queryOutputPIR , int k, boolean recall) {
 		double relDoc = 0; // number of relevant docs
@@ -174,7 +243,7 @@ public class MeasureImpl{
 			}
 		}
 		
-		double denominator = (recall == true) ? queryRel.nRelevanteDoc() : k; 
+		double denominator = (recall == true) ? queryRel.nRelevantDoc() : k; 
 		return (relDoc / denominator);
 	}
 
@@ -190,11 +259,13 @@ public class MeasureImpl{
 		User userRel, userPIR;
 		Topic topicRel, topicPIR;
 		Query queryRel, queryPIR;
+		
 		/*Precision@K variables*/
 		Double uPrecisionKMean, uPrecisionK ,tPrecisionKMean, tPrecisionK, qPrecisionKMean, qPrecisionK;
 		uPrecisionKMean = uPrecisionK = tPrecisionKMean = tPrecisionK = qPrecisionKMean = qPrecisionK = 0.0;
 		String qPK, tPK, uPK;
 		qPK = tPK = uPK = "";
+		
 		itUserRel = relevanceDoc.iterator();
 		itUserPIR = outputPIR.iterator();
 		while(itUserRel.hasNext() && itUserPIR.hasNext()) { // per-user
@@ -256,16 +327,6 @@ public class MeasureImpl{
 	public Map<String, String> getMeasures() {
 		return measures;
 	}
-
-
-	/**
-	 * @param measures the measures to set
-	 */
-	public void setMeasures(Map<String, String> measures) {
-		this.measures = measures;
-	}
-
-
 
 	@Override
 	public String toString() {

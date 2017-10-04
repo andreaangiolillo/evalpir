@@ -109,7 +109,7 @@ public class Query {
 	 * This method return the number of relevant documents of this query. If the query contains DocumentOutputPIR object return 0.
 	 * @return nRelDoc
 	 * */
-	public int nRelevanteDoc() {
+	public int nRelevantDoc() {
 		int nRelDoc = 0;
 		Iterator<?> it = docs.entrySet().iterator();
 		boolean instance = true;

@@ -24,10 +24,161 @@ public class TestCaseMeasuresImpl {
 	    m = new MeasureImpl();	
 	}
 
+	
+	@Test
+	public void testFMeasure() {
+		Double delta = 0.000001;
+		Query query_result;
+		Query query_rel;
+		double recall;
+		double precision;
+		
+		//user0
+		query_result = result.get(0).getTopics().get(0).getQueries().get(0);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(0);
+		recall = m.recall(query_rel, query_result);
+		precision = m.precision(query_rel, query_result);
+		assertEquals(0.181818182, m.fMeasure(precision, recall, 0.5),delta);
+		
+		query_result = result.get(0).getTopics().get(0).getQueries().get(1);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(1);
+		recall = m.recall(query_rel, query_result);
+		precision = m.precision(query_rel, query_result);
+		assertEquals(0.181818182, m.fMeasure(precision, recall, 0.5),delta);
+		
+		query_result = result.get(0).getTopics().get(1).getQueries().get(1);
+		query_rel = rel.get(0).getTopics().get(1).getQueries().get(1);
+		recall = m.recall(query_rel, query_result);
+		precision = m.precision(query_rel, query_result);
+		assertEquals(0.666666667, m.fMeasure(precision, recall, 0.5),delta);
+		
+	}
+	
 
 	@Test
+	public void testPrecision() {
+		Double delta = 0.000001;
+		Query query_result;
+		Query query_rel;
+		
+		
+		query_result = result.get(0).getTopics().get(0).getQueries().get(0);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(0);
+		//user0 - P
+		query_result = result.get(0).getTopics().get(0).getQueries().get(0);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(0);
+		assertEquals(0.1, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(0).getQueries().get(1);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(1);
+		assertEquals(0.1, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(0).getQueries().get(2);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(2);
+		assertEquals(0.1, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(1).getQueries().get(0);
+		query_rel = rel.get(0).getTopics().get(1).getQueries().get(0);
+		assertEquals(0.1, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(1).getQueries().get(1);
+		query_rel = rel.get(0).getTopics().get(1).getQueries().get(1);
+		assertEquals(0.5, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(1).getQueries().get(2);
+		query_rel = rel.get(0).getTopics().get(1).getQueries().get(2);
+		assertEquals(0.4, m.precision(query_rel, query_result) ,delta);
+		
+
+		//user1 - P
+		query_result = result.get(1).getTopics().get(0).getQueries().get(0);
+		query_rel = rel.get(1).getTopics().get(0).getQueries().get(0);
+		assertEquals(0.4, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(0).getQueries().get(1);
+		query_rel = rel.get(1).getTopics().get(0).getQueries().get(1);
+		assertEquals(0.1, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(0).getQueries().get(2);
+		query_rel = rel.get(1).getTopics().get(0).getQueries().get(2);
+		assertEquals(0.3, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(1).getQueries().get(0);
+		query_rel = rel.get(1).getTopics().get(1).getQueries().get(0);
+		assertEquals(0.2, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(1).getQueries().get(1);
+		query_rel = rel.get(1).getTopics().get(1).getQueries().get(1);
+		assertEquals(0.2, m.precision(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(1).getQueries().get(2);
+		query_rel = rel.get(1).getTopics().get(1).getQueries().get(2);
+		assertEquals(0.4, m.precision(query_rel, query_result) ,delta);
+		
+		
+	}
+	
+	@Test
+	public void testRecall() {
+		Double delta = 0.000001;
+		Query query_result;
+		Query query_rel;
+		
+		//user0 - R
+		query_result = result.get(0).getTopics().get(0).getQueries().get(0);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(0);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(0).getQueries().get(1);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(1);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(0).getQueries().get(2);
+		query_rel = rel.get(0).getTopics().get(0).getQueries().get(2);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(1).getQueries().get(0);
+		query_rel = rel.get(0).getTopics().get(1).getQueries().get(0);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(1).getQueries().get(1);
+		query_rel = rel.get(0).getTopics().get(1).getQueries().get(1);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(0).getTopics().get(1).getQueries().get(2);
+		query_rel = rel.get(0).getTopics().get(1).getQueries().get(2);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+
+		//user1 - R
+		query_result = result.get(1).getTopics().get(0).getQueries().get(0);
+		query_rel = rel.get(1).getTopics().get(0).getQueries().get(0);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(0).getQueries().get(1);
+		query_rel = rel.get(1).getTopics().get(0).getQueries().get(1);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(0).getQueries().get(2);
+		query_rel = rel.get(1).getTopics().get(0).getQueries().get(2);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(1).getQueries().get(0);
+		query_rel = rel.get(1).getTopics().get(1).getQueries().get(0);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(1).getQueries().get(1);
+		query_rel = rel.get(1).getTopics().get(1).getQueries().get(1);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+		
+		query_result = result.get(1).getTopics().get(1).getQueries().get(2);
+		query_rel = rel.get(1).getTopics().get(1).getQueries().get(2);
+		assertEquals(1.0, m.recall(query_rel, query_result) ,delta);
+	}
+	
+	
+	@Test
 	public void testCalculateNDCG() {
-		//public Double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) 
 		Double delta = 0.000001;
 		Query query_result;
 		Query query_rel;

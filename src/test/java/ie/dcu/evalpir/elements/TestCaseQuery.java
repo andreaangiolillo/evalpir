@@ -32,21 +32,21 @@ public class TestCaseQuery {
 	}
 
 	@Test
-	public void testNRelevanteDoc() {
+	public void testNRelevantDoc() {
 		int relevantDOC; 
 		int mustBezero; 
-		mustBezero = result.get(0).getTopics().get(0).getQueries().get(0).nRelevanteDoc();
-		relevantDOC = rel.get(0).getTopics().get(0).getQueries().get(0).nRelevanteDoc();
+		mustBezero = result.get(0).getTopics().get(0).getQueries().get(0).nRelevantDoc();
+		relevantDOC = rel.get(0).getTopics().get(0).getQueries().get(0).nRelevantDoc();
 		assertTrue("Error this element must be zero", mustBezero == 0);
 		assertTrue(relevantDOC == 1);
 		
-		mustBezero = result.get(0).getTopics().get(0).getQueries().get(1).nRelevanteDoc();
-		relevantDOC = rel.get(0).getTopics().get(0).getQueries().get(1).nRelevanteDoc();
+		mustBezero = result.get(0).getTopics().get(0).getQueries().get(1).nRelevantDoc();
+		relevantDOC = rel.get(0).getTopics().get(0).getQueries().get(1).nRelevantDoc();
 		assertTrue("Error this element must be zero", mustBezero == 0);
 		assertTrue(relevantDOC == 1);
 		
-		mustBezero = result.get(0).getTopics().get(1).getQueries().get(1).nRelevanteDoc();
-		relevantDOC = rel.get(0).getTopics().get(1).getQueries().get(1).nRelevanteDoc();
+		mustBezero = result.get(0).getTopics().get(1).getQueries().get(1).nRelevantDoc();
+		relevantDOC = rel.get(0).getTopics().get(1).getQueries().get(1).nRelevantDoc();
 		assertTrue("Error this element must be zero", mustBezero == 0);
 		assertTrue(relevantDOC == 5);
 		
