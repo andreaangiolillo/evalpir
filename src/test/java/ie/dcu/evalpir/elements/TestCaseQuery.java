@@ -48,11 +48,7 @@ public class TestCaseQuery {
 		mustBezero = result.get(0).getTopics().get(1).getQueries().get(1).nRelevantDoc();
 		relevantDOC = rel.get(0).getTopics().get(1).getQueries().get(1).nRelevantDoc();
 		assertTrue("Error this element must be zero", mustBezero == 0);
-		assertTrue(relevantDOC == 5);
-		
-		
-		
-		
+		assertTrue(relevantDOC == 5);	
 		
 	}
 

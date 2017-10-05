@@ -21,6 +21,7 @@ import ie.dcu.evalpir.input.InputCreator;
 import ie.dcu.evalpir.input.InputCreatorImpl;
 import ie.dcu.evalpir.measures.Measure;
 import ie.dcu.evalpir.measures.MeasureImpl;
+import me.tongfei.progressbar.ProgressBar;
 
 /**
  * @author Andrea Angiolillo
@@ -28,9 +29,19 @@ import ie.dcu.evalpir.measures.MeasureImpl;
  * @
  * EvalEpir allows the evaluation of personalized information retrieval
  * 
+ * @see https://github.com/ctongfei/progressbar
  */
 public class EvalEpir {
     public static void main( String[] args ) {
+    	
+    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
+    	
+    	pb.stepBy(50);
+    	for (int i = 0; i<10000000 ; i ++) {
+    		
+    	}
+    	pb.stepBy(50);
+    	pb.stop();
     	
 //    	InputCreator input = new InputCreatorImpl();
 //    	input.generateFilesInput(2, 2);

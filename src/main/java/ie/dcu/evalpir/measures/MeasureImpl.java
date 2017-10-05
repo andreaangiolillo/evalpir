@@ -71,6 +71,7 @@ public class MeasureImpl{
 	 * 
 	 * @input precision
 	 * @input recall
+	 * @input alpha must be in (0, 1]
 	 * @return f_meausure
 	 * @Complexity O(1) 
 	 * **/
@@ -83,7 +84,7 @@ public class MeasureImpl{
 	 * Average Precision (AP) is the average precision at k values
 	 * computed after each relevant document is retrieved for a given topic,
 	 *  
-	 * If the query doesn't have at least one relevant document it returns -1.
+	 * If the query doesn't have at least one relevant document it returns 0.
 	 * 
 	 * @input queryRel
 	 * @input queryOutputPIR
@@ -122,7 +123,7 @@ public class MeasureImpl{
 			}
 			aveP = (interpolation) ? aveP/11 : aveP/nRelevantDoc;
 		}else {
-			return nRelevantDoc; // return -1 if there isn't a relevant document
+			return 0; // return 0 if there isn't a relevant document
 			
 		}
 		
@@ -140,7 +141,6 @@ public class MeasureImpl{
 	
 	public double interpolation(int r, ArrayList<Pair> listPair) {
 		double max = 0.0;
-		
 		for (Pair p : listPair) {
 			if(p.getKey() >= r) {
 				max = (max >= p.getValue()) ? max : p.getValue();	
@@ -219,6 +219,8 @@ public class MeasureImpl{
 	 * documents in the document collection.
 	 * 
 	 * It computes the precision@k and the recall@k
+	 * If the query doesn't have at least one relevant document it returns 0.
+	 * 
 	 * @param queryRel
 	 * @param queryResult
 	 * @param k
@@ -227,21 +229,26 @@ public class MeasureImpl{
 	 * @Complexity Complexity: O(n)
 	 */
 	public double calculatePKRK(Query queryRel, Query queryOutputPIR , int k, boolean recall) {
-		double relDoc = 0; // number of relevant docs
-		Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
-		DocumentRelevanceFile docRel;
-		DocumentOutputPIR docOut;
-		while (itDocOutputPIR.hasNext()) {
-			Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
-			docOut = (DocumentOutputPIR)pairDocOUT.getValue();
-			docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
-			if((docRel != null) && (docOut.getRank() <= k) && (docRel.getIsRelevance() == true)) {
-				relDoc ++;
+		double relDoc = 0; // number of relevant docs found
+		double nRelevantDoc = queryRel.nRelevantDoc(); // number of relevant docs in queryRel
+		if(nRelevantDoc != -1) {
+			Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
+			DocumentRelevanceFile docRel;
+			DocumentOutputPIR docOut;
+			while (itDocOutputPIR.hasNext()) {
+				Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
+				docOut = (DocumentOutputPIR)pairDocOUT.getValue();
+				docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
+				if((docRel != null) && (docOut.getRank() <= k) && (docRel.getIsRelevance() == true)) {
+					relDoc ++;
+				}
 			}
+			
+			double denominator = (recall == true) ? nRelevantDoc : k; 
+			return (relDoc / denominator);
 		}
 		
-		double denominator = (recall == true) ? queryRel.nRelevantDoc() : k; 
-		return (relDoc / denominator);
+		return 0;
 	}
 
 	/**
