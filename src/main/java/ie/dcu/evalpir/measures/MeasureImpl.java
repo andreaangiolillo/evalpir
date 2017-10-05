@@ -105,14 +105,12 @@ public class MeasureImpl{
 				docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
 				if(docRel != null & docRel.getIsRelevance()) {
 					listPair.add(new Pair(docOut.getRank(), calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false)));
-					System.out.println("P@" + docOut.getRank() + ": " + calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false));
 				}
 			}
 			
 			if(interpolation) {
 				Collections.sort(listPair);
 				for (int i = 0; i < 11; i++) {
-					System.out.println("interpolation " + i +": " + interpolation(i, listPair));
 					aveP += interpolation(i, listPair);
 				}
 				
@@ -122,7 +120,6 @@ public class MeasureImpl{
 				}
 				
 			}
-			System.out.println("nRelavantDoc: " + nRelevantDoc);
 			aveP = (interpolation) ? aveP/11 : aveP/nRelevantDoc;
 		}else {
 			return nRelevantDoc; // return -1 if there isn't a relevant document
