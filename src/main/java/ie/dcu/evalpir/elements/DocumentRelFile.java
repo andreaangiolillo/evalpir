@@ -7,7 +7,7 @@ package ie.dcu.evalpir.elements;
  * @author Andrea Angiolillo
  *
  */
-public class DocumentRelevanceFile extends Document{
+public class DocumentRelFile extends Document{
 	
 	static final int  THRESHOLD = 2; //it is used to set isRelevance
 	
@@ -19,7 +19,7 @@ public class DocumentRelevanceFile extends Document{
 	/**
 	 * @param id
 	 */
-	public DocumentRelevanceFile(String id) {
+	public DocumentRelFile(String id) {
 		super(id);
 	}	
 	
@@ -28,7 +28,7 @@ public class DocumentRelevanceFile extends Document{
 	 * @param id
 	 * @param relevance
 	 */
-	public DocumentRelevanceFile(String id, int relevance) {
+	public DocumentRelFile(String id, int relevance) {
 		super(id);
 		this.relevance = relevance;
 		setIsRelevance();

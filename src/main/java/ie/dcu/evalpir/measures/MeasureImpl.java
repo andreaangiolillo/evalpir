@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
-import ie.dcu.evalpir.elements.DocumentRelevanceFile;
+import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
+import ie.dcu.evalpir.elements.QueryOutputPIR;
+import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.elements.User;
 
@@ -23,16 +24,18 @@ import ie.dcu.evalpir.elements.User;
  * **/
 public class MeasureImpl{
 
-	private Map<String, String> measures;
+	//private Map<String, String> measures;
+	private ArrayList<User> relevanceDoc;
 	
 	
 	
 	/**
 	 * Constructor
-	 * @param measures
+	 * @param 
 	 */
-	public MeasureImpl() {
-		this.measures = new LinkedHashMap<String,String>();
+	public MeasureImpl(ArrayList<User> relevanceDoc) {
+		//this.measures = new LinkedHashMap<String,String>();
+		this.relevanceDoc = relevanceDoc;
 	}
 	
 	
@@ -47,7 +50,7 @@ public class MeasureImpl{
 	 * @return 
 	 * @Complexity O(n)
 	 * **/
-	public double precision(Query queryRel, Query queryOutputPIR){
+	public static double precision(Query queryRel, Query queryOutputPIR){
 		return calculatePKRK(queryRel, queryOutputPIR, queryOutputPIR.getDocs().size(), false);
 	}
 	
@@ -61,7 +64,7 @@ public class MeasureImpl{
 	 * @return 
 	 * @Complexity O(n)
 	 * **/
-	public double recall(Query queryRel, Query queryOutputPIR){
+	public static double recall(Query queryRel, Query queryOutputPIR){
 		return calculatePKRK(queryRel, queryOutputPIR, queryOutputPIR.getDocs().size(), true);
 	}
 	
@@ -75,7 +78,7 @@ public class MeasureImpl{
 	 * @return f_meausure
 	 * @Complexity O(1) 
 	 * **/
-	public double fMeasure(double precision, double recall, double alpha) {
+	public static double fMeasure(double precision, double recall, double alpha) {
 		return (alpha > 0.0 && alpha <= 1.0 ) ? (1/((alpha * 1/precision) + (1 - alpha) * 1/recall)) : 0;
 	}
 	
@@ -92,18 +95,18 @@ public class MeasureImpl{
 	 * @return AP
 	 * @Complexity O(n^2)
 	 * **/
-	public double ap(Query queryRel, Query queryOutputPIR, boolean interpolation) {
-		int nRelevantDoc = (queryRel.nRelevantDoc() == 0) ? -1 : queryRel.nRelevantDoc();
+	public static double ap(Query queryRel, Query queryOutputPIR, boolean interpolation) {
+		int nRelevantDoc = (((QueryRelFile) queryRel).getNRelevantDoc() == 0) ? -1 : ((QueryRelFile) queryRel).getNRelevantDoc();
 		double aveP = 0.0;
 		if(nRelevantDoc != -1) {
 			Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
-			DocumentRelevanceFile docRel;
+			DocumentRelFile docRel;
 			DocumentOutputPIR docOut;
-			ArrayList<Pair> listPair = new ArrayList<Pair>();
+			ArrayList<Pair<Integer, Double>> listPair = new ArrayList<Pair<Integer, Double>>();
 			while (itDocOutputPIR.hasNext()) {
 				Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
 				docOut = (DocumentOutputPIR)pairDocOUT.getValue();
-				docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
+				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				if(docRel != null & docRel.getIsRelevance()) {
 					listPair.add(new Pair(docOut.getRank(), calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false)));
 				}
@@ -116,8 +119,8 @@ public class MeasureImpl{
 				}
 				
 			}else {
-				for (Pair p : listPair) {
-					aveP += p.getValue();
+				for (Pair<Integer, Double> p : listPair) {
+					aveP += (Double)p.getValue();
 				}
 				
 			}
@@ -139,9 +142,9 @@ public class MeasureImpl{
 	 * @return interpolated precision
 	 * **/
 	
-	public double interpolation(int r, ArrayList<Pair> listPair) {
+	public static double interpolation(int r, ArrayList<Pair<Integer, Double>> listPair) {
 		double max = 0.0;
-		for (Pair p : listPair) {
+		for (Pair<Integer, Double> p : listPair) {
 			if(p.getKey() >= r) {
 				max = (max >= p.getValue()) ? max : p.getValue();	
 			}
@@ -163,21 +166,21 @@ public class MeasureImpl{
 	 *@return the NDCG for the given data
 	 *@Complexity O(n)
 	 */
-	public double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) {
+	public static double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) {
 		ArrayList<Integer> idcg = new ArrayList<Integer>();
 		double dcg = 0.0;
 		int value_relevance = 0;
 		Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
-		DocumentRelevanceFile docRel;
+		DocumentRelFile docRel;
 		DocumentOutputPIR docOut;
 		while (itDocOutputPIR.hasNext()) {
 			Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
 			docOut = (DocumentOutputPIR)pairDocOUT.getValue();
-			docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
+			docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 			value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
 			idcg.add(value_relevance);
 			if(docOut.getRank() <= p) {	
-				docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
+				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
 				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (log(docOut.getRank() + 1, 2));	
 			}
@@ -205,7 +208,7 @@ public class MeasureImpl{
 	 * @input value
 	 * @input base
 	 * */
-	public double log(int value, int base) {
+	public static double log(int value, int base) {
 		return Math.log(value) / Math.log(base);
 	}
 
@@ -228,17 +231,17 @@ public class MeasureImpl{
 	 * @return (relDoc / denominator)
 	 * @Complexity Complexity: O(n)
 	 */
-	public double calculatePKRK(Query queryRel, Query queryOutputPIR , int k, boolean recall) {
+	public static double calculatePKRK(Query queryRel, Query queryOutputPIR , int k, boolean recall) {
 		double relDoc = 0; // number of relevant docs found
-		double nRelevantDoc = queryRel.nRelevantDoc(); // number of relevant docs in queryRel
+		double nRelevantDoc = ((QueryRelFile) queryRel).getNRelevantDoc(); // number of relevant docs in queryRel
 		if(nRelevantDoc != -1) {
 			Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
-			DocumentRelevanceFile docRel;
+			DocumentRelFile docRel;
 			DocumentOutputPIR docOut;
 			while (itDocOutputPIR.hasNext()) {
 				Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
 				docOut = (DocumentOutputPIR)pairDocOUT.getValue();
-				docRel = (DocumentRelevanceFile)queryRel.findDoc(docOut.getId());
+				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				if((docRel != null) && (docOut.getRank() <= k) && (docRel.getIsRelevance() == true)) {
 					relDoc ++;
 				}
@@ -257,20 +260,87 @@ public class MeasureImpl{
 	 * @param k
 	 * @Complexity !CRITICAL! O(nUser * nTopic * nQuery * measures) 
 	 */
-	public void evaluationProcess(ArrayList<User> relevanceDoc, ArrayList<User> outputPIR, int k){
+//	public void evaluationProcess(ArrayList<User> relevanceDoc, ArrayList<User> outputPIR, int k){
+//		
+//		Iterator<?> itUserRel, itUserPIR, itTopicRel, itTopicPIR, itQueryRel, itQueryPIR;
+//		User userRel, userPIR;
+//		Topic topicRel, topicPIR;
+//		Query queryRel, queryPIR;
+//		
+//		/*Precision@K variables*/
+//		Double uPrecisionKMean, uPrecisionK ,tPrecisionKMean, tPrecisionK, qPrecisionKMean, qPrecisionK;
+//		uPrecisionKMean = uPrecisionK = tPrecisionKMean = tPrecisionK = qPrecisionKMean = qPrecisionK = 0.0;
+//		String qPK, tPK, uPK;
+//		qPK = tPK = uPK = "";
+//		
+//		itUserRel = relevanceDoc.iterator();
+//		itUserPIR = outputPIR.iterator();
+//		while(itUserRel.hasNext() && itUserPIR.hasNext()) { // per-user
+//			userRel = (User) itUserRel.next();
+//			userPIR = (User) itUserPIR.next();
+//			itTopicRel = userRel.getTopics().iterator();
+//			itTopicPIR = userPIR.getTopics().iterator();
+//			while(itTopicRel.hasNext() && itTopicPIR.hasNext()) { // per-topic
+//				topicRel = 	(Topic) itTopicRel.next();
+//				topicPIR = 	(Topic) itTopicPIR.next();
+//				itQueryRel = topicRel.getQueries().iterator();
+//				itQueryPIR = topicPIR.getQueries().iterator();
+//				while(itQueryRel.hasNext() && itQueryPIR.hasNext()) { // per-query
+//					queryRel = (Query)itQueryRel.next();
+//					queryPIR = (Query)itQueryPIR.next();
+//					qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
+//					qPK += printMeasure(userRel.getId(), topicRel.getId(), queryRel.getId(), k, qPrecisionK);
+//					qPrecisionKMean += qPrecisionK;
+//				}
+//				
+//				measures.put("p"+k+"query", qPK);
+//				tPrecisionK = qPrecisionKMean / topicRel.getQueries().size();				
+//				tPK += printMeasure(userRel.getId(), topicRel.getId(), "", k, tPrecisionK);
+//				tPrecisionKMean += tPrecisionK;		
+//				qPrecisionKMean = 0.0;
+//			}
+//			
+//			measures.put("p"+k+"topic", tPK);
+//			uPrecisionK = tPrecisionKMean / userRel.getTopics().size();
+//			uPK += printMeasure(userRel.getId(), "", "", k, uPrecisionK);
+//			uPrecisionKMean += uPrecisionK;
+//			tPrecisionKMean = 0.0;
+//		}
+//		
+//		measures.put("p"+k+"user", uPK);
+//		measures.put("TOT - Precision@" + k , "TOT - Precision@" + k + ": " + String.valueOf(uPrecisionKMean / relevanceDoc.size()));
+//	}
+//	
+	
+	/**
+	 * @param userID
+	 * @param topicId
+	 * @param queryId
+	 * @param k
+	 * @param measure
+	 * @return the text with the measure's info
+	 */
+	public static String printMeasure(String userID, String topicId, String queryId, int k, Double measure) {
+		return "UserID: " + userID + (topicId.equalsIgnoreCase("") ? "" : " TopicID: " + topicId)
+				+ (queryId.equalsIgnoreCase("") ? "" : " QueryID: " + queryId) + " Precision@" + k + ": " + String.valueOf(measure) + "\n";  
+		
+	}
+	
+	
+	
+	
+	public void calculateMeasures(ArrayList<User> outputPIR) {
 		
 		Iterator<?> itUserRel, itUserPIR, itTopicRel, itTopicPIR, itQueryRel, itQueryPIR;
 		User userRel, userPIR;
 		Topic topicRel, topicPIR;
 		Query queryRel, queryPIR;
 		
-		/*Precision@K variables*/
-		Double uPrecisionKMean, uPrecisionK ,tPrecisionKMean, tPrecisionK, qPrecisionKMean, qPrecisionK;
-		uPrecisionKMean = uPrecisionK = tPrecisionKMean = tPrecisionK = qPrecisionKMean = qPrecisionK = 0.0;
-		String qPK, tPK, uPK;
-		qPK = tPK = uPK = "";
+		/*Measures variables*/
+		Double qPrecisionK = 0.0;
+		int k = 0;
 		
-		itUserRel = relevanceDoc.iterator();
+		itUserRel = getRelevanceDoc().iterator();
 		itUserPIR = outputPIR.iterator();
 		while(itUserRel.hasNext() && itUserPIR.hasNext()) { // per-user
 			userRel = (User) itUserRel.next();
@@ -285,64 +355,49 @@ public class MeasureImpl{
 				while(itQueryRel.hasNext() && itQueryPIR.hasNext()) { // per-query
 					queryRel = (Query)itQueryRel.next();
 					queryPIR = (Query)itQueryPIR.next();
-					qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
-					qPK += printMeasure(userRel.getId(), topicRel.getId(), queryRel.getId(), k, qPrecisionK);
-					qPrecisionKMean += qPrecisionK;
-				}
-				
-				measures.put("p"+k+"query", qPK);
-				tPrecisionK = qPrecisionKMean / topicRel.getQueries().size();				
-				tPK += printMeasure(userRel.getId(), topicRel.getId(), "", k, tPrecisionK);
-				tPrecisionKMean += tPrecisionK;		
-				qPrecisionKMean = 0.0;
+					k = ((QueryRelFile) queryRel).getNRelevantDoc();
+					for (; k != 0; k --) {
+						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
+						((QueryOutputPIR) queryPIR).addMeasure("Precision@"+k, qPrecisionK);
+					}
+					
+					
+				}	
 			}
-			
-			measures.put("p"+k+"topic", tPK);
-			uPrecisionK = tPrecisionKMean / userRel.getTopics().size();
-			uPK += printMeasure(userRel.getId(), "", "", k, uPrecisionK);
-			uPrecisionKMean += uPrecisionK;
-			tPrecisionKMean = 0.0;
 		}
 		
-		measures.put("p"+k+"user", uPK);
-		measures.put("TOT - Precision@" + k , "TOT - Precision@" + k + ": " + String.valueOf(uPrecisionKMean / relevanceDoc.size()));
-	}
-	
-	
-	/**
-	 * @param userID
-	 * @param topicId
-	 * @param queryId
-	 * @param k
-	 * @param measure
-	 * @return the text with the measure's info
-	 */
-	public String printMeasure(String userID, String topicId, String queryId, int k, Double measure) {
-		return "UserID: " + userID + (topicId.equalsIgnoreCase("") ? "" : " TopicID: " + topicId)
-				+ (queryId.equalsIgnoreCase("") ? "" : " QueryID: " + queryId) + " Precision@" + k + ": " + String.valueOf(measure) + "\n";  
-		
 	}
 	
 	
 	
-	/**
-	 * @return the measures
-	 */
-	public Map<String, String> getMeasures() {
-		return measures;
-	}
+//	/**
+//	 * @return the measures
+//	 */
+//	public Map<String, String> getMeasures() {
+//		return measures;
+//	}
+//
+//	@Override
+//	public String toString() {
+//		String stringMeasures = "";
+//		Iterator<?> it = measures.entrySet().iterator();
+//		while(it.hasNext()) {
+//			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
+//			stringMeasures += (String)pair.getValue() + "\n";
+//		}
+//		return "Measures: \n" + stringMeasures;
+//	}
+	
+//}
 
-	@Override
-	public String toString() {
-		String stringMeasures = "";
-		Iterator<?> it = measures.entrySet().iterator();
-		while(it.hasNext()) {
-			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
-			stringMeasures += (String)pair.getValue() + "\n";
-		}
-		return "Measures: \n" + stringMeasures;
+
+
+	/**
+	 * @return the relevanceDoc
+	 */
+	public ArrayList<User> getRelevanceDoc() {
+		return relevanceDoc;
 	}
-	
 }
 
 

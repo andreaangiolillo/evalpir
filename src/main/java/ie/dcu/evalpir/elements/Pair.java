@@ -1,14 +1,14 @@
 package ie.dcu.evalpir.elements;
 
-public class Pair implements Comparable<Pair>{
+public class Pair<K extends Comparable<K>,T extends Comparable<T>> implements Comparable<Pair<K,T>>{
 	
-	private int key;
-	private double value;
+	private K key;
+	private T value;
 	/**
 	 * @param key
 	 * @param value
 	 */
-	public Pair(int key, double value) {
+	public Pair(K key, T value) {
 		super();
 		this.key = key;
 		this.value = value;
@@ -16,20 +16,20 @@ public class Pair implements Comparable<Pair>{
 	/**
 	 * @return the key
 	 */
-	public int getKey() {
+	public K getKey() {
 		return key;
 	}
 	/**
 	 * @return the value
 	 */
-	public double getValue() {
+	public T getValue() {
 		return value;
 	}
-	public int compareTo(Pair o) {
+	public int compareTo(Pair<K,T> o) {
 		
-		if (this.key < o.getKey()) {
+		if (this.key.compareTo(o.getKey()) < 0) {
 		      return -1;
-		    } else if (this.key > o.getKey()) {
+		    } else if (this.key.compareTo(o.getKey()) > 0) {
 		      return 1;
 		    }
 		return -1;

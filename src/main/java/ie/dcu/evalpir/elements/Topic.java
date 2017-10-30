@@ -14,8 +14,6 @@ public class Topic {
 	private String id;
 	private ArrayList<Query> queries;
 	
-	
-	
 	/**
 	 * 
 	 */
@@ -33,10 +31,6 @@ public class Topic {
 		this.id = id;
 	}
 
-
-
-
-
 	/**
 	 * @param id
 	 * @param queries
@@ -46,9 +40,6 @@ public class Topic {
 		this.id = id;
 		this.queries = queries;
 	}
-	
-	
-	
 	
 	/**
 	 * @param queryId
@@ -62,13 +53,7 @@ public class Topic {
 		}
 		return null;
 	}
-	
-	
-	
-	
-	
-	
-
+		
 	/**
 	 * @return the id
 	 */
@@ -76,13 +61,13 @@ public class Topic {
 		return id;
 	}
 
-
 	/**
 	 * @return the queries
 	 */
 	public ArrayList<Query> getQueries() {
 		return queries;
 	}
+	
 	/**
 	 * @param queries the queries to set
 	 */

@@ -1,5 +1,6 @@
 package ie.dcu.evalpir;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,9 +9,11 @@ import java.util.stream.Collectors;
 
 import javax.swing.RowFilter.Entry;
 
+import ie.dcu.evalpir.chart.CreatorChart;
 import ie.dcu.evalpir.checking.CheckInput;
 import ie.dcu.evalpir.checking.CheckInputImpl;
 import ie.dcu.evalpir.elements.Document;
+import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.elements.User;
@@ -32,24 +35,105 @@ import me.tongfei.progressbar.ProgressBar;
  * @see https://github.com/ctongfei/progressbar
  */
 public class EvalEpir {
+	static final String RELEVANCE_FILE_PATH = "src/main/resources/qrels.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv";
+	
+	/**
+	 * It Creates the folder for the diagrams
+	 * @param nameFolder
+	 * @return
+	 */
+	 public static String createFolder(String nameFolder){
+	    	String path;
+			try {
+				path = new File(".").getCanonicalPath() + "/" + nameFolder;
+				System.out.println(path);
+				File dir = new File(path);
+		        dir.mkdir();
+				return (path);
+				
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			return "";
+	    	
+	 }
+	
     public static void main( String[] args ) {
     	
-    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
+    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
+    	File outputPIR = new File("src/main/resources/result.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv");
     	
-    	pb.stepBy(50);
-    	for (int i = 0; i<10000000 ; i ++) {
-    		
+    	InputReaderImpl reader = new InputReaderImpl();
+    	
+    	ArrayList<User>  qRel = reader.extractRelevanceFile(relevanceFile);
+    	ArrayList<PIR> pirs = reader.extractOutputPIR(outputPIR);
+    	
+    	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
+    	for (User s : qRel) {
+    		System.out.println(s.toString());
     	}
-    	pb.stepBy(50);
-    	pb.stop();
     	
+    	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
+    	
+    	for (PIR p : pirs) {
+    		System.out.println(p.toString());
+    	}
+    	
+    	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
+    	
+    	MeasureImpl m = new MeasureImpl(qRel);
+    	
+    	for (PIR p: pirs) {
+    		m.calculateMeasures(p.getUsers());
+    		System.out.println(p.toString());
+    	}
+    	
+
+		String path = createFolder("Charts");
+		CreatorChart.createChart(path, pirs);
+		
+    	
+    	
+    	
+//    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
+    	
+    	
+//    	for (int i = 1; i<=10; i++) {
+//    		pb.stepBy(10);
+//    		pb.maxHint(100);
+//    	}
+//    	pb.stop();
+//    	
+    	
+    	
+//        double x = 1.0;
+//        double y = x * x;
+//
+//        ArrayList<Integer> l = new ArrayList<Integer>();
+//
+//        System.out.println("\n\n\n\n\n");
+//
+//        for (int i = 0; i < 10000; i++) {
+//            int sum = 0;
+//            for (int j = 0; j < i * 2000; j++)
+//                sum += j;
+//            l.add(sum);
+//
+//            pb.step();
+//            if (pb.getCurrent() > 1) pb.maxHint(10000);
+//
+//        }
+//        pb.stop();
+//    	
 //    	InputCreator input = new InputCreatorImpl();
 //    	input.generateFilesInput(2, 2);
     	
       
 //    	InputReaderImpl reader = new InputReaderImpl();
 //    
-//		ArrayList<User>  qRel = reader.extract("src/main/resources/qrels.test.nUser.5.nTopic.6.Fri Sep 29 10:31:28 IST 2017.csv", true);
+//		ArrayList<User>  qRel = reader.extract(RELEVANCE_FILE_PATH, true);
 //    	ArrayList<User>  result = reader.extract("src/main/resources/result.test.nUser.5.nTopic.6.Fri Sep 29 10:31:28 IST 2017.csv", false);
 //    	
 //    	System.out.println(result.get(0).getTopics().get(1).getQueries().get(0).getDocs().size());
@@ -87,10 +171,5 @@ public class EvalEpir {
     	
     }
     
-    
-
-    
-   
-    
-    
+       
 }

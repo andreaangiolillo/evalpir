@@ -1,7 +1,10 @@
 package ie.dcu.evalpir.extractor;
 
 
+import java.io.File;
 import java.util.ArrayList;
+
+import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.User;
 
 public interface InputReader {
@@ -9,10 +12,18 @@ public interface InputReader {
 	/**
 	 * This method extract the data from the input CSV to create a data structure. 
 	 * @param csvFile
-	 * @param isRealFile -> true: the file to read is the qRels.test. false: the file to read is the result.test
-	 * @return map
+	 * @return Arraylist<User>
 	 * 
 	 */
-	public ArrayList<User> extract(String csvFile, boolean isRelevanceFile);
-
+	public ArrayList<User> extractRelevanceFile(File file);
+	
+	
+	/**
+	 * This method extract the data from the input CSV to create a data structure. 
+	 * @param csvFile
+	 * @return ArrayList<PIR>
+	 * 
+	 */
+	public ArrayList<PIR> extractOutputPIR(File file);
+	
 }

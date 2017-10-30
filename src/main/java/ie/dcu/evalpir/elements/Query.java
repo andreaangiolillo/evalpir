@@ -11,7 +11,7 @@ import java.util.Map;
  * */
 
 
-public class Query {
+public abstract class Query {
 	
 	private String id;
 	private Map<String,Document> docs;
@@ -105,25 +105,7 @@ public class Query {
 		this.docs = docs;
 	}
 
-	/**
-	 * This method return the number of relevant documents of this query. If the query contains DocumentOutputPIR object return 0.
-	 * @return nRelDoc
-	 * */
-	public int nRelevantDoc() {
-		int nRelDoc = 0;
-		Iterator<?> it = docs.entrySet().iterator();
-		boolean instance = true;
-		while(it.hasNext() && instance) {
-			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
-			if (!(pair.getValue() instanceof DocumentRelevanceFile)) {
-				instance = false;
-			}
-			nRelDoc += (instance && ((DocumentRelevanceFile)pair.getValue()).getIsRelevance()) ? 1 : 0;
-			
-		}
-		
-		return nRelDoc;
-	}
+
 
 	
 	
