@@ -1,16 +1,45 @@
 package ie.dcu.evalpir.chart;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryOutputPIR;
 import ie.dcu.evalpir.elements.Topic;
+import me.tongfei.progressbar.ProgressBar;
 
 
 public class CreatorChart {
 	
-	public static void createChart(final String path, final ArrayList<PIR> pirs) {
+
+	
+	/**
+	 * It Creates the folder for the diagrams
+	 * @param nameFolder
+	 * @return
+	 */
+	 public static String createFolder(String nameFolder){
+	    	String path;
+			try {
+				path = new File(".").getCanonicalPath() + "/" + nameFolder;
+				File dir = new File(path);
+		        dir.mkdir();
+				return (path);
+				
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			return "";
+	    	
+	 }
+	
+	public static void createChart(final ArrayList<PIR> pirs) {
+		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
+		String path = createFolder("Charts");
 		String[] namePirs = new String[pirs.size()];
 		String[] nameMeasures;
 		ArrayList<Topic> topics = new ArrayList<Topic>();
@@ -19,6 +48,7 @@ public class CreatorChart {
 		int numberUsers = pirs.get(0).getUsers().size();
 		int numberTopics; 
 		String userId, topicId;
+		pb.maxHint(numberUsers*5*20); // progressbar
 		for (int k = 0; k < numberPIRS; k++) {
 			namePirs[k] = pirs.get(k).getName();
 		}
@@ -32,19 +62,18 @@ public class CreatorChart {
 				for (PIR p : pirs) {
 					topics.add(p.getUsers().get(i).getTopics().get(j));
 				}
-				
 				for (String measure : nameMeasures) {
 					chart = new LineChart(path + "/userId:" + userId + "_Topic:" + topicId , namePirs, topics, userId, measure);
+					pb.step();// progressbar
 				}
 				
 				topics = new ArrayList<Topic>();
 			}
 		}
-		
-		
+		pb.stepTo(numberUsers*5*20);// progressbar
+		pb.stop();// progressbar
 	}
 	
-		
 	/**
 	 * We calculated the k (for the metric precision@k, etc..) dynamically, consequently we have a 
 	 * different number of measures for each query performed in a topic. As result of this we need to know the max number of measures 

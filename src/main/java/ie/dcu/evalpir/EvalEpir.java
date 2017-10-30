@@ -37,29 +37,6 @@ import me.tongfei.progressbar.ProgressBar;
 public class EvalEpir {
 	static final String RELEVANCE_FILE_PATH = "src/main/resources/qrels.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv";
 	
-	/**
-	 * It Creates the folder for the diagrams
-	 * @param nameFolder
-	 * @return
-	 */
-	 public static String createFolder(String nameFolder){
-	    	String path;
-			try {
-				path = new File(".").getCanonicalPath() + "/" + nameFolder;
-				System.out.println(path);
-				File dir = new File(path);
-		        dir.mkdir();
-				return (path);
-				
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			return "";
-	    	
-	 }
-	
     public static void main( String[] args ) {
     	
     	File relevanceFile = new File(RELEVANCE_FILE_PATH);
@@ -86,13 +63,12 @@ public class EvalEpir {
     	MeasureImpl m = new MeasureImpl(qRel);
     	
     	for (PIR p: pirs) {
-    		m.calculateMeasures(p.getUsers());
+    		m.calculateMeasures(p.getName(), p.getUsers());
     		System.out.println(p.toString());
     	}
     	
 
-		String path = createFolder("Charts");
-		CreatorChart.createChart(path, pirs);
+		CreatorChart.createChart(pirs);
 		
     	
     	

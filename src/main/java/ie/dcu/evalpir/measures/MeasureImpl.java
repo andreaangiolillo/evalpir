@@ -16,6 +16,7 @@ import ie.dcu.evalpir.elements.QueryOutputPIR;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.elements.User;
+import me.tongfei.progressbar.ProgressBar;
 
 /**
  * @author Andrea Angiolillo
@@ -329,8 +330,10 @@ public class MeasureImpl{
 	
 	
 	
-	public void calculateMeasures(ArrayList<User> outputPIR) {
+	public void calculateMeasures(String pirName, ArrayList<User> outputPIR) {
 		
+		ProgressBar pb = new ProgressBar("Measures Calculation for " + pirName, 100).start(); // progressbar
+		pb.maxHint(outputPIR.size()*5*20); // progressbar
 		Iterator<?> itUserRel, itUserPIR, itTopicRel, itTopicPIR, itQueryRel, itQueryPIR;
 		User userRel, userPIR;
 		Topic topicRel, topicPIR;
@@ -338,6 +341,11 @@ public class MeasureImpl{
 		
 		/*Measures variables*/
 		Double qPrecisionK = 0.0;
+		Double qRecallK = 0.0;
+		Double qNDCG = 0.0;
+		Double precision = 0.0;
+		Double recall = 0.0;
+		Double fMeasure = 0.0;
 		int k = 0;
 		
 		itUserRel = getRelevanceDoc().iterator();
@@ -358,13 +366,26 @@ public class MeasureImpl{
 					k = ((QueryRelFile) queryRel).getNRelevantDoc();
 					for (; k != 0; k --) {
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
+						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
+						qNDCG = calculateNDCG(queryRel, queryPIR, 10);
+						precision = precision(queryRel, queryPIR);
+						recall = recall(queryRel, queryPIR);
+						fMeasure = fMeasure(precision, recall, 0.5);
+						
 						((QueryOutputPIR) queryPIR).addMeasure("Precision@"+k, qPrecisionK);
+						((QueryOutputPIR) queryPIR).addMeasure("Recall@"+k, qRecallK);
+						((QueryOutputPIR) queryPIR).addMeasure("NDCG@"+10, qNDCG);
+						((QueryOutputPIR) queryPIR).addMeasure("precision", precision);
+						((QueryOutputPIR) queryPIR).addMeasure("recall", recall);
+						((QueryOutputPIR) queryPIR).addMeasure("fMeasure0.5", fMeasure);
+						
+						pb.step();// progressbar
 					}
-					
-					
 				}	
 			}
 		}
+		pb.stepTo(outputPIR.size()*5*20);// progressbar
+		pb.stop();//progressbar
 		
 	}
 	
