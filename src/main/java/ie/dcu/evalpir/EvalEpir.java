@@ -15,6 +15,8 @@ import ie.dcu.evalpir.checking.CheckInputImpl;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
+import ie.dcu.evalpir.elements.QueryOutputPIR;
+import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.elements.User;
 import ie.dcu.evalpir.exceptions.InvalidInputException;
@@ -32,10 +34,29 @@ import me.tongfei.progressbar.ProgressBar;
  * @
  * EvalEpir allows the evaluation of personalized information retrieval
  * 
- * @see https://github.com/ctongfei/progressbar
+ * 
  */
 public class EvalEpir {
 	static final String RELEVANCE_FILE_PATH = "src/main/resources/qrels.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv";
+	
+//	public static void printOutput(ArrayList<PIR> pirs){
+//		int nUser = pirs.get(0).getUsers().size();
+//		int nTopic = 0;
+//		int nQuery = 0;
+//		int nMeasures = 0;
+//		for (int user = 0; user < nUser; user++) {
+//			nTopic = pirs.get(0).getUsers().get(user).getTopics().size();
+//			for (int topic = 0; topic < nTopic; topic ++) {
+//				nQuery = pirs.get(0).getUsers().get(user).getTopics().get(topic).getQueries().size();
+//				for (int query = 0; query < nQuery; query ++){
+//					nMeasures = ((QueryOutputPIR)(pirs.get(0).getUsers().get(user).getTopics().get(topic).getQueries().get(query))).getMeasures().size();
+//					
+//				}
+//			}
+//		}
+//		
+//	}
+	
 	
     public static void main( String[] args ) {
     	
@@ -44,11 +65,11 @@ public class EvalEpir {
     	
     	InputReaderImpl reader = new InputReaderImpl();
     	
-    	ArrayList<User>  qRel = reader.extractRelevanceFile(relevanceFile);
+    	ArrayList<Query>  qRel = reader.extractRelevanceFile(relevanceFile);
     	ArrayList<PIR> pirs = reader.extractOutputPIR(outputPIR);
     	
     	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
-    	for (User s : qRel) {
+    	for (Query s : qRel) {
     		System.out.println(s.toString());
     	}
     	
@@ -62,15 +83,16 @@ public class EvalEpir {
     	
     	MeasureImpl m = new MeasureImpl(qRel);
     	
-    	for (PIR p: pirs) {
-    		m.calculateMeasures(p.getName(), p.getUsers());
-    		System.out.println(p.toString());
+    	m.calculateMeasures(pirs);
+    	
+    	for(Query q : qRel) {
+    		System.out.print(((QueryRelFile)q).toString());
     	}
-    	
-
-		CreatorChart.createChart(pirs);
-		
-    	
+//    	
+//
+//		CreatorChart.createChart(pirs);
+//		
+//    	
     	
     	
 //    	ProgressBar pb = new ProgressBar("Test", 100).start(); 

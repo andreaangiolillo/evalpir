@@ -1,37 +1,72 @@
 package ie.dcu.evalpir.elements;
 
+
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	
+	private Map<String, Measure> measures;
 	
+	/***
+	 * 
+	 */
+	public QueryRelFile(String user, String topic, String id) {
+		super(user, topic, id);
+		this.measures = new HashMap<String, Measure>();
+	}
+
+	/***
+	 * 
+	 */
+	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs) {
+		super(user, topic, id, docs);
+		this.measures = new HashMap<String, Measure>();
+	}
+
+
+	/**
+	 * @param measures
+	 */
+	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs, HashMap<String, Measure> measures) {
+		super(user, topic, id, docs);
+		this.measures = measures;
+	}
 	
+	/**
+	 * 
+	 * @param m
+	 */
+	public void addMeasure(Measure m) {
+		getMeasures().put(m.getName().trim().toLowerCase(), m);
+	}
 	
 	/**
 	 * 
 	 */
-	public QueryRelFile() {
-		super();
-		// TODO Auto-generated constructor stub
+	public void removeMeasure(String name) {
+		getMeasures().remove(name.trim().toLowerCase());
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public Measure searchMeasure(String name) {
+		return getMeasures().get(name.trim().toLowerCase());
 	}
 
-	/**
-	 * @param id
-	 * @param docs
-	 */
-	public QueryRelFile(String id, Map<String, Document> docs) {
-		super(id, docs);
-		// TODO Auto-generated constructor stub
-	}
+	
 
 	/**
-	 * @param id
+	 * @return the measures
 	 */
-	public QueryRelFile(String id) {
-		super(id);
-		// TODO Auto-generated constructor stub
+	public Map<String, Measure> getMeasures() {
+		return measures;
 	}
+
 
 	/**
 	 * This method return the number of relevant documents of this query. If the query contains DocumentOutputPIR object return 0.
@@ -51,6 +86,23 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		}
 		
 		return nRelDoc;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		String output = super.toString();
+		String stringDoc = "";
+		Iterator<?> it = getMeasures().entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
+			stringDoc += ((Measure)pair.getValue()).toString() + "\n";
+		}
+		
+		return output + "\n" + stringDoc;
 	}
 	
 

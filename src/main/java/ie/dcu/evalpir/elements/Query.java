@@ -11,8 +11,10 @@ import java.util.Map;
  * */
 
 
-public abstract class Query {
+public class Query {
 	
+	private String user;
+	private String topic;
 	private String id;
 	private Map<String,Document> docs;
 	
@@ -23,17 +25,19 @@ public abstract class Query {
 	public Query() {
 		super();
 		id = "None";
+		this.topic = "None";
+		this.user = "None";
 	}
-
-
 
 	/**
 	 * @param id
 	 * @param docs
 	 */
-	public Query(String id, Map<String, Document> docs) {
+	public Query(String user, String topic, String id, Map<String, Document> docs) {
 		super();
 		this.id = id;
+		this.topic = topic;
+		this.user = user;
 		this.docs = docs;
 	}
 	
@@ -42,19 +46,14 @@ public abstract class Query {
 	/**
 	 * @param id
 	 */
-	public Query(String id) {
+	public Query(String user, String topic, String id) {
 		super();
 		this.id = id;
+		this.topic = topic;
+		this.user = user;
 		this.docs = new HashMap<String, Document>();
 				
-	}
-
-	
-
-	
-	
-	
-	
+	}	
 	
 	/**
 	 * @param docId
@@ -107,6 +106,50 @@ public abstract class Query {
 
 
 
+
+	/**
+	 * @return the user
+	 */
+	public String getUser() {
+		return user;
+	}
+
+
+
+	/**
+	 * @param user the user to set
+	 */
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+
+
+	/**
+	 * @return the topic
+	 */
+	public String getTopic() {
+		return topic;
+	}
+
+
+
+	/**
+	 * @param topic the topic to set
+	 */
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	
 	
 	
@@ -121,8 +164,8 @@ public abstract class Query {
 			stringDoc += ((Document)pair.getValue()).toString() + "\n";
 		}
 		stringDoc += "] \nNumber of documents: " + docs.size() + " ]";
-		return "\nQuery [id=" + id + ", docs=\n" + stringDoc;
-	}
+		return "\nUser = " + user + " Topic = " + topic + " Query [id = " + id + ", docs =\n" + stringDoc ;
+	} 
 	
 	
 	

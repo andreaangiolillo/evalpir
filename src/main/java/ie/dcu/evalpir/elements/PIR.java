@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class PIR {
 
 	
-	ArrayList<User> users;
+	ArrayList<Query> queries;
 	String name;
 	
 	/**
@@ -20,7 +20,7 @@ public class PIR {
 	 */
 	public PIR(String name) {
 		super();
-		this.users = new ArrayList<User>();
+		this.queries = new ArrayList<Query>();
 		this.name = name;
 	}
 	
@@ -29,17 +29,26 @@ public class PIR {
 	 * @param users
 	 * @param name
 	 */
-	public PIR(String name, ArrayList<User> users) {
+	public PIR(String name, ArrayList<Query> queries) {
 		super();
-		this.users = users;
+		this.queries = queries;
 		this.name = name;
 	}
 	
 	/**
 	 * @return the users
 	 */
-	public ArrayList<User> getUsers() {
-		return users;
+	public ArrayList<Query> getQueries() {
+		return queries;
+	}
+	
+	/**
+	 * 
+	 * @param i
+	 * @return
+	 */
+	public Query getQuery(int i) {
+		return getQueries().get(i);
 	}
 	
 	/**
@@ -52,11 +61,11 @@ public class PIR {
 	@Override
 	public String toString() {
 		String stringDoc = "";
-		for (User s : users) {
+		for (Query s : queries) {
 			stringDoc += s.toString();
 		}
-		stringDoc += "\nNumber of users: " + users.size() + " ]";
-		return "PIR [id=" + getName()  + ", users=" + stringDoc;
+		stringDoc += "\nNumber of queries: " + queries.size() + " ]";
+		return "PIR [id=" + getName()  + ", queries=" + stringDoc;
 	}
 	
 	

@@ -37,42 +37,46 @@ public class CreatorChart {
 	    	
 	 }
 	
-	public static void createChart(final ArrayList<PIR> pirs) {
-		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
-		String path = createFolder("Charts");
-		String[] namePirs = new String[pirs.size()];
-		String[] nameMeasures;
-		ArrayList<Topic> topics = new ArrayList<Topic>();
-		LineChart chart;
-		int numberPIRS = pirs.size();
-		int numberUsers = pirs.get(0).getUsers().size();
-		int numberTopics; 
-		String userId, topicId;
-		pb.maxHint(numberUsers*5*20); // progressbar
-		for (int k = 0; k < numberPIRS; k++) {
-			namePirs[k] = pirs.get(k).getName();
-		}
-		
-		for (int i = 0; i < numberUsers ; i++) {
-			numberTopics = pirs.get(0).getUsers().get(0).getTopics().size();
-			for(int j = 0; j < numberTopics; j++) {
-				nameMeasures = getNameMeasures(pirs.get(0).getUsers().get(i).getTopics().get(j));
-				userId = pirs.get(0).getUsers().get(i).getId();
-				topicId = pirs.get(0).getUsers().get(i).getTopics().get(j).getId();
-				for (PIR p : pirs) {
-					topics.add(p.getUsers().get(i).getTopics().get(j));
-				}
-				for (String measure : nameMeasures) {
-					chart = new LineChart(path + "/userId:" + userId + "_Topic:" + topicId , namePirs, topics, userId, measure);
-					pb.step();// progressbar
-				}
-				
-				topics = new ArrayList<Topic>();
-			}
-		}
-		pb.stepTo(numberUsers*5*20);// progressbar
-		pb.stop();// progressbar
-	}
+	 /***
+	  * 
+	  * @param pirs
+	  */
+//	public static void createChart(final ArrayList<PIR> pirs) {
+//		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
+//		String path = createFolder("Charts");
+//		String[] namePirs = new String[pirs.size()];
+//		String[] nameMeasures;
+//		ArrayList<Topic> topics = new ArrayList<Topic>();
+//		LineChart chart;
+//		int numberPIRS = pirs.size();
+//		int numberUsers = pirs.get(0).getUsers().size();
+//		int numberTopics; 
+//		String userId, topicId;
+//		pb.maxHint(numberUsers*5*20); // progressbar
+//		for (int k = 0; k < numberPIRS; k++) {
+//			namePirs[k] = pirs.get(k).getName();
+//		}
+//		
+//		for (int i = 0; i < numberUsers ; i++) {
+//			numberTopics = pirs.get(0).getUsers().get(0).getTopics().size();
+//			for(int j = 0; j < numberTopics; j++) {
+//				nameMeasures = getNameMeasures(pirs.get(0).getUsers().get(i).getTopics().get(j));
+//				userId = pirs.get(0).getUsers().get(i).getId();
+//				topicId = pirs.get(0).getUsers().get(i).getTopics().get(j).getId();
+//				for (PIR p : pirs) {
+//					topics.add(p.getUsers().get(i).getTopics().get(j));
+//				}
+//				for (String measure : nameMeasures) {
+//					chart = new LineChart(path + "/userId:" + userId + "_Topic:" + topicId , namePirs, topics, userId, measure);
+//					pb.step();// progressbar
+//				}
+//				
+//				topics = new ArrayList<Topic>();
+//			}
+//		}
+//		pb.stepTo(numberUsers*5*20);// progressbar
+//		pb.stop();// progressbar
+//	}
 	
 	/**
 	 * We calculated the k (for the metric precision@k, etc..) dynamically, consequently we have a 
@@ -80,6 +84,7 @@ public class CreatorChart {
 	 * calculated for a query in the topic to create the chart.
 	 * This method returns the name of the measures of the query with the max number of measures calculated in the topic.
 	 * 
+	 * @input  Topic
 	 * @return nameMeasures
 	 *
 	 * **/	

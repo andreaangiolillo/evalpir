@@ -7,32 +7,18 @@ public class QueryOutputPIR extends Query {
 	
 	ArrayList<Pair<String, Double>> measures;
 
+	
 	/**
 	 * 
 	 */
 	public QueryOutputPIR() {
 		super();
-		measures = new ArrayList<Pair<String, Double>>();
+		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @param id
-	 * @param docs
-	 */
-	public QueryOutputPIR(String id, Map<String, Document> docs) {
-		super(id, docs);
-		measures = new ArrayList<Pair<String, Double>>();
-	}
 
-	/**
-	 * @param id
-	 */
-	public QueryOutputPIR(String id) {
-		super(id);
-		measures = new ArrayList<Pair<String, Double>>();
-		
-	}
-	
+
+
 	public void  addMeasure(String key, Double value) {
 		measures.add(new Pair(key, value));
 	}

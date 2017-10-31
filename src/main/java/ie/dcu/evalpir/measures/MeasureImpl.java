@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
+import ie.dcu.evalpir.elements.Measure;
+import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryOutputPIR;
@@ -26,7 +28,7 @@ import me.tongfei.progressbar.ProgressBar;
 public class MeasureImpl{
 
 	//private Map<String, String> measures;
-	private ArrayList<User> relevanceDoc;
+	private ArrayList<Query> relevanceFile;
 	
 	
 	
@@ -34,9 +36,9 @@ public class MeasureImpl{
 	 * Constructor
 	 * @param 
 	 */
-	public MeasureImpl(ArrayList<User> relevanceDoc) {
+	public MeasureImpl(ArrayList<Query> relevanceFile) {
 		//this.measures = new LinkedHashMap<String,String>();
-		this.relevanceDoc = relevanceDoc;
+		this.relevanceFile = relevanceFile;
 	}
 	
 	
@@ -329,16 +331,27 @@ public class MeasureImpl{
 	
 	
 	
+	public QueryRelFile createMeasure(QueryRelFile q) {
+		int k = q.getNRelevantDoc();
+		for (; k != 0; k --) {
+			q.addMeasure(new Measure("Precision@"+k));
+			q.addMeasure(new Measure("Recall@"+k));
+		}
+		
+		q.addMeasure(new Measure("Precision"));
+		q.addMeasure(new Measure("Recall"));
+		q.addMeasure(new Measure("fMeasure0.5"));
+		q.addMeasure(new Measure("NDCG@10"));
+		
+		return q;
+	}
 	
-	public void calculateMeasures(String pirName, ArrayList<User> outputPIR) {
+	public void calculateMeasures(ArrayList<PIR> pirs) {
 		
-		ProgressBar pb = new ProgressBar("Measures Calculation for " + pirName, 100).start(); // progressbar
-		pb.maxHint(outputPIR.size()*5*20); // progressbar
-		Iterator<?> itUserRel, itUserPIR, itTopicRel, itTopicPIR, itQueryRel, itQueryPIR;
-		User userRel, userPIR;
-		Topic topicRel, topicPIR;
-		Query queryRel, queryPIR;
-		
+		ProgressBar pb = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
+		pb.maxHint(pirs.size()* pirs.get(0).getQueries().size()); // progressbar
+		Query queryPIR;
+		QueryRelFile queryRel;
 		/*Measures variables*/
 		Double qPrecisionK = 0.0;
 		Double qRecallK = 0.0;
@@ -347,46 +360,37 @@ public class MeasureImpl{
 		Double recall = 0.0;
 		Double fMeasure = 0.0;
 		int k = 0;
-		
-		itUserRel = getRelevanceDoc().iterator();
-		itUserPIR = outputPIR.iterator();
-		while(itUserRel.hasNext() && itUserPIR.hasNext()) { // per-user
-			userRel = (User) itUserRel.next();
-			userPIR = (User) itUserPIR.next();
-			itTopicRel = userRel.getTopics().iterator();
-			itTopicPIR = userPIR.getTopics().iterator();
-			while(itTopicRel.hasNext() && itTopicPIR.hasNext()) { // per-topic
-				topicRel = 	(Topic) itTopicRel.next();
-				topicPIR = 	(Topic) itTopicPIR.next();
-				itQueryRel = topicRel.getQueries().iterator();
-				itQueryPIR = topicPIR.getQueries().iterator();
-				while(itQueryRel.hasNext() && itQueryPIR.hasNext()) { // per-query
-					queryRel = (Query)itQueryRel.next();
-					queryPIR = (Query)itQueryPIR.next();
-					k = ((QueryRelFile) queryRel).getNRelevantDoc();
-					for (; k != 0; k --) {
-						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
-						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
-						qNDCG = calculateNDCG(queryRel, queryPIR, 10);
-						precision = precision(queryRel, queryPIR);
-						recall = recall(queryRel, queryPIR);
-						fMeasure = fMeasure(precision, recall, 0.5);
-						
-						((QueryOutputPIR) queryPIR).addMeasure("Precision@"+k, qPrecisionK);
-						((QueryOutputPIR) queryPIR).addMeasure("Recall@"+k, qRecallK);
-						((QueryOutputPIR) queryPIR).addMeasure("NDCG@"+10, qNDCG);
-						((QueryOutputPIR) queryPIR).addMeasure("precision", precision);
-						((QueryOutputPIR) queryPIR).addMeasure("recall", recall);
-						((QueryOutputPIR) queryPIR).addMeasure("fMeasure0.5", fMeasure);
-						
-						pb.step();// progressbar
-					}
-				}	
+		int nQuery = getRelevanceFile().size();
+		for (int i = 0; i< nQuery; i ++) {
+			queryRel =(QueryRelFile) getRelevanceFile().get(i);
+			queryRel = createMeasure(queryRel);
+			for(PIR pir : pirs) {
+				pb.step();
+				queryPIR = pir.getQuery(i);
+				k =  queryRel.getNRelevantDoc();
+				for (; k != 0; k --) {
+					qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
+					qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
+					
+					queryRel.searchMeasure("Precision@"+k).addPIR(pir.getName(), qPrecisionK);
+					queryRel.searchMeasure("Recall@"+k).addPIR(pir.getName(), qRecallK);
+					
+				}
+				
+				qNDCG = calculateNDCG(queryRel, queryPIR, 10);
+				precision = precision(queryRel, queryPIR);
+				recall = recall(queryRel, queryPIR);
+				fMeasure = fMeasure(precision, recall, 0.5);
+					
+				queryRel.searchMeasure("NDCG@10").addPIR(pir.getName(), qNDCG);
+				queryRel.searchMeasure("Precision").addPIR(pir.getName(), precision);
+				queryRel.searchMeasure("Recall").addPIR(pir.getName(), recall);
+				queryRel.searchMeasure("fMeasure0.5").addPIR(pir.getName(), fMeasure);
+				
 			}
-		}
-		pb.stepTo(outputPIR.size()*5*20);// progressbar
-		pb.stop();//progressbar
-		
+			pb.stepTo(pirs.size()* pirs.get(0).getQueries().size());// progressbar
+			pb.stop();//progressbar
+		}	
 	}
 	
 	
@@ -416,8 +420,8 @@ public class MeasureImpl{
 	/**
 	 * @return the relevanceDoc
 	 */
-	public ArrayList<User> getRelevanceDoc() {
-		return relevanceDoc;
+	public ArrayList<Query> getRelevanceFile() {
+		return relevanceFile;
 	}
 }
 
