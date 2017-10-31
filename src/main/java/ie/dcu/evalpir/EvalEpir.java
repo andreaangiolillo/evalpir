@@ -86,7 +86,7 @@ public class EvalEpir {
     	m.calculateMeasures(pirs);
     	
     	for(Query q : qRel) {
-    		System.out.print(((QueryRelFile)q).toString());
+    		System.out.print(((QueryRelFile)q).printMeasures());
     	}
 //    	
 //

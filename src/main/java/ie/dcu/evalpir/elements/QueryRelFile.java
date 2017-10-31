@@ -88,21 +88,20 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		return nRelDoc;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * 
+	 * @return
 	 */
-	@Override
-	public String toString() {
-		String output = super.toString();
+	public String printMeasures() {
 		String stringDoc = "";
 		Iterator<?> it = getMeasures().entrySet().iterator();
 		
 		while(it.hasNext()) {
 			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
-			stringDoc += ((Measure)pair.getValue()).toString() + "\n";
+			stringDoc += ((Measure)pair.getValue()).printMeasure(getUser(), getTopic()) + "\n";
 		}
 		
-		return output + "\n" + stringDoc;
+		return stringDoc;
 	}
 	
 

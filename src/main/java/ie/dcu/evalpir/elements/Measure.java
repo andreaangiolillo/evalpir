@@ -81,15 +81,14 @@ public class Measure {
 	
 	
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * 
 	 */
-	@Override
-	public String toString() {
+	public String printMeasure(String user, String topic) {
 		sort();
 		AsciiTable at = new AsciiTable();
 		at.addRule();
-		at.addRow(getName(),"","","");
+		at.addRow(getName(),"User: " + user,"Topic: " + topic,"");
 		at.addRule();
 		at.addRow("System", "Value", "---", "---");
 		at.addRule();
