@@ -17,12 +17,10 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.Query;
-import ie.dcu.evalpir.elements.QueryOutputPIR;
 import ie.dcu.evalpir.elements.QueryRelFile;
-import ie.dcu.evalpir.elements.Topic;
+
 
 public class LineChart{
 	

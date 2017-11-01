@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -14,10 +13,7 @@ import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
-import ie.dcu.evalpir.elements.QueryOutputPIR;
 import ie.dcu.evalpir.elements.QueryRelFile;
-import ie.dcu.evalpir.elements.Topic;
-import ie.dcu.evalpir.elements.User;
 import me.tongfei.progressbar.ProgressBar;
 
 /**

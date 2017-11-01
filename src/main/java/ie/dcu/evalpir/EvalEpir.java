@@ -1,32 +1,14 @@
 package ie.dcu.evalpir;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.swing.RowFilter.Entry;
 
 import ie.dcu.evalpir.chart.CreatorChart;
-import ie.dcu.evalpir.checking.CheckInput;
-import ie.dcu.evalpir.checking.CheckInputImpl;
-import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
-import ie.dcu.evalpir.elements.QueryOutputPIR;
 import ie.dcu.evalpir.elements.QueryRelFile;
-import ie.dcu.evalpir.elements.Topic;
-import ie.dcu.evalpir.elements.User;
-import ie.dcu.evalpir.exceptions.InvalidInputException;
-import ie.dcu.evalpir.extractor.InputReader;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
-import ie.dcu.evalpir.input.InputCreator;
-import ie.dcu.evalpir.input.InputCreatorImpl;
-import ie.dcu.evalpir.measures.Measure;
 import ie.dcu.evalpir.measures.MeasureImpl;
-import me.tongfei.progressbar.ProgressBar;
 
 /**
  * @author Andrea Angiolillo

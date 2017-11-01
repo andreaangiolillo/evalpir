@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 
 import ie.dcu.evalpir.elements.Query;
-import ie.dcu.evalpir.elements.User;
+
 
 public interface Measure {
 	
@@ -18,7 +18,7 @@ public interface Measure {
 	 * @param k
 	 * @Complexity !CRITICAL! O(nUser * nTopic * nQuery * measures) 
 	 */
-	public void meanAverageMeasure(ArrayList<User> relevanceDoc, ArrayList<User> outputPIR, int k);
+	//public void meanAverageMeasure(ArrayList<Query> relevanceDoc, ArrayList<User> outputPIR, int k);
 		
 	
 	

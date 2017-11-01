@@ -3,9 +3,9 @@ package ie.dcu.evalpir.extractor;
 
 import java.io.File;
 import java.util.ArrayList;
-
 import ie.dcu.evalpir.elements.PIR;
-import ie.dcu.evalpir.elements.User;
+import ie.dcu.evalpir.elements.Query;
+
 
 public interface InputReader {
 	
@@ -15,7 +15,7 @@ public interface InputReader {
 	 * @return Arraylist<User>
 	 * 
 	 */
-	public ArrayList<User> extractRelevanceFile(File file);
+	public ArrayList<Query> extractRelevanceFile(File file);
 	
 	
 	/**

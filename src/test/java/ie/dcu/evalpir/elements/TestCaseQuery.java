@@ -15,7 +15,7 @@ public class TestCaseQuery {
 	static final String RELEVANCE_FILE_PATH =  "src/main/resources/qrels.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv";
 	
 	
-	private ArrayList<User>  rel; 
+	private ArrayList<Query>  rel; 
 	private ArrayList<PIR>  result;
 	
 	/**
@@ -34,7 +34,7 @@ public class TestCaseQuery {
 
 	@Test
 	public void testFindDoc() {
-		QueryRelFile qRel = (QueryRelFile) rel.get(0).getTopics().get(0).getQueries().get(0);
+		QueryRelFile qRel = (QueryRelFile) rel.get(0);
 		assertTrue(qRel.findDoc("clueweb12-0100tw-1").getId().equalsIgnoreCase("clueweb12-0100tw-1"));
 	}
 
@@ -42,14 +42,15 @@ public class TestCaseQuery {
 	public void testNRelevantDoc() {
 		int relevantDOC; 
 		
-		relevantDOC = ((QueryRelFile)rel.get(0).getTopics().get(0).getQueries().get(0)).getNRelevantDoc();
+		relevantDOC = ((QueryRelFile)rel.get(0)).getNRelevantDoc();
 		assertTrue(relevantDOC == 1);
 		
-		relevantDOC = ((QueryRelFile) rel.get(0).getTopics().get(0).getQueries().get(1)).getNRelevantDoc();
+		relevantDOC = ((QueryRelFile) rel.get(1)).getNRelevantDoc();
 		assertTrue(relevantDOC == 1);
 		
-		relevantDOC = ((QueryRelFile) rel.get(0).getTopics().get(1).getQueries().get(1)).getNRelevantDoc();
-		assertTrue(relevantDOC == 5);	
+		relevantDOC = ((QueryRelFile) rel.get(2)).getNRelevantDoc();
+
+		assertTrue(relevantDOC == 1);	
 		
 	}
 

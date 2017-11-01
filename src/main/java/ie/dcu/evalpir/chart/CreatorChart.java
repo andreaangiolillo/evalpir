@@ -4,17 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
 import ie.dcu.evalpir.elements.Measure;
-import ie.dcu.evalpir.elements.PIR;
-import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
-import ie.dcu.evalpir.elements.QueryOutputPIR;
 import ie.dcu.evalpir.elements.QueryRelFile;
-import ie.dcu.evalpir.elements.Topic;
 import me.tongfei.progressbar.ProgressBar;
 
 
