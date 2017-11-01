@@ -84,11 +84,11 @@ public class Measure {
 	/**
 	 * 
 	 */
-	public String printMeasure(String user, String topic) {
+	public String printMeasure(String user, String topic, String query) {
 		sort();
 		AsciiTable at = new AsciiTable();
 		at.addRule();
-		at.addRow(getName(),"User: " + user,"Topic: " + topic,"");
+		at.addRow(getName(),"User: " + user,"Topic: " + topic,"Query: " + query );
 		at.addRule();
 		at.addRow("System", "Value", "---", "---");
 		at.addRule();

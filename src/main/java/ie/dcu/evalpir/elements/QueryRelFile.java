@@ -98,7 +98,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		
 		while(it.hasNext()) {
 			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
-			stringDoc += ((Measure)pair.getValue()).printMeasure(getUser(), getTopic()) + "\n";
+			stringDoc += ((Measure)pair.getValue()).printMeasure(getUser(), getTopic(), getId()) + "\n";
 		}
 		
 		return stringDoc;

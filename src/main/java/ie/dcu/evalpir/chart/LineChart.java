@@ -17,29 +17,33 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
+import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryOutputPIR;
+import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Topic;
 
 public class LineChart{
 	
-	private String path;
-	
-	public LineChart(String path, String[] namePirs, ArrayList<Topic> topics, String user, String measure) {
-		this.path = path;
-		initUI(namePirs, topics, user, measure);
+	public static void CreateLineChart(String path, ArrayList<Query> topic, Measure m) {
+		initUI(path, topic, m);
 	}
 	
-	private void initUI(String[] namePirs, ArrayList<Topic> topics, String user, String measure) {
+	private static void initUI(String path, ArrayList<Query> topic, Measure m) {
 	
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
 		theme.setPlotBackgroundPaint(Color.WHITE);
 		ChartFactory.setChartTheme(theme);
-		XYSeriesCollection dataset = createDataset(namePirs, topics, measure);
-		JFreeChart chart = createChart(dataset, user, topics.get(0).getId(), measure);
+		XYSeriesCollection dataset = createDataset(topic, m);
+		String user = topic.get(0).getUser();
+		String nameTopic = topic.get(0).getTopic();
+		JFreeChart chart = createChart(dataset, user, nameTopic, m.getName());
 		chart.setBackgroundPaint(Color.WHITE);
+		
+		System.out.println("MEASURE NAME: " + m.getName());
         try {
-			ChartUtilities.saveChartAsPNG(new File(getPath() + "_" + measure +"_line_chart.png"), chart, 750, 500);
+			ChartUtilities.saveChartAsPNG(new File(path + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -47,21 +51,26 @@ public class LineChart{
 		
 	}
 	
-	private XYSeriesCollection createDataset(String[] namePirs, ArrayList<Topic> topics, String measure) {
-		XYSeries[] series = new XYSeries[topics.size()];
-		ArrayList<Query> queries;
-		//final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		for (int i = 0; i < topics.size(); i++) {
-			//System.out.println("Nunmber topic: " + topics.size() + " number of pirs name: " + namePirs.length);
-			series[i] = new XYSeries(namePirs[i]);
-			queries = topics.get(i).getQueries();
-			
-			for (int j = 0; j < queries.size(); j++) {
-//				System.out.println("Number queries: " + topics.get(i).getQueries().size());
-//				System.out.println("j: " + j + " y: " + (Double) ((QueryOutputPIR)queries.get(j)).getMeasure(measure));
-				//dataset.addValue((Double) ((QueryOutputPIR)queries.get(j)).getMeasure(measure), namePirs[i], Integer.toString(j));
+	private static XYSeriesCollection createDataset(ArrayList<Query> topic, Measure m) {
+		int nQuery = topic.size();
+		int nPIR = m.getPIRvalue().size();
+		XYSeries[] series = new XYSeries[nPIR];
+		Measure measure;
+		Double value = 0.0;
+		for (int i = 0; i < nQuery; i++) {			
+			for (int j = 0; j < nPIR; j++) { 
+				if(i == 0) {
+					series[j] = new XYSeries(m.getPIR(j).getKey());
+				}
 				
-				series[i].add(j, (Double) ((QueryOutputPIR)queries.get(j)).getMeasure(measure));
+				measure = ((QueryRelFile)topic.get(i)).searchMeasure(m.getName());
+				if(measure != null) {
+					value = (Double)measure.getPIR(j).getValue();
+					
+				}
+				System.out.println("Number of PIR: " + nPIR +"\n j: " + j);
+				series[j].add(i, value);
+				value = 0.0;
 			}
 		}
 		
@@ -75,7 +84,7 @@ public class LineChart{
 		
 	}
 	
-	 private JFreeChart createChart(final XYSeriesCollection dataset, final String user, final String topic, final String measure) {
+	 private static JFreeChart createChart(final XYSeriesCollection dataset, final String user, final String topic, final String measure) {
 	        JFreeChart chart = ChartFactory.createXYLineChart(
 	                "User: " + user + " Topic: " + topic, 
 	                "Query", 
@@ -99,7 +108,7 @@ public class LineChart{
 	        
 	 }
 	 
-	 private void setXYAxis(JFreeChart chart, String measure) {
+	 private static void setXYAxis(JFreeChart chart, String measure) {
 		
 		NumberAxis xAxis = new NumberAxis();
 		xAxis.setTickUnit(new NumberTickUnit(1));
@@ -122,12 +131,6 @@ public class LineChart{
 		}		
 	 }
 	
-	/**
-	 * @return the path
-	 */
-	public String getPath() {
-		return path;
-	}
 	
 	
 }

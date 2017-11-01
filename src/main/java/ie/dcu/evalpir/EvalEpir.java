@@ -70,13 +70,13 @@ public class EvalEpir {
     	
     	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
     	for (Query s : qRel) {
-    		System.out.println(s.toString());
+    		//System.out.println(s.toString());
     	}
     	
     	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
     	
     	for (PIR p : pirs) {
-    		System.out.println(p.toString());
+    		//System.out.println(p.toString());
     	}
     	
     	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
@@ -88,11 +88,11 @@ public class EvalEpir {
     	for(Query q : qRel) {
     		System.out.print(((QueryRelFile)q).printMeasures());
     	}
-//    	
-//
-//		CreatorChart.createChart(pirs);
-//		
-//    	
+    	
+
+		CreatorChart.createChart(qRel);
+		
+    	
     	
     	
 //    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
