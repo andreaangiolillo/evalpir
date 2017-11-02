@@ -22,7 +22,7 @@ public class TestCaseMeasuresImpl {
 	
 	private ArrayList<Query>  rel; 
 	private ArrayList<PIR>  result;
-	private MeasureImpl m;
+	private CalculateMeasureImpl m;
 	/**
 	 * 
 	 */
@@ -36,7 +36,7 @@ public class TestCaseMeasuresImpl {
 		File outputPIR = new File("src/main/resources/result.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv");
 	    result = reader.extractOutputPIR(outputPIR);
 	    
-	    m = new MeasureImpl(rel);	
+	    m = new CalculateMeasureImpl(rel);	
 	}
 
 	
@@ -90,8 +90,8 @@ public class TestCaseMeasuresImpl {
 		Query qOut = new Query("user", "topic", "queryOut", docs1);
 		
 		
-		assertEquals(0.783, MeasureImpl.ap(qRel, qOut, false), 0.001);
-		assertEquals(0.712121212, MeasureImpl.ap(qRel, qOut, true), 0.001);	
+		assertEquals(0.783, CalculateMeasureImpl.ap(qRel, qOut, false), 0.001);
+		assertEquals(0.712121212, CalculateMeasureImpl.ap(qRel, qOut, true), 0.001);	
 	}
 	
 	
@@ -108,21 +108,21 @@ public class TestCaseMeasuresImpl {
 		//user0
 		query_result = result.get(0).getQuery(0);
 		query_rel = rel.get(0);
-		recall = MeasureImpl.recall(query_rel, query_result);
-		precision = MeasureImpl.precision(query_rel, query_result);
-		assertEquals(0.181818182, MeasureImpl.fMeasure(precision, recall, 0.5),delta);
+		recall = CalculateMeasureImpl.recall(query_rel, query_result);
+		precision = CalculateMeasureImpl.precision(query_rel, query_result);
+		assertEquals(0.181818182, CalculateMeasureImpl.fMeasure(precision, recall, 0.5),delta);
 		
 		query_result = result.get(0).getQuery(1);
 		query_rel = rel.get(1);
-		recall = MeasureImpl.recall(query_rel, query_result);
-		precision = MeasureImpl.precision(query_rel, query_result);
-		assertEquals(0.181818182, MeasureImpl.fMeasure(precision, recall, 0.5),delta);
+		recall = CalculateMeasureImpl.recall(query_rel, query_result);
+		precision = CalculateMeasureImpl.precision(query_rel, query_result);
+		assertEquals(0.181818182, CalculateMeasureImpl.fMeasure(precision, recall, 0.5),delta);
 		
 		query_result = result.get(0).getQuery(4);
 		query_rel = rel.get(4);
-		recall = MeasureImpl.recall(query_rel, query_result);
-		precision = MeasureImpl.precision(query_rel, query_result);
-		assertEquals(0.666666667, MeasureImpl.fMeasure(precision, recall, 0.5),delta);
+		recall = CalculateMeasureImpl.recall(query_rel, query_result);
+		precision = CalculateMeasureImpl.precision(query_rel, query_result);
+		assertEquals(0.666666667, CalculateMeasureImpl.fMeasure(precision, recall, 0.5),delta);
 		
 	}
 	
@@ -136,53 +136,53 @@ public class TestCaseMeasuresImpl {
 		//user0 - P
 		query_result = result.get(0).getQuery(0);
 		query_rel = rel.get(0);
-		assertEquals(0.1, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.1, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(1);
 		query_rel = rel.get(1);
-		assertEquals(0.1, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.1, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(2);
 		query_rel = rel.get(2);
-		assertEquals(0.1, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.1, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(3);
 		query_rel = rel.get(3);
-		assertEquals(0.1, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.1, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(4);
 		query_rel = rel.get(4);
-		assertEquals(0.5, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.5, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(5);
 		query_rel = rel.get(5);
-		assertEquals(0.4, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.4, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 
 		//user1 - P
 		query_result = result.get(0).getQuery(6);
 		query_rel = rel.get(6);
-		assertEquals(0.4, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.4, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(7);
 		query_rel = rel.get(7);
-		assertEquals(0.1, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.1, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(8);
 		query_rel = rel.get(8);
-		assertEquals(0.3, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.3, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(9);
 		query_rel = rel.get(9);
-		assertEquals(0.2, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.2, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(10);
 		query_rel = rel.get(10);
-		assertEquals(0.2, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.2, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(11);
 		query_rel = rel.get(11);
-		assertEquals(0.4, MeasureImpl.precision(query_rel, query_result) ,delta);
+		assertEquals(0.4, CalculateMeasureImpl.precision(query_rel, query_result) ,delta);
 		
 		
 	}
@@ -196,53 +196,53 @@ public class TestCaseMeasuresImpl {
 		//user0 - R
 		query_result = result.get(0).getQuery(0);
 		query_rel = rel.get(0);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(1);
 		query_rel = rel.get(1);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(2);
 		query_rel = rel.get(2);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(3);
 		query_rel = rel.get(3);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 			
 		query_result = result.get(0).getQuery(4);
 		query_rel = rel.get(4);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(5);
 		query_rel = rel.get(5);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 
 		//user1 - R
 		query_result = result.get(0).getQuery(6);
 		query_rel = rel.get(6);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 			
 		query_result = result.get(0).getQuery(7);
 		query_rel = rel.get(7);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(8);
 		query_rel = rel.get(8);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(9);
 		query_rel = rel.get(9);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(10);
 		query_rel = rel.get(10);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 		query_result = result.get(0).getQuery(11);
 		query_rel = rel.get(11);
-		assertEquals(1.0, MeasureImpl.recall(query_rel, query_result) ,delta);
+		assertEquals(1.0, CalculateMeasureImpl.recall(query_rel, query_result) ,delta);
 		
 	}
 	
@@ -256,30 +256,30 @@ public class TestCaseMeasuresImpl {
 		//user0 
 		query_result = result.get(0).getQuery(0);
 		query_rel = rel.get(0);
-		assertEquals(0.441060599, MeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
+		assertEquals(0.441060599, CalculateMeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
 	
 		query_result = result.get(0).getQuery(1);
 		query_rel = rel.get(1);
-		assertEquals(0.809953117, MeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
+		assertEquals(0.809953117, CalculateMeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
 		
 		query_result = result.get(0).getQuery(2);
 		query_rel = rel.get(2);
-		assertEquals(0.904976558, MeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
+		assertEquals(0.904976558, CalculateMeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
 		
 				
 		//user1 - PK
 		
 		query_result = result.get(0).getQuery(9);
 		query_rel = rel.get(9);
-		assertEquals(0.55353405, MeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
+		assertEquals(0.55353405, CalculateMeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
 		
 		query_result = result.get(0).getQuery(10);
 		query_rel = rel.get(10);
-		assertEquals(0.61830695, MeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
+		assertEquals(0.61830695, CalculateMeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
 		
 		query_result = result.get(0).getQuery(11);
 		query_rel = rel.get(11);
-		assertEquals(0.544276169, MeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
+		assertEquals(0.544276169, CalculateMeasureImpl.calculateNDCG(query_rel, query_result, 3), delta);
 				
 		
 		
@@ -296,103 +296,103 @@ public class TestCaseMeasuresImpl {
 		query_result = result.get(0).getQuery(0);
 		query_rel = rel.get(0);
 		
-		assertEquals(0.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(1);
 		query_rel = rel.get(1);
-		assertEquals(0.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(2);
 		query_rel = rel.get(2);
-		assertEquals(0.2, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.2, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(3);
 		query_rel = rel.get(3);
-		assertEquals(0.2, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.2, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(4);
 		query_rel = rel.get(4);
-		assertEquals(0.40, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.40, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(5);
 		query_rel = rel.get(5);
-		assertEquals(0.40, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.40, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		//user0 - RK
 		query_result = result.get(0).getQuery(0);
 		query_rel = rel.get(0);
-		assertEquals(0.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(1);
 		query_rel = rel.get(1);
-		assertEquals(0.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(2);
 		query_rel = rel.get(2);
-		assertEquals(1.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(1.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(3);
 		query_rel = rel.get(3);
-		assertEquals(1.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(1.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(4);
 		query_rel = rel.get(4);
-		assertEquals(0.40, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.40, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(5);
 		query_rel = rel.get(5);
-		assertEquals(0.50, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.50, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 	
 		
 		//user1 - PK
 		query_result = result.get(0).getQuery(6);
 		query_rel = rel.get(6);
-		assertEquals(0.60, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.60, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(7);
 		query_rel = rel.get(7);
-		assertEquals(0.2, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.2, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(8);
 		query_rel = rel.get(8);
-		assertEquals(0.2, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.2, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(9);
 		query_rel = rel.get(9);
-		assertEquals(0.2, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.2, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(10);
 		query_rel = rel.get(10);
-		assertEquals(0.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		query_result = result.get(0).getQuery(11);
 		query_rel = rel.get(11);
-		assertEquals(0.2, MeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
+		assertEquals(0.2, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, false), delta);
 		
 		//user1 - RK
 		query_result = result.get(0).getQuery(6);
 		query_rel = rel.get(6);
-		assertEquals(0.75, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.75, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(7);
 		query_rel = rel.get(7);
-		assertEquals(1.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(1.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(8);
 		query_rel = rel.get(8);
-		assertEquals(0.3333333333, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.3333333333, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(9);
 		query_rel = rel.get(9);
-		assertEquals(0.5, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.5, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(10);
 		query_rel = rel.get(10);
-		assertEquals(0.0, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.0, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 		
 		query_result = result.get(0).getQuery(11);
 		query_rel = rel.get(11);
-		assertEquals(0.25, MeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
+		assertEquals(0.25, CalculateMeasureImpl.calculatePKRK(query_rel, query_result, 5, true), delta);
 	}
 
 

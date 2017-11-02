@@ -2,13 +2,17 @@ package ie.dcu.evalpir;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import ie.dcu.evalpir.chart.CreatorChart;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
+import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
-import ie.dcu.evalpir.measures.MeasureImpl;
+import ie.dcu.evalpir.measures.CalculateMeasureImpl;
 
 /**
  * @author Andrea Angiolillo
@@ -20,40 +24,31 @@ import ie.dcu.evalpir.measures.MeasureImpl;
  */
 public class EvalEpir {
 	static final String RELEVANCE_FILE_PATH = "src/main/resources/qrels.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv";
-	
-//	public static void printOutput(ArrayList<PIR> pirs){
-//		int nUser = pirs.get(0).getUsers().size();
-//		int nTopic = 0;
-//		int nQuery = 0;
-//		int nMeasures = 0;
-//		for (int user = 0; user < nUser; user++) {
-//			nTopic = pirs.get(0).getUsers().get(user).getTopics().size();
-//			for (int topic = 0; topic < nTopic; topic ++) {
-//				nQuery = pirs.get(0).getUsers().get(user).getTopics().get(topic).getQueries().size();
-//				for (int query = 0; query < nQuery; query ++){
-//					nMeasures = ((QueryOutputPIR)(pirs.get(0).getUsers().get(user).getTopics().get(topic).getQueries().get(query))).getMeasures().size();
-//					
-//				}
-//			}
-//		}
-//		
-//	}
-	
+	static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
 	
     public static void main( String[] args ) {
     	
     	File relevanceFile = new File(RELEVANCE_FILE_PATH);
+    	File logsFile = new File(LOGS_FILE_PATH);
     	File outputPIR = new File("src/main/resources/result.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv");
     	
-    	InputReaderImpl reader = new InputReaderImpl();
     	
-    	ArrayList<Query>  qRel = reader.extractRelevanceFile(relevanceFile);
-    	ArrayList<PIR> pirs = reader.extractOutputPIR(outputPIR);
+    	ArrayList<Query>  qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
+    	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
+    	Map<String, Session> logs = InputReaderImpl.extracLogFile(logsFile);
     	
     	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
     	for (Query s : qRel) {
     		//System.out.println(s.toString());
     	}
+    	
+    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
+        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
+    	
+        while(it.hasNext()) {
+        	System.out.println(it.next().getValue().toString());
+        }
+    	
     	
     	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
     	
@@ -61,18 +56,21 @@ public class EvalEpir {
     		//System.out.println(p.toString());
     	}
     	
+    	
+    	
+    	
     	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
     	
-    	MeasureImpl m = new MeasureImpl(qRel);
+    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel);
     	
-    	m.calculateMeasures(pirs);
+    	//m.calculateMeasures(pirs);
     	
     	for(Query q : qRel) {
-    		System.out.print(((QueryRelFile)q).printMeasures());
+    		//System.out.print(((QueryRelFile)q).printMeasures());
     	}
     	
 
-		CreatorChart.createChart(qRel);
+		//CreatorChart.createChart(qRel);
 		
     	
     	

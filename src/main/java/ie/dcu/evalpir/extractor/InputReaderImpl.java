@@ -7,14 +7,20 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import me.tongfei.progressbar.ProgressBar;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
+import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.PIR;
+import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
+import ie.dcu.evalpir.elements.Session;
 
 /**
  * @author Andrea Angiolillo
@@ -23,8 +29,82 @@ import ie.dcu.evalpir.elements.QueryRelFile;
  * **/
 public class InputReaderImpl /*implements InputReader*/{
 
-	public InputReaderImpl() {
-		super();
+	
+	/**
+	 * @input logsfile
+	 * 
+	 **/
+//	public static Map<String ,Session> extracLogFile(File logsFile){
+//		BufferedReader br = null;
+//		String line = "";
+//		String cvsSplitBy = ","; 
+//		Map<String ,Session> sessions = new HashMap<String, Session>();		
+//		try {
+//			String[] row;
+//			br = new BufferedReader(new FileReader(logsFile.getPath()));
+//			Log log;
+//			Session session;
+//			br.readLine();//removing first row
+//			while ((line= br.readLine()) != null) {	
+//				row = (line  != null) ? line.split(cvsSplitBy) : null;
+//				log = new Log(row[5], row[4], row[1], row[3]);
+//				if(sessions.containsKey(row[8].toLowerCase())) {
+//					sessions.get(row[8]).addLog(log);
+//				}else {
+//					session = new Session(row[8].toLowerCase(), row[9].toLowerCase(), row[10].toLowerCase());
+//					session.addLog(log);
+//					sessions.put(session.getId(), session);
+//				}			
+//			}			
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	
+//		
+//		return sessions;
+//	}
+//	
+	public static Map<String ,Session> extracLogFile(File logsFile){
+		BufferedReader br = null;
+		String line = "";
+		String cvsSplitBy = ","; 
+		Map<String ,Session> sessions = new HashMap<String, Session>();		
+		try {
+			String[] row;
+			br = new BufferedReader(new FileReader(logsFile.getPath()));
+			Log log;
+			Session session;
+			String key ;
+			br.readLine();//removing first row
+			while ((line= br.readLine()) != null) {	
+				row = (line  != null) ? line.split(cvsSplitBy) : null;
+				log = new Log(row[5], row[4], row[1], row[3]);
+				key = row[9].toLowerCase() + row[10].toLowerCase();
+				if(sessions.containsKey(key)) {
+					if(!sessions.get(key).getId().contains(row[8].toLowerCase())) {
+						sessions.get(key).addId(row[8].toLowerCase());
+					}
+					sessions.get(key).addLog(log);
+				}else {
+					session = new Session(row[8].toLowerCase(), row[9].toLowerCase(), row[10].toLowerCase());
+					session.addLog(log);
+					sessions.put(key , session);
+				}			
+			}			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		
+		return sessions;
 	}
 	
 	
@@ -34,7 +114,7 @@ public class InputReaderImpl /*implements InputReader*/{
 	 * @return Arraylist<User>
 	 * 
 	 */
-	public ArrayList<Query> extractRelevanceFile(File file) {
+	public static ArrayList<Query> extractRelevanceFile(File file) {
 	    BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
@@ -45,33 +125,29 @@ public class InputReaderImpl /*implements InputReader*/{
 		
 		try {
 			String[] text;
-			String userKey, topicKey, queryKey, docKey, docValue1, docValue2;
-			userKey = topicKey = queryKey = docKey = docValue1 = docValue2 = "";
+			String userKey, topicKey, queryKey, docKey, docValue1;
+			userKey = topicKey = queryKey = docKey = docValue1 = "";
 		    br = new BufferedReader(new FileReader(file.getPath()));
 		    br.readLine();//removing first row
 		   
 		    while ((line= br.readLine()) != null) {	
 		    	text = (line  != null) ? line.split(cvsSplitBy) : null;
-		    	
-		    	try {//the value (relevance, similarity, rank) should be a number
-		    		if(!userKey.equalsIgnoreCase("")) {
-		    			doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
-			    		docs.put(doc.getId(), doc);
-		    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
-		    				query = new QueryRelFile(userKey, topicKey, queryKey, docs);												
-				    		queries.add(query);
-				    		docs =  new HashMap<String,Document>();
-		    			}
-		    		}
-		    			
-			    	userKey = text[0].replaceAll("\\s+","");
-			    	topicKey = text[1].replaceAll("\\s+","");
-			    	queryKey = text[2].replaceAll("\\s+","");
-			    	docKey = text[3].replaceAll("\\s+","");
-			    	docValue1 = text[4].replaceAll("\\s+","");
-		    	}catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
+	    		if(!userKey.equalsIgnoreCase("")) {
+	    			doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
+		    		docs.put(doc.getId(), doc);
+	    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
+	    				query = new QueryRelFile(userKey, topicKey, queryKey, docs);												
+			    		queries.add(query);
+			    		docs =  new HashMap<String,Document>();
+	    			}
+	    		}
+	    			
+		    	userKey = text[0].replaceAll("\\s+","");
+		    	topicKey = text[1].replaceAll("\\s+","");
+		    	queryKey = text[2].replaceAll("\\s+","");
+		    	docKey = text[3].replaceAll("\\s+","");
+		    	docValue1 = text[4].replaceAll("\\s+","");
+	    	
 		    	
 		    }
 		    
@@ -105,7 +181,7 @@ public class InputReaderImpl /*implements InputReader*/{
 	 * @return ArrayList<PIR>
 	 * 
 	 */
-	public ArrayList<PIR> extractOutputPIR(File file) {
+	public static ArrayList<PIR> extractOutputPIR(File file) {
 	    BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
@@ -125,38 +201,32 @@ public class InputReaderImpl /*implements InputReader*/{
 		   
 		    while ((line= br.readLine()) != null) {	
 		    	text = (line  != null) ? line.split(cvsSplitBy) : null;
-		    	
-		    	try {//the value (relevance, similarity, rank) should be a number
-		    		if(!userKey.equalsIgnoreCase("")) {
-		    			
-		    			doc = new DocumentOutputPIR(docKey, Integer.parseInt(docValue1), Double.parseDouble(docValue2));
-			    		docs.put(doc.getId(), doc);
-		    		
-		    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
-		    				query = new Query(userKey, topicKey, queryKey, docs);												
-				    		queries.add(query);
-				    		docs =  new HashMap<String,Document>();
-		    			}
-				    	
-				    	if(!modelKey.equalsIgnoreCase(text[6].replaceAll("\\s+",""))){
-				    		pir = new PIR(modelKey, queries);
-				    		pirs.add(pir);
-				    		queries = new ArrayList<Query>();
-				    	}
-				    
-		    		}
-		    			
-			    	userKey = text[0].replaceAll("\\s+","");
-			    	modelKey = text[6].replaceAll("\\s+","");
-			    	topicKey = text[1].replaceAll("\\s+","");
-			    	queryKey = text[2].replaceAll("\\s+","");
-			    	docKey = text[3].replaceAll("\\s+","");
-			    	docValue1 = text[4].replaceAll("\\s+","");
-			    	docValue2 = text[5].replaceAll("\\s+","");
-		    	}catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
-		    	
+	    		if(!userKey.equalsIgnoreCase("")) {
+	    			
+	    			doc = new DocumentOutputPIR(docKey, Integer.parseInt(docValue1), Double.parseDouble(docValue2));
+		    		docs.put(doc.getId(), doc);
+	    		
+	    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
+	    				query = new Query(userKey, topicKey, queryKey, docs);												
+			    		queries.add(query);
+			    		docs =  new HashMap<String,Document>();
+	    			}
+			    	
+			    	if(!modelKey.equalsIgnoreCase(text[6].replaceAll("\\s+",""))){
+			    		pir = new PIR(modelKey, queries);
+			    		pirs.add(pir);
+			    		queries = new ArrayList<Query>();
+			    	}
+			    
+	    		}
+	    			
+		    	userKey = text[0].replaceAll("\\s+","");
+		    	modelKey = text[6].replaceAll("\\s+","");
+		    	topicKey = text[1].replaceAll("\\s+","");
+		    	queryKey = text[2].replaceAll("\\s+","");
+		    	docKey = text[3].replaceAll("\\s+","");
+		    	docValue1 = text[4].replaceAll("\\s+","");
+		    	docValue2 = text[5].replaceAll("\\s+","");  	
 		    }
 		    
 		    doc = new DocumentOutputPIR(docKey, Integer.parseInt(docValue1), Double.parseDouble(docValue2));

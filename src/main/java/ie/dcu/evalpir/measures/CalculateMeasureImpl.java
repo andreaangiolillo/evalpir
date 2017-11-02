@@ -21,7 +21,7 @@ import me.tongfei.progressbar.ProgressBar;
  * @version 1.0
  * 
  * **/
-public class MeasureImpl{
+public class CalculateMeasureImpl{
 
 	//private Map<String, String> measures;
 	private ArrayList<Query> relevanceFile;
@@ -32,7 +32,7 @@ public class MeasureImpl{
 	 * Constructor
 	 * @param 
 	 */
-	public MeasureImpl(ArrayList<Query> relevanceFile) {
+	public CalculateMeasureImpl(ArrayList<Query> relevanceFile) {
 		//this.measures = new LinkedHashMap<String,String>();
 		this.relevanceFile = relevanceFile;
 	}

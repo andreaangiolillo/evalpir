@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import ie.dcu.evalpir.elements.Query;
 
 
-public interface Measure {
+public interface CalculateMeasure {
 	
 //	public Double calculatePK(ArrayList<Doc> dRel, ArrayList<String[]> result ,int K);
 //	public Double calculateNDCG ( List<String> realData, List<String> predictionData );

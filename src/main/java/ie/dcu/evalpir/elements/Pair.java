@@ -1,6 +1,6 @@
 package ie.dcu.evalpir.elements;
 
-public class Pair<K extends Comparable<K>,T extends Comparable<T>> implements Comparable<Pair<K,T>>{
+public class Pair<K extends Comparable<K>,T> implements Comparable<Pair<K,T>>{
 	
 	private K key;
 	private T value;
