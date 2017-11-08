@@ -65,7 +65,7 @@ public class EvalEpir {
     	
     	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
     	
-    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel);
+    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
     	
     	//m.calculateMeasures(pirs);
     	

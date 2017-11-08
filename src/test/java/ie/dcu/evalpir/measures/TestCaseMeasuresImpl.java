@@ -12,16 +12,18 @@ import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
+import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
 
 
 public class TestCaseMeasuresImpl {
 	
 	static final String RELEVANCE_FILE_PATH =  "src/main/resources/qrels.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv";
-	
+	static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
 	
 	private ArrayList<Query>  rel; 
 	private ArrayList<PIR>  result;
+	private Map<String ,Session> logsfile;
 	private CalculateMeasureImpl m;
 	/**
 	 * 
@@ -36,7 +38,9 @@ public class TestCaseMeasuresImpl {
 		File outputPIR = new File("src/main/resources/result.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv");
 	    result = reader.extractOutputPIR(outputPIR);
 	    
-	    m = new CalculateMeasureImpl(rel);	
+	    File logfile = new File(LOGS_FILE_PATH);
+	    logsfile = reader.extracLogFile(logfile);
+	    m = new CalculateMeasureImpl(rel, logsfile);	
 	}
 
 	

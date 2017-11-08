@@ -12,11 +12,13 @@ import javax.sql.rowset.spi.TransactionalWriter;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
+import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
+import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import me.tongfei.progressbar.ProgressBar;
 
@@ -29,16 +31,17 @@ public class CalculateMeasureImpl{
 
 	//private Map<String, String> measures;
 	private ArrayList<Query> relevanceFile;
-	
+	private Map<String, Session> logsFile;
 	
 	
 	/**
 	 * Constructor
 	 * @param 
 	 */
-	public CalculateMeasureImpl(ArrayList<Query> relevanceFile) {
+	public CalculateMeasureImpl(ArrayList<Query> relevanceFile, Map<String, Session> logsfile) {
 		//this.measures = new LinkedHashMap<String,String>();
 		this.relevanceFile = relevanceFile;
+		this.logsFile = logsfile;
 	}
 	
 	
@@ -300,9 +303,42 @@ public class CalculateMeasureImpl{
 	 * @param query
 	 * @return
 	 */
-	public static int setK(ArrayList<Query> query) {
-		return 0;
+	public int setMaxK(ArrayList<Query> query) {
+		String key = query.get(0).getUser() + query.get(0).getTopic();
+		Session session = getSession(key);
+		ArrayList<Log> logs = session.getnDocOpened();
+		int k = 0;
+		int rank = 0;
+		
+		for (Log l : logs) {
+			rank = Integer.parseInt(l.getRank());
+			if (rank > k){
+				k = rank;
+			}
+		}
+		
+		return k;
 	}
+	
+	/**
+	 * @param query
+	 * @return
+	 */
+	public int setAverageK(ArrayList<Query> query) {
+		String key = query.get(0).getUser() + query.get(0).getTopic();
+		Session session = getSession(key);
+		ArrayList<Log> logs = session.getnDocOpened();
+		int k = 0;
+		int rank = 0;
+		for (Log l : logs) {
+			rank = Integer.parseInt(l.getRank());
+			k += rank;
+			
+		}
+		
+		return k/logs.size();
+	}
+	
 	
 	/**
 	 * sDCG(q) = (1 + log_bq q)-1 * DCG
@@ -314,8 +350,7 @@ public class CalculateMeasureImpl{
 	 * @param ideal
 	 * @return
 	 */
-	public static double sDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int logbase, boolean ideal) {
-		int k = setK(queryRel);
+	public static double sDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int k,  int logbase, boolean ideal) {
 		double sDCG = 0.0;
 		if (queryRel.size() != queryOutputPIR.size()) {
 			throw new DifferentSizeException();
@@ -338,27 +373,10 @@ public class CalculateMeasureImpl{
 	 * @param ideal
 	 * @return
 	 */
-	public static double NSDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int logbase, boolean ideal) {
-		return sDCG(queryRel, queryOutputPIR, logbase, false) / sDCG(queryRel, queryOutputPIR, logbase, true);
+	public static double NSDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int k, int logbase, boolean ideal) {
+		return sDCG(queryRel, queryOutputPIR, k, logbase, false) / sDCG(queryRel, queryOutputPIR, k, logbase, true);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	/**
 	 * @param userID
 	 * @param topicId
@@ -372,7 +390,6 @@ public class CalculateMeasureImpl{
 				+ (queryId.equalsIgnoreCase("") ? "" : " QueryID: " + queryId) + " Precision@" + k + ": " + String.valueOf(measure) + "\n";  
 		
 	}
-	
 	
 	/**
 	 * @param q
@@ -446,6 +463,24 @@ public class CalculateMeasureImpl{
 	public ArrayList<Query> getRelevanceFile() {
 		return relevanceFile;
 	}
+
+	/**
+	 * @return the logsFile
+	 */
+	public Map<String, Session> getLogsFile() {
+		return logsFile;
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public Session getSession(String key){
+		return getLogsFile().get(key);
+		
+	}
+	
 }
 
 
