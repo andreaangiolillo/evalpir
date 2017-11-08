@@ -46,7 +46,11 @@ public class EvalEpir {
         Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
     	
         while(it.hasNext()) {
-        	System.out.println(it.next().getValue().toString());
+        	Entry<String, Session> a = it.next();
+        	if(a.getValue().getSessionMeasure()) {
+        		System.out.println(a.getValue().toString());
+        	}
+        
         }
     	
     	

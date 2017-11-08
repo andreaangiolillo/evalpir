@@ -6,6 +6,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.sql.rowset.spi.TransactionalWriter;
+
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -14,6 +17,7 @@ import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
+import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import me.tongfei.progressbar.ProgressBar;
 
 /**
@@ -107,7 +111,7 @@ public class CalculateMeasureImpl{
 				docOut = (DocumentOutputPIR)pairDocOUT.getValue();
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				if(docRel != null & docRel.getIsRelevance()) {
-					listPair.add(new Pair(docOut.getRank(), calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false)));
+					listPair.add(new Pair<Integer, Double>(docOut.getRank(), calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false)));
 				}
 			}
 			
@@ -154,19 +158,15 @@ public class CalculateMeasureImpl{
 	}
 	
 	/**
-	 * Normalized Discounted Cumulative Gain (NDCG) is a precision
-	 * metric that is designed for experiments where documents are judged
+	 * Discounted Cumulative Gain (DCG) is a metric that is designed for experiments where documents are judged
 	 * using a non-binary relevance scale. It assigns higher scores for more
 	 * relevant documents being ranked higher in the ranked results list.
-	 * 
-	 *@input realData
-	 *@input predictionData
-	 *@input p
-	 *@return the NDCG for the given data
-	 *@Complexity O(n)
+	 * @param queryRel
+	 * @param queryOutputPIR
+	 * @param p
+	 * @return
 	 */
-	public static double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) {
-		ArrayList<Integer> idcg = new ArrayList<Integer>();
+	public static double DCG(Query queryRel, Query queryOutputPIR, int p) {
 		double dcg = 0.0;
 		int value_relevance = 0;
 		Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
@@ -177,12 +177,37 @@ public class CalculateMeasureImpl{
 			docOut = (DocumentOutputPIR)pairDocOUT.getValue();
 			docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 			value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
-			idcg.add(value_relevance);
 			if(docOut.getRank() <= p) {	
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
 				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (log(docOut.getRank() + 1, 2));	
 			}
+			
+		}
+		
+		return dcg;
+	}
+		
+	/**
+	 * Ideal DCG
+	 * 
+	 *@input realData
+	 *@input predictionData
+	 *@input p
+	 *@return the NDCG for the given data
+	 */
+	public static double IDCG(Query queryRel, Query queryOutputPIR, int p) {
+		ArrayList<Integer> idcg = new ArrayList<Integer>();
+		int value_relevance = 0;
+		Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
+		DocumentRelFile docRel;
+		DocumentOutputPIR docOut;
+		while (itDocOutputPIR.hasNext()) {
+			Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
+			docOut = (DocumentOutputPIR)pairDocOUT.getValue();
+			docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
+			value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
+			idcg.add(value_relevance);	
 		}
 		
 		Collections.sort(idcg, new Comparator<Integer>() {
@@ -198,7 +223,23 @@ public class CalculateMeasureImpl{
 			rank ++;	
 		}
 		
-		return dcg / idcgValue;
+		return idcgValue;
+	}
+	
+	/**
+	 * Normalized Discounted Cumulative Gain (NDCG) is a precision
+	 * metric that is designed for experiments where documents are judged
+	 * using a non-binary relevance scale. It assigns higher scores for more
+	 * relevant documents being ranked higher in the ranked results list.
+	 * 
+	 *@input realData
+	 *@input predictionData
+	 *@input p
+	 *@return the NDCG for the given data
+	 *@Complexity O(n)
+	 */
+	public static double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) {
+		return DCG(queryRel, queryOutputPIR, p) / IDCG( queryRel, queryOutputPIR, p);
 	}
 	
 	/**
@@ -251,65 +292,72 @@ public class CalculateMeasureImpl{
 		}
 		
 		return 0;
+	}	
+	
+	/** Session measures **/
+	
+	/**
+	 * @param query
+	 * @return
+	 */
+	public static int setK(ArrayList<Query> query) {
+		return 0;
+	}
+	
+	/**
+	 * sDCG(q) = (1 + log_bq q)-1 * DCG
+	 * where bq ∈ R is the logarithm base for the query discount; 1 < bq < 1000
+	 * q is the position of the query.
+	 * @param queryRel
+	 * @param queryOutputPIR
+	 * @param logbase
+	 * @param ideal
+	 * @return
+	 */
+	public static double sDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int logbase, boolean ideal) {
+		int k = setK(queryRel);
+		double sDCG = 0.0;
+		if (queryRel.size() != queryOutputPIR.size()) {
+			throw new DifferentSizeException();
+		}
+		
+		for (int i = 0; i < queryRel.size(); i++) {
+			sDCG += ideal ? Math.pow(1 + log(i + 1, logbase), -1) * DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
+						  :	Math.pow(1 + log(i + 1, logbase), -1) * IDCG(queryRel.get(i), queryOutputPIR.get(i), k);
+		}
+		
+		return sDCG;
 	}
 
+	
 	/**
-	 * @param relevanceDoc
-	 * @param outputPIR
-	 * @param k
-	 * @Complexity !CRITICAL! O(nUser * nTopic * nQuery * measures) 
+	 * Normalized session discounted cumulative gain
+	 * @param queryRel
+	 * @param queryOutputPIR
+	 * @param logbase
+	 * @param ideal
+	 * @return
 	 */
-//	public void evaluationProcess(ArrayList<User> relevanceDoc, ArrayList<User> outputPIR, int k){
-//		
-//		Iterator<?> itUserRel, itUserPIR, itTopicRel, itTopicPIR, itQueryRel, itQueryPIR;
-//		User userRel, userPIR;
-//		Topic topicRel, topicPIR;
-//		Query queryRel, queryPIR;
-//		
-//		/*Precision@K variables*/
-//		Double uPrecisionKMean, uPrecisionK ,tPrecisionKMean, tPrecisionK, qPrecisionKMean, qPrecisionK;
-//		uPrecisionKMean = uPrecisionK = tPrecisionKMean = tPrecisionK = qPrecisionKMean = qPrecisionK = 0.0;
-//		String qPK, tPK, uPK;
-//		qPK = tPK = uPK = "";
-//		
-//		itUserRel = relevanceDoc.iterator();
-//		itUserPIR = outputPIR.iterator();
-//		while(itUserRel.hasNext() && itUserPIR.hasNext()) { // per-user
-//			userRel = (User) itUserRel.next();
-//			userPIR = (User) itUserPIR.next();
-//			itTopicRel = userRel.getTopics().iterator();
-//			itTopicPIR = userPIR.getTopics().iterator();
-//			while(itTopicRel.hasNext() && itTopicPIR.hasNext()) { // per-topic
-//				topicRel = 	(Topic) itTopicRel.next();
-//				topicPIR = 	(Topic) itTopicPIR.next();
-//				itQueryRel = topicRel.getQueries().iterator();
-//				itQueryPIR = topicPIR.getQueries().iterator();
-//				while(itQueryRel.hasNext() && itQueryPIR.hasNext()) { // per-query
-//					queryRel = (Query)itQueryRel.next();
-//					queryPIR = (Query)itQueryPIR.next();
-//					qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
-//					qPK += printMeasure(userRel.getId(), topicRel.getId(), queryRel.getId(), k, qPrecisionK);
-//					qPrecisionKMean += qPrecisionK;
-//				}
-//				
-//				measures.put("p"+k+"query", qPK);
-//				tPrecisionK = qPrecisionKMean / topicRel.getQueries().size();				
-//				tPK += printMeasure(userRel.getId(), topicRel.getId(), "", k, tPrecisionK);
-//				tPrecisionKMean += tPrecisionK;		
-//				qPrecisionKMean = 0.0;
-//			}
-//			
-//			measures.put("p"+k+"topic", tPK);
-//			uPrecisionK = tPrecisionKMean / userRel.getTopics().size();
-//			uPK += printMeasure(userRel.getId(), "", "", k, uPrecisionK);
-//			uPrecisionKMean += uPrecisionK;
-//			tPrecisionKMean = 0.0;
-//		}
-//		
-//		measures.put("p"+k+"user", uPK);
-//		measures.put("TOT - Precision@" + k , "TOT - Precision@" + k + ": " + String.valueOf(uPrecisionKMean / relevanceDoc.size()));
-//	}
-//	
+	public static double NSDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int logbase, boolean ideal) {
+		return sDCG(queryRel, queryOutputPIR, logbase, false) / sDCG(queryRel, queryOutputPIR, logbase, true);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * @param userID
@@ -326,7 +374,10 @@ public class CalculateMeasureImpl{
 	}
 	
 	
-	
+	/**
+	 * @param q
+	 * @return
+	 */
 	public QueryRelFile createMeasure(QueryRelFile q) {
 		int k = q.getNRelevantDoc();
 		for (; k != 0; k --) {
@@ -389,30 +440,6 @@ public class CalculateMeasureImpl{
 		}	
 	}
 	
-	
-	
-//	/**
-//	 * @return the measures
-//	 */
-//	public Map<String, String> getMeasures() {
-//		return measures;
-//	}
-//
-//	@Override
-//	public String toString() {
-//		String stringMeasures = "";
-//		Iterator<?> it = measures.entrySet().iterator();
-//		while(it.hasNext()) {
-//			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
-//			stringMeasures += (String)pair.getValue() + "\n";
-//		}
-//		return "Measures: \n" + stringMeasures;
-//	}
-	
-//}
-
-
-
 	/**
 	 * @return the relevanceDoc
 	 */
