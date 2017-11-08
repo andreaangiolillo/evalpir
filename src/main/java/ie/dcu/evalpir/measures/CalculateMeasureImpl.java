@@ -3,6 +3,7 @@ package ie.dcu.evalpir.measures;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,6 +17,7 @@ import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
+import ie.dcu.evalpir.elements.Path;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
@@ -299,46 +301,20 @@ public class CalculateMeasureImpl{
 	
 	/** Session measures **/
 	
-	/**
-	 * @param query
-	 * @return
-	 */
-	public int setMaxK(ArrayList<Query> query) {
-		String key = query.get(0).getUser() + query.get(0).getTopic();
-		Session session = getSession(key);
-		ArrayList<Log> logs = session.getnDocOpened();
-		int k = 0;
-		int rank = 0;
-		
-		for (Log l : logs) {
-			rank = Integer.parseInt(l.getRank());
-			if (rank > k){
-				k = rank;
-			}
-		}
-		
-		return k;
-	}
 	
 	/**
-	 * @param query
+	 * @param measures must be normalized
 	 * @return
 	 */
-	public int setAverageK(ArrayList<Query> query) {
-		String key = query.get(0).getUser() + query.get(0).getTopic();
-		Session session = getSession(key);
-		ArrayList<Log> logs = session.getnDocOpened();
-		int k = 0;
-		int rank = 0;
-		for (Log l : logs) {
-			rank = Integer.parseInt(l.getRank());
-			k += rank;
-			
+	public static double[] extendSingleQueryMeasure(Double[] measure) {
+		double[] session = new double[measure.length];
+		for (int i = 0; i < measure.length; i++) {
+			session[i] += (i == 0) ? measure[i] * Math.exp(-(1 + measure[i]))
+								: measure[i] * Math.exp(-1 + (measure[i] - measure[i - 1]));
 		}
 		
-		return k/logs.size();
+		return session;
 	}
-	
 	
 	/**
 	 * sDCG(q) = (1 + log_bq q)-1 * DCG
@@ -377,6 +353,38 @@ public class CalculateMeasureImpl{
 		return sDCG(queryRel, queryOutputPIR, k, logbase, false) / sDCG(queryRel, queryOutputPIR, k, logbase, true);
 	}
 
+	public void modelFreeSession(ArrayList<Query> queryRel, Session s) {
+		
+		int j = s.getQuery().size();
+		int k = 10;
+		ArrayList<Integer> path;
+		ArrayList<Path> paths = new ArrayList<Path>();
+		Map <String, ArrayList<Path>> pathsession = new HashMap<String, ArrayList<Path>>();
+		for(int i = 0; i < j; i++) {
+			for(int z = 0; z < k; z++){
+				if(i == 0) {
+					path = new ArrayList<Integer>();
+					path.add(z + 1);
+					paths = new ArrayList<Path>();
+					paths.add(new Path(path));
+					pathsession.put(k + "," + i, paths);
+				}else {
+					paths = pathsession.get(k + "," + (i - 1));
+					for(Path p : paths) {
+						p.addElement(z + 1);
+					}
+					
+					pathsession.put(k + "," + i, paths);
+				}
+				
+				
+				
+				
+			}
+		}
+	}
+	
+	
 	/**
 	 * @param userID
 	 * @param topicId

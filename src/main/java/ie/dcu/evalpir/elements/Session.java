@@ -1,6 +1,10 @@
 package ie.dcu.evalpir.elements;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class Session{
 	
@@ -89,6 +93,54 @@ public class Session{
 		}
 	}
 
+	
+	/**
+	 * @param query
+	 * @return
+	 */
+	public int setMaxK(ArrayList<Query> query) {
+		ArrayList<Log> logs = getnDocOpened();
+		int k = 0;
+		int rank = 0;
+		
+		for (Log l : logs) {
+			rank = Integer.parseInt(l.getRank());
+			if (rank > k){
+				k = rank;
+			}
+		}
+		
+		return k;
+	}
+	
+	/**
+	 * @param query
+	 * @return
+	 */
+	public int setAverageK(ArrayList<Query> query) {
+		ArrayList<Log> logs = getnDocOpened();
+		int k = 0;
+		int rank = 0;
+		Map<String, Integer> maxRankQuery = new Hashtable<String, Integer>();
+		for (Log l : logs) {
+			rank = Integer.parseInt(l.getRank());
+			if(!maxRankQuery.containsKey(l.getQuery())) {
+				maxRankQuery.put(l.getQuery(), rank);
+			}else if(rank > maxRankQuery.get(l.getQuery())){
+				maxRankQuery.put(l.getQuery(), rank);
+			}
+		}
+		
+		Iterator<Entry<String, Integer>> it = maxRankQuery.entrySet().iterator();
+		while(it.hasNext()) {
+			k += it.next().getValue();
+		}
+		
+		return k/logs.size();
+	}
+	
+	
+	
 	/**
 	 * @return the nQuery
 	 */
