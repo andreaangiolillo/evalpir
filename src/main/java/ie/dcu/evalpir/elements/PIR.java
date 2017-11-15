@@ -4,6 +4,10 @@
 package ie.dcu.evalpir.elements;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author Andrea Angiolillo	
@@ -12,7 +16,7 @@ import java.util.ArrayList;
 public class PIR {
 
 	
-	ArrayList<Query> queries;
+	Map<String, Query> queries;
 	String name;
 	
 	/**
@@ -20,8 +24,17 @@ public class PIR {
 	 */
 	public PIR(String name) {
 		super();
-		this.queries = new ArrayList<Query>();
+		this.queries = new HashMap<String, Query >();
 		this.name = name;
+	}
+	
+	/*@param PIR
+	 * 
+	 */
+	public PIR(PIR p) {
+		super();
+		this.queries = new HashMap<String, Query>(p.getQueries());
+		this.name = p.getName();
 	}
 	
 	
@@ -29,7 +42,7 @@ public class PIR {
 	 * @param users
 	 * @param name
 	 */
-	public PIR(String name, ArrayList<Query> queries) {
+	public PIR(String name, Map<String, Query>queries) {
 		super();
 		this.queries = queries;
 		this.name = name;
@@ -38,7 +51,7 @@ public class PIR {
 	/**
 	 * @return the users
 	 */
-	public ArrayList<Query> getQueries() {
+	public Map<String, Query> getQueries() {
 		return queries;
 	}
 	
@@ -47,7 +60,7 @@ public class PIR {
 	 * @param i
 	 * @return
 	 */
-	public Query getQuery(int i) {
+	public Query getQuery(String i) {
 		return getQueries().get(i);
 	}
 	
@@ -61,8 +74,9 @@ public class PIR {
 	@Override
 	public String toString() {
 		String stringDoc = "";
-		for (Query s : queries) {
-			stringDoc += s.toString();
+		Iterator<Entry<String, Query>> it = getQueries().entrySet().iterator();
+		while (it.hasNext()) {
+			stringDoc += it.next().getValue().toString();
 		}
 		stringDoc += "\nNumber of queries: " + queries.size() + " ]";
 		return "PIR [id=" + getName()  + ", queries=" + stringDoc;

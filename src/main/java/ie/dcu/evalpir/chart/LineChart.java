@@ -11,10 +11,13 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import ie.dcu.evalpir.elements.Measure;
@@ -36,7 +39,12 @@ public class LineChart{
 		XYSeriesCollection dataset = createDataset(topic, m);
 		String user = topic.get(0).getUser();
 		String nameTopic = topic.get(0).getTopic();
-		JFreeChart chart = createChart(dataset, user, nameTopic, m.getName());
+		String[] nameQuery =  new String[topic.size()];
+		
+		
+		
+		
+		JFreeChart chart = createChart(dataset, user, nameTopic, m.getName(), topic);
 		chart.setBackgroundPaint(Color.WHITE);
 		
 		System.out.println("MEASURE NAME: " + m.getName());
@@ -66,7 +74,7 @@ public class LineChart{
 					value = (Double)measure.getPIR(j).getValue();
 					
 				}
-				System.out.println("Number of PIR: " + nPIR +"\n j: " + j);
+				//System.out.println("Number of PIR: " + nPIR +"\n j: " + j);
 				series[j].add(i, value);
 				value = 0.0;
 			}
@@ -82,9 +90,9 @@ public class LineChart{
 		
 	}
 	
-	 private static JFreeChart createChart(final XYSeriesCollection dataset, final String user, final String topic, final String measure) {
+	 private static JFreeChart createChart(final XYSeriesCollection dataset, final String user, final String topicName, final String measure , ArrayList<Query> topic) {
 	        JFreeChart chart = ChartFactory.createXYLineChart(
-	                "User: " + user + " Topic: " + topic, 
+	                "User: " + user + " Topic: " + topicName, 
 	                "Query", 
 	                measure, 
 	                dataset, 
@@ -93,7 +101,7 @@ public class LineChart{
 	                true, 
 	                false
 	        );
-	        setXYAxis(chart, measure);
+	        setXYAxis(chart, measure, topic);
 	        XYPlot plot = (XYPlot) chart.getPlot();
 	        XYLineAndShapeRenderer r = (XYLineAndShapeRenderer) plot.getRenderer();
 			r.setAutoPopulateSeriesShape(true);
@@ -106,7 +114,7 @@ public class LineChart{
 	        
 	 }
 	 
-	 private static void setXYAxis(JFreeChart chart, String measure) {
+	 private static void setXYAxis(JFreeChart chart, String measure, ArrayList<Query> topic) {
 		
 		NumberAxis xAxis = new NumberAxis();
 		xAxis.setTickUnit(new NumberTickUnit(1));
@@ -121,8 +129,19 @@ public class LineChart{
 			i++;
 		}
 		
+		String[]name = new String[topic.size()];
+		for(int j = 0; j < topic.size(); j++) {
+			name[j] = topic.get(j).getId();
+		}
+		
+		SymbolAxis rangeAxis = new SymbolAxis("Query", name);
+		rangeAxis.setTickUnit(new NumberTickUnit(1));
+		rangeAxis.setRange(0,topic.size());
+		 
 		XYPlot plot = (XYPlot) chart.getPlot();
-		plot.setDomainAxis(xAxis);
+		//plot.setRenderer(renderer);
+		//plot.setRangeAxis(rangeAxis);
+		plot.setDomainAxis(rangeAxis);
 		if (isNormaliseMeasure) {
 			ValueAxis yAxis = plot.getRangeAxis();
 			yAxis.setRange(0, 1.0);

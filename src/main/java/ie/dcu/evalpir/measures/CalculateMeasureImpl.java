@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 
 import javax.sql.rowset.spi.TransactionalWriter;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -32,7 +34,7 @@ import me.tongfei.progressbar.ProgressBar;
 public class CalculateMeasureImpl{
 
 	//private Map<String, String> measures;
-	private ArrayList<Query> relevanceFile;
+	private Map<String, Query> relevanceFile;
 	private Map<String, Session> logsFile;
 	
 	
@@ -40,7 +42,7 @@ public class CalculateMeasureImpl{
 	 * Constructor
 	 * @param 
 	 */
-	public CalculateMeasureImpl(ArrayList<Query> relevanceFile, Map<String, Session> logsfile) {
+	public CalculateMeasureImpl(Map<String, Query> relevanceFile, Map<String, Session> logsfile) {
 		//this.measures = new LinkedHashMap<String,String>();
 		this.relevanceFile = relevanceFile;
 		this.logsFile = logsfile;
@@ -280,6 +282,7 @@ public class CalculateMeasureImpl{
 		double relDoc = 0; // number of relevant docs found
 		double nRelevantDoc = ((QueryRelFile) queryRel).getNRelevantDoc(); // number of relevant docs in queryRel
 		if(nRelevantDoc != -1) {
+			//System.out.print("SIZEEE" + queryRel.getId() + " " + queryRel.getTopic() + " " + queryRel.getUser());
 			Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
 			DocumentRelFile docRel;
 			DocumentOutputPIR docOut;
@@ -293,6 +296,7 @@ public class CalculateMeasureImpl{
 			}
 			
 			double denominator = (recall == true) ? nRelevantDoc : k; 
+			//System.out.println("Query " + queryOutputPIR.getId() + " RelDOc " + relDoc + " denominator " + denominator + " recall: " + recall);
 			return (relDoc / denominator);
 		}
 		
@@ -333,7 +337,7 @@ public class CalculateMeasureImpl{
 		}
 		
 		for (int i = 0; i < queryRel.size(); i++) {
-			sDCG += ideal ? Math.pow(1 + log(i + 1, logbase), -1) * DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
+			sDCG += !ideal ? Math.pow(1 + log(i + 1, logbase), -1) * DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
 						  :	Math.pow(1 + log(i + 1, logbase), -1) * IDCG(queryRel.get(i), queryOutputPIR.get(i), k);
 		}
 		
@@ -353,36 +357,66 @@ public class CalculateMeasureImpl{
 		return sDCG(queryRel, queryOutputPIR, k, logbase, false) / sDCG(queryRel, queryOutputPIR, k, logbase, true);
 	}
 
-	public void modelFreeSession(ArrayList<Query> queryRel, Session s) {
-		
-		int j = s.getQuery().size();
-		int k = 10;
-		ArrayList<Integer> path;
-		ArrayList<Path> paths = new ArrayList<Path>();
-		Map <String, ArrayList<Path>> pathsession = new HashMap<String, ArrayList<Path>>();
-		for(int i = 0; i < j; i++) {
-			for(int z = 0; z < k; z++){
-				if(i == 0) {
-					path = new ArrayList<Integer>();
-					path.add(z + 1);
-					paths = new ArrayList<Path>();
-					paths.add(new Path(path));
-					pathsession.put(k + "," + i, paths);
-				}else {
-					paths = pathsession.get(k + "," + (i - 1));
-					for(Path p : paths) {
-						p.addElement(z + 1);
-					}
-					
-					pathsession.put(k + "," + i, paths);
-				}
-				
-				
-				
-				
-			}
+//	public void modelFreeSession(ArrayList<Query> queryRel, Session s) {
+//		
+//		int j = s.getQuery().size();
+//		int k = 10;
+//		ArrayList<Integer> path;
+//		ArrayList<Path> paths = new ArrayList<Path>();
+//		Map <String, ArrayList<Path>> pathsession = new HashMap<String, ArrayList<Path>>();
+//		for(int i = 0; i < j; i++) {
+//			for(int z = 0; z < k; z++){
+//				if(i == 0) {
+//					path = new ArrayList<Integer>();
+//					path.add(z + 1);
+//					paths = new ArrayList<Path>();
+//					paths.add(new Path(path));
+//					pathsession.put(k + "," + i, paths);
+//				}else {
+//					paths = pathsession.get(k + "," + (i - 1));
+//					for(Path p : paths) {
+//						p.addElement(z + 1);
+//					}
+//					
+//					pathsession.put(k + "," + i, paths);
+//				}
+//				
+//				
+//				
+//				
+//			}
+//		}
+//	}
+	
+	public static ArrayList<ArrayList<Integer>>  partition(int n, int k, int j, ArrayList<Integer> prefix, ArrayList<ArrayList<Integer>> memo) {
+		if(prefix.size()> j || (n == 0 && prefix.size() < j)) {
+	        	return memo;
+		} 
+		  
+		if (n == 0) {
+			System.out.println(prefix);
+	        memo.add(prefix);
+	        return memo;
 		}
+	        
+		for (int i = n; i >= 1; i--) {
+			
+			if (i <=k) {
+				ArrayList<Integer> prefix_ = new ArrayList<Integer>(prefix);
+				prefix_.add(i);
+				//System.out.println(i);
+				
+				partition(n-i, k, j, prefix_, memo);
+			}
+			
+		}
+		
+		return memo;
+	    
 	}
+	  
+	  
+	
 	
 	
 	/**
@@ -432,32 +466,36 @@ public class CalculateMeasureImpl{
 		Double recall = 0.0;
 		Double fMeasure = 0.0;
 		int k = 0;
-		int nQuery = getRelevanceFile().size();
-		for (int i = 0; i< nQuery; i ++) {
-			queryRel =(QueryRelFile) getRelevanceFile().get(i);
+		//int nQuery = getRelevanceFile().size();
+		Iterator<Entry<String, Query>> it = getRelevanceFile().entrySet().iterator();
+		while (it.hasNext()) {
+			queryRel =(QueryRelFile) it.next().getValue();
 			queryRel = createMeasure(queryRel);
 			for(PIR pir : pirs) {
 				pb.step();
-				queryPIR = pir.getQuery(i);
-				k =  queryRel.getNRelevantDoc();
-				for (; k != 0; k --) {
-					qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
-					qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
+				queryPIR = pir.getQuery(queryRel.getId());
+				if(queryPIR != null) {
 					
-					queryRel.searchMeasure("Precision@"+k).addPIR(pir.getName(), qPrecisionK);
-					queryRel.searchMeasure("Recall@"+k).addPIR(pir.getName(), qRecallK);
+					k =  queryRel.getNRelevantDoc();
+					for (; k != 0; k --) {
+						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
+						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
+						
+						queryRel.searchMeasure("Precision@"+k).addPIR(pir.getName(), qPrecisionK);
+						queryRel.searchMeasure("Recall@"+k).addPIR(pir.getName(), qRecallK);
+						
+					}
 					
+					qNDCG = calculateNDCG(queryRel, queryPIR, 10);
+					precision = precision(queryRel, queryPIR);
+					recall = recall(queryRel, queryPIR);
+					fMeasure = fMeasure(precision, recall, 0.5);
+						
+					queryRel.searchMeasure("NDCG@10").addPIR(pir.getName(), qNDCG);
+					queryRel.searchMeasure("Precision").addPIR(pir.getName(), precision);
+					queryRel.searchMeasure("Recall").addPIR(pir.getName(), recall);
+					queryRel.searchMeasure("fMeasure0.5").addPIR(pir.getName(), fMeasure);
 				}
-				
-				qNDCG = calculateNDCG(queryRel, queryPIR, 10);
-				precision = precision(queryRel, queryPIR);
-				recall = recall(queryRel, queryPIR);
-				fMeasure = fMeasure(precision, recall, 0.5);
-					
-				queryRel.searchMeasure("NDCG@10").addPIR(pir.getName(), qNDCG);
-				queryRel.searchMeasure("Precision").addPIR(pir.getName(), precision);
-				queryRel.searchMeasure("Recall").addPIR(pir.getName(), recall);
-				queryRel.searchMeasure("fMeasure0.5").addPIR(pir.getName(), fMeasure);
 				
 			}
 			pb.stepTo(pirs.size()* pirs.get(0).getQueries().size());// progressbar
@@ -468,7 +506,7 @@ public class CalculateMeasureImpl{
 	/**
 	 * @return the relevanceDoc
 	 */
-	public ArrayList<Query> getRelevanceFile() {
+	public Map<String, Query> getRelevanceFile() {
 		return relevanceFile;
 	}
 

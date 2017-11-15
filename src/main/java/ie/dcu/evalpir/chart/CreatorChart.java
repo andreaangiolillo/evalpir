@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
@@ -38,32 +42,84 @@ public class CreatorChart {
 	  * 
 	  * @param 
 	  */
-	public static void createChart(final ArrayList<Query> queries) {	
+//	public static void createChart(final Map<String,Query> queries) {	
+//		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
+//		pb.maxHint(queries.size() * 40); // progressbar
+//		String path = createFolder("Charts");
+//		ArrayList<Query> topic = new ArrayList<Query>();
+//		Measure[] measures;
+//		
+//		Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
+//		Query q = it.next().getValue();
+//		String topicName = q.getTopic();
+//		topic.add(q);
+//		
+//		while(it.hasNext()){
+//			q = it.next().getValue();
+//			if(q.getTopic().equalsIgnoreCase(topicName)) {
+//				topic.add(q);
+//			}else {
+//				measures = getNameMeasures(topic);
+//				for (Measure measure : measures) {
+//					System.out.println("Topic " + topic.size());
+//					LineChart.CreateLineChart(path, topic, measure);
+//					pb.step();
+//				}
+//				
+//				topic = new ArrayList<Query>();
+//				topic.add(q);
+//				topicName = q.getTopic();
+//			}	
+//		}
+//		
+//		pb.stepTo(queries.size() * 40);// progressbar
+//		pb.stop();// progressbar
+//	}
+	
+	 public static void createChart(final Map<String,Query> queries) {
 		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
 		pb.maxHint(queries.size() * 40); // progressbar
 		String path = createFolder("Charts");
-		ArrayList<Query> topic = new ArrayList<Query>();
+		Map<String, ArrayList<Query>> topics = setTopic(queries);
+		Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
 		Measure[] measures;
-		int nQuery = queries.size();
-		topic.add(queries.get(0));
-		for (int i = 1; i < nQuery; i++) {
-			if(queries.get(i).getTopic().equalsIgnoreCase(queries.get(i - 1).getTopic())) {
-				topic.add(queries.get(i));
-			}else {
-				measures = getNameMeasures(topic);
-				for (Measure measure : measures) {
-					System.out.println("Topic " + topic.size());
-					LineChart.CreateLineChart(path, topic, measure);
-					pb.step();
-				}
-				
-				topic = new ArrayList<Query>();
-				topic.add(queries.get(i));
-			}	
+		ArrayList<Query> topic;
+		while(it.hasNext()) {
+			topic = it.next().getValue();
+			measures = getNameMeasures(topic);
+			for (Measure measure : measures) {
+				LineChart.CreateLineChart(path, topic, measure);
+				pb.step();
+			}
 		}
 		
 		pb.stepTo(queries.size() * 40);// progressbar
 		pb.stop();// progressbar
+	 }
+	
+	 /**
+	  * 
+	  * @param queries
+	  * @return
+	  */
+	public static Map<String, ArrayList<Query>> setTopic(final Map<String,Query> queries){
+		Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
+		Query q;
+		String key ="";
+		Map<String, ArrayList<Query>> topicUser = new HashMap<String, ArrayList<Query>>();
+		while(it.hasNext()) {
+			q = it.next().getValue();
+			key = q.getTopic() +  "," + q.getUser();
+			if(!topicUser.containsKey(q.getTopic() +  "," + q.getUser())) {
+				ArrayList<Query> topic = new ArrayList<Query>();
+				topic.add(q);
+				topicUser.put(key, topic);
+			}else {
+				topicUser.get(key).add(q);
+			}
+		}
+		
+		return topicUser;
 	}
 	
 	/**

@@ -1,13 +1,21 @@
 package ie.dcu.evalpir;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import ie.dcu.evalpir.chart.CreatorChart;
+import ie.dcu.evalpir.elements.Document;
+import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.PIR;
+import ie.dcu.evalpir.elements.Path;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
@@ -23,37 +31,39 @@ import ie.dcu.evalpir.measures.CalculateMeasureImpl;
  * 
  */
 public class EvalEpir {
-	static final String RELEVANCE_FILE_PATH = "src/main/resources/qrels.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv";
+	static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
 	static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
 	
     public static void main( String[] args ) {
     	
     	File relevanceFile = new File(RELEVANCE_FILE_PATH);
     	File logsFile = new File(LOGS_FILE_PATH);
-    	File outputPIR = new File("src/main/resources/result.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv");
+    	File outputPIR = new File("src/main/resources/a.csv");
     	
     	
-    	ArrayList<Query>  qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
+    	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
     	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
     	Map<String, Session> logs = InputReaderImpl.extracLogFile(logsFile);
     	
     	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
-    	for (Query s : qRel) {
-    		//System.out.println(s.toString());
-    	}
+    	Iterator<Entry<String, Query>> itd = qRel.entrySet().iterator();
     	
-    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
-        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
-    	
-        while(it.hasNext()) {
-        	Entry<String, Session> a = it.next();
-        	if(a.getValue().getSessionMeasure()) {
-        		System.out.println(a.getValue().toString());
-        	}
-        
-        }
-    	
-    	
+//    	while (itd.hasNext()) {
+//    		System.out.println(itd.next().getValue().toString());
+//    	}
+//    	
+//    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
+//        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
+//    	
+//        while(it.hasNext()) {
+//        	Entry<String, Session> a = it.next();
+//        	if(a.getValue().getSessionMeasure()) {
+//        		System.out.println(a.getValue().toString());
+//        	}
+//        
+//        }
+//    	
+//    	
     	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
     	
     	for (PIR p : pirs) {
@@ -67,14 +77,33 @@ public class EvalEpir {
     	
     	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
     	
-    	//m.calculateMeasures(pirs);
+    	m.calculateMeasures(pirs);
+    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
     	
-    	for(Query q : qRel) {
-    		//System.out.print(((QueryRelFile)q).printMeasures());
-    	}
-    	
+//    	while (itm.hasNext()) {
+//    		System.out.println(((QueryRelFile)itm.next().getValue()).printMeasures());
+//    	}
+//    	
+//    	for(Query q : qRel) {
+//    		//System.out.print(((QueryRelFile)q).printMeasures());
+//    	}
+//    	
 
-		//CreatorChart.createChart(qRel);
+//    	Path p = new Path();
+//    	ArrayList<Path> memo = new ArrayList<Path>();
+//    	
+//    	ArrayList<Integer> input = new ArrayList<Integer>();
+//    
+//    	
+//    	ArrayList<ArrayList<Integer>> a = new ArrayList<ArrayList<Integer>>();
+//    	//CalculateMeasureImpl.partition(60,15, 5, input, a);
+    	
+//    	Path p = new Path(4);
+//    	Map <String, ArrayList<Path>> memo = new HashMap<String, ArrayList<Path>>();
+//    	CalculateMeasureImpl.findPaths(44, 11, 4, p, memo);
+    	
+    	
+		CreatorChart.createChart(qRel);
 		
     	
     	
@@ -153,5 +182,83 @@ public class EvalEpir {
     	
     }
     
+    
+    public static void randomPIR(PIR p) {
+    	
+    	PIR p1 = new PIR(p);
+    	Map<String, Query> qs = p1.getQueries();
+    	Map<String, Document> dcs;
+    	Iterator<Entry<String, Document>> it;
+    	Random rand = new Random();
+    	int  n = rand.nextInt(1000) + 1;
+    	HashSet<Integer> listRandom = new HashSet<Integer>();
+    	PrintWriter pw = null;
+    	DocumentOutputPIR d;
+    	try {
+    	    pw = new PrintWriter(new File("src/main/resources/NewData.csv"));
+    	} catch (FileNotFoundException e) {
+    	    e.printStackTrace();
+    	}
+    	StringBuilder builder = new StringBuilder();
+    	
+    	//50 is the maximum and the 1 i
+    	Iterator <Entry<String, Query>> its = qs.entrySet().iterator();
+    	while (its.hasNext()){
+    		Query q = its.next().getValue();
+    		dcs = q.getDocs();
+    		it = dcs.entrySet().iterator();
+    		while(it.hasNext()) {
+    			while(listRandom.contains(n)) {
+    				n = rand.nextInt(1000) + 1;
+    			}
+    			
+    			listRandom.add(n);
+    			d = ((DocumentOutputPIR)it.next().getValue());
+    			d.setRank(n);
+    			builder.append(q.getUser() + "," + q.getTopic()+ "," + q.getId()+ "," + d.getId()+ "," + d.getRank()+ "," + d.getSimilarity() + "," + "random");
+    			builder.append("\n");
+    		}
+    		
+    		listRandom = new HashSet<Integer>();
+    	}
+    	pw.write(builder.toString());
+    	pw.close();
+    	
+    	
+    	
+    	
+    }
        
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

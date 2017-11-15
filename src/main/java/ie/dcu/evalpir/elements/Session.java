@@ -203,7 +203,7 @@ public class Session{
 			logs += l.toString() + "\n";
 		}
 		
-		return "Session [id=" + id + ", user=" + getUser() + ", topic=" + getTopic() + "nQuery" + query.size() + ", sessionMeasure=" + sessionMeasure + ", logs=\n" + logs + "]";
+		return "Session [id=" + id + ", user=" + getUser() + ", topic=" + getTopic() + ", nQuery=" + query.size() + ", sessionMeasure=" + sessionMeasure + ", logs=\n" + logs + "]";
 	}
 
 	

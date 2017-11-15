@@ -114,12 +114,15 @@ public class InputReaderImpl /*implements InputReader*/{
 	 * @return Arraylist<User>
 	 * 
 	 */
-	public static ArrayList<Query> extractRelevanceFile(File file) {
+	public static Map<String, Query> extractRelevanceFile(File file) {
 	    BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
 		Map<String,Document> docs = new HashMap<String,Document>();
-		ArrayList<Query> queries = new ArrayList<Query>();
+		Map<String, Document> storeDocs;
+		Map<String, Query> queries = new HashMap<String, Query>();
+		
+		
 		Document doc;
 		QueryRelFile query;
 		
@@ -129,16 +132,21 @@ public class InputReaderImpl /*implements InputReader*/{
 			userKey = topicKey = queryKey = docKey = docValue1 = "";
 		    br = new BufferedReader(new FileReader(file.getPath()));
 		    br.readLine();//removing first row
-		   
 		    while ((line= br.readLine()) != null) {	
 		    	text = (line  != null) ? line.split(cvsSplitBy) : null;
 	    		if(!userKey.equalsIgnoreCase("")) {
 	    			doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
 		    		docs.put(doc.getId(), doc);
 	    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
-	    				query = new QueryRelFile(userKey, topicKey, queryKey, docs);												
-			    		queries.add(query);
-			    		docs =  new HashMap<String,Document>();
+	    				if(!queries.containsKey(queryKey)) {
+		    				query = new QueryRelFile(userKey, topicKey, queryKey, docs);												
+				    		queries.put(queryKey,query);
+	    				}else {
+	    					storeDocs = queries.get(queryKey).getDocs();
+	    					storeDocs.putAll(docs);
+	    				}
+	    				
+	    				docs =  new HashMap<String,Document>();
 	    			}
 	    		}
 	    			
@@ -154,7 +162,7 @@ public class InputReaderImpl /*implements InputReader*/{
 		    doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
 		    docs.put(doc.getId(), doc);
 		    query = new QueryRelFile(userKey, topicKey, queryKey, docs);
-		    queries.add(query);	    
+		    queries.put(queryKey, query);	    
 		}catch (NumberFormatException e) {
 					e.printStackTrace();
 		}catch (FileNotFoundException e) {
@@ -186,7 +194,7 @@ public class InputReaderImpl /*implements InputReader*/{
 		String line = "";
 		String cvsSplitBy = ","; 
 		Map<String,Document> docs = new HashMap<String,Document>();
-		ArrayList<Query> queries = new ArrayList<Query>();
+		Map<String, Query> queries = new HashMap<String, Query>();
 		ArrayList<PIR> pirs = new ArrayList<PIR>();
 		Document doc;
 		Query query;
@@ -208,14 +216,14 @@ public class InputReaderImpl /*implements InputReader*/{
 	    		
 	    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
 	    				query = new Query(userKey, topicKey, queryKey, docs);												
-			    		queries.add(query);
+			    		queries.put(query.getId(), query);
 			    		docs =  new HashMap<String,Document>();
 	    			}
 			    	
 			    	if(!modelKey.equalsIgnoreCase(text[6].replaceAll("\\s+",""))){
 			    		pir = new PIR(modelKey, queries);
 			    		pirs.add(pir);
-			    		queries = new ArrayList<Query>();
+			    		queries = new HashMap<String, Query>();
 			    	}
 			    
 	    		}
@@ -232,7 +240,7 @@ public class InputReaderImpl /*implements InputReader*/{
 		    doc = new DocumentOutputPIR(docKey, Integer.parseInt(docValue1), Double.parseDouble(docValue2));
 		    docs.put(doc.getId(), doc);
 		    query = new Query(userKey, topicKey,queryKey, docs);
-		    queries.add(query);
+		    queries.put(query.getId(),query);
 		    pir = new PIR(modelKey, queries);
 		    pirs.add(pir);
 		    
