@@ -47,10 +47,16 @@ public class EvalEpir {
     	
     	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
     	Iterator<Entry<String, Query>> itd = qRel.entrySet().iterator();
-    	
-//    	while (itd.hasNext()) {
-//    		System.out.println(itd.next().getValue().toString());
-//    	}
+    	Query q1;
+    	while (itd.hasNext()) {
+    		q1 = itd.next().getValue();
+    		
+    		if(q1.getId().equals("256")) {
+    			//System.out.println(q1.toString());
+    		//	System.out.println(((QueryRelFile)q1).getNRelevantDoc());
+    		}
+    		
+    	}
 //    	
 //    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
 //        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
@@ -82,8 +88,10 @@ public class EvalEpir {
     	Query q ;
     	while (itm.hasNext()) {
     		q = itm.next().getValue();
+    		if(q.getUser().equals("151")) {
+    			//System.out.println(((QueryRelFile)q).printMeasures());
+    		}
     		
-    		System.out.println(((QueryRelFile)q).printMeasures());
     		
     	}
 //    	

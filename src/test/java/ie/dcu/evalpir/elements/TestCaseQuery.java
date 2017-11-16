@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -15,7 +16,7 @@ public class TestCaseQuery {
 	static final String RELEVANCE_FILE_PATH =  "src/main/resources/qrels.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv";
 	
 	
-	private ArrayList<Query>  rel; 
+	private Map<String, Query>  rel; 
 	private ArrayList<PIR>  result;
 	
 	/**

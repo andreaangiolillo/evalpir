@@ -318,7 +318,7 @@ public class CalculateMeasureImpl{
 		double[] session = new double[measure.length];
 		for (int i = 0; i < measure.length; i++) {
 			session[i] += (i == 0) ? measure[i] * Math.exp(-(1 + measure[i]))
-								: measure[i] * Math.exp(-1 + (measure[i] - measure[i - 1]));
+								: session[i - 1] + measure[i] * Math.exp(-1 + (measure[i] - measure[i - 1]));
 		}
 		
 		return session;
@@ -357,7 +357,7 @@ public class CalculateMeasureImpl{
 	 * @param ideal
 	 * @return
 	 */
-	public static double NSDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int k, int logbase, boolean ideal) {
+	public static double NsDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int k, int logbase, boolean ideal) {
 		return sDCG(queryRel, queryOutputPIR, k, logbase, false) / sDCG(queryRel, queryOutputPIR, k, logbase, true);
 	}
 

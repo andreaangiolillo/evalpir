@@ -38,44 +38,10 @@ public class CreatorChart {
 			return "";	
 	 }
 	
-	 /***
+	 /**
 	  * 
-	  * @param 
+	  * @param queries
 	  */
-//	public static void createChart(final Map<String,Query> queries) {	
-//		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
-//		pb.maxHint(queries.size() * 40); // progressbar
-//		String path = createFolder("Charts");
-//		ArrayList<Query> topic = new ArrayList<Query>();
-//		Measure[] measures;
-//		
-//		Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
-//		Query q = it.next().getValue();
-//		String topicName = q.getTopic();
-//		topic.add(q);
-//		
-//		while(it.hasNext()){
-//			q = it.next().getValue();
-//			if(q.getTopic().equalsIgnoreCase(topicName)) {
-//				topic.add(q);
-//			}else {
-//				measures = getNameMeasures(topic);
-//				for (Measure measure : measures) {
-//					System.out.println("Topic " + topic.size());
-//					LineChart.CreateLineChart(path, topic, measure);
-//					pb.step();
-//				}
-//				
-//				topic = new ArrayList<Query>();
-//				topic.add(q);
-//				topicName = q.getTopic();
-//			}	
-//		}
-//		
-//		pb.stepTo(queries.size() * 40);// progressbar
-//		pb.stop();// progressbar
-//	}
-	
 	 public static void createChart(final Map<String,Query> queries) {
 		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
 		pb.maxHint(queries.size() * 40); // progressbar
