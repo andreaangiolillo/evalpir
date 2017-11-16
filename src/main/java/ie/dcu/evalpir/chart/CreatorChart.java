@@ -108,15 +108,18 @@ public class CreatorChart {
 		String key ="";
 		Map<String, ArrayList<Query>> topicUser = new HashMap<String, ArrayList<Query>>();
 		while(it.hasNext()) {
-			q = it.next().getValue();
-			key = q.getTopic() +  "," + q.getUser();
-			if(!topicUser.containsKey(q.getTopic() +  "," + q.getUser())) {
-				ArrayList<Query> topic = new ArrayList<Query>();
-				topic.add(q);
-				topicUser.put(key, topic);
-			}else {
-				topicUser.get(key).add(q);
+			q = it.next().getValue();	
+			if(((QueryRelFile)q).isToConsiderForChart()) {
+				key = q.getTopic() +  "," + q.getUser();
+				if(!topicUser.containsKey(q.getTopic() +  "," + q.getUser())) {
+					ArrayList<Query> topic = new ArrayList<Query>();
+					topic.add(q);
+					topicUser.put(key, topic);
+				}else {
+					topicUser.get(key).add(q);
+				}
 			}
+			
 		}
 		
 		return topicUser;
@@ -135,7 +138,7 @@ public class CreatorChart {
 	public static Measure[] getNameMeasures(final ArrayList<Query> topic) {
 		Measure [] nameMeasures = null;
 		if (topic.get(0) instanceof QueryRelFile) {
-			 Map<String, Measure> minMeasures = ((QueryRelFile)topic.get(0)).getMeasures();
+			Map<String, Measure> minMeasures = ((QueryRelFile)topic.get(0)).getMeasures();
 			for (Query q : topic) {
 				Map<String, Measure> measure = ((QueryRelFile)q).getMeasures();
 				if( measure.size() < minMeasures.size()) {

@@ -281,7 +281,7 @@ public class CalculateMeasureImpl{
 	public static double calculatePKRK(Query queryRel, Query queryOutputPIR , int k, boolean recall) {
 		double relDoc = 0; // number of relevant docs found
 		double nRelevantDoc = ((QueryRelFile) queryRel).getNRelevantDoc(); // number of relevant docs in queryRel
-		if(nRelevantDoc != -1) {
+		if(nRelevantDoc != 0) {
 			//System.out.print("SIZEEE" + queryRel.getId() + " " + queryRel.getTopic() + " " + queryRel.getUser());
 			Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
 			DocumentRelFile docRel;
@@ -296,7 +296,11 @@ public class CalculateMeasureImpl{
 			}
 			
 			double denominator = (recall == true) ? nRelevantDoc : k; 
-			//System.out.println("Query " + queryOutputPIR.getId() + " RelDOc " + relDoc + " denominator " + denominator + " recall: " + recall);
+//			if(queryOutputPIR.getId().equalsIgnoreCase("110")) {
+//				System.out.println("Query " + queryOutputPIR.getId() + " RelDOc " + relDoc + " denominator " + denominator + " recall: " + recall);
+//				System.out.println(((QueryRelFile) queryRel).toString());
+//			}
+			
 			return (relDoc / denominator);
 		}
 		
@@ -447,7 +451,10 @@ public class CalculateMeasureImpl{
 		q.addMeasure(new Measure("Precision"));
 		q.addMeasure(new Measure("Recall"));
 		q.addMeasure(new Measure("fMeasure0.5"));
+		q.addMeasure(new Measure("NDCG@5"));
 		q.addMeasure(new Measure("NDCG@10"));
+		q.addMeasure(new Measure("NDCG@15"));
+		q.addMeasure(new Measure("NDCG@20"));
 		
 		return q;
 	}
@@ -456,12 +463,12 @@ public class CalculateMeasureImpl{
 		
 		ProgressBar pb = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
 		pb.maxHint(pirs.size()* pirs.get(0).getQueries().size()); // progressbar
-		Query queryPIR;
+		Query queryPIR = null;
 		QueryRelFile queryRel;
 		/*Measures variables*/
 		Double qPrecisionK = 0.0;
 		Double qRecallK = 0.0;
-		Double qNDCG = 0.0;
+		Double qNDCG5, qNDCG10, qNDCG15, qNDCG20 = 0.0;
 		Double precision = 0.0;
 		Double recall = 0.0;
 		Double fMeasure = 0.0;
@@ -469,13 +476,13 @@ public class CalculateMeasureImpl{
 		//int nQuery = getRelevanceFile().size();
 		Iterator<Entry<String, Query>> it = getRelevanceFile().entrySet().iterator();
 		while (it.hasNext()) {
-			queryRel =(QueryRelFile) it.next().getValue();
+			queryRel = (QueryRelFile) it.next().getValue();
 			queryRel = createMeasure(queryRel);
 			for(PIR pir : pirs) {
 				pb.step();
 				queryPIR = pir.getQuery(queryRel.getId());
 				if(queryPIR != null) {
-					
+					queryRel.setToConsiderForChart(true);
 					k =  queryRel.getNRelevantDoc();
 					for (; k != 0; k --) {
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
@@ -485,13 +492,18 @@ public class CalculateMeasureImpl{
 						queryRel.searchMeasure("Recall@"+k).addPIR(pir.getName(), qRecallK);
 						
 					}
-					
-					qNDCG = calculateNDCG(queryRel, queryPIR, 10);
+					qNDCG5 = calculateNDCG(queryRel, queryPIR, 5);
+					qNDCG10 = calculateNDCG(queryRel, queryPIR, 10);
+					qNDCG15 = calculateNDCG(queryRel, queryPIR, 15);
+					qNDCG20 = calculateNDCG(queryRel, queryPIR, 20);
 					precision = precision(queryRel, queryPIR);
 					recall = recall(queryRel, queryPIR);
 					fMeasure = fMeasure(precision, recall, 0.5);
 						
-					queryRel.searchMeasure("NDCG@10").addPIR(pir.getName(), qNDCG);
+					queryRel.searchMeasure("NDCG@5").addPIR(pir.getName(), qNDCG5);
+					queryRel.searchMeasure("NDCG@10").addPIR(pir.getName(), qNDCG10);
+					queryRel.searchMeasure("NDCG@15").addPIR(pir.getName(), qNDCG15);
+					queryRel.searchMeasure("NDCG@20").addPIR(pir.getName(), qNDCG20);
 					queryRel.searchMeasure("Precision").addPIR(pir.getName(), precision);
 					queryRel.searchMeasure("Recall").addPIR(pir.getName(), recall);
 					queryRel.searchMeasure("fMeasure0.5").addPIR(pir.getName(), fMeasure);

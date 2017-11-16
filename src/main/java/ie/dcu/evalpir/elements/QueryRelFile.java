@@ -8,6 +8,7 @@ import java.util.Map;
 public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	
 	private Map<String, Measure> measures;
+	private boolean toConsiderForChart;
 	
 	/***
 	 * 
@@ -15,6 +16,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	public QueryRelFile(String user, String topic, String id) {
 		super(user, topic, id);
 		this.measures = new HashMap<String, Measure>();
+		this.toConsiderForChart = false;
 	}
 
 	/***
@@ -23,6 +25,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs) {
 		super(user, topic, id, docs);
 		this.measures = new HashMap<String, Measure>();
+		this.toConsiderForChart = false;
 	}
 
 
@@ -32,6 +35,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs, HashMap<String, Measure> measures) {
 		super(user, topic, id, docs);
 		this.measures = measures;
+		this.toConsiderForChart = false;
 	}
 	
 	/**
@@ -59,6 +63,20 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	}
 
 	
+
+	/**
+	 * @return the toConsiderForChart
+	 */
+	public boolean isToConsiderForChart() {
+		return toConsiderForChart;
+	}
+
+	/**
+	 * @param toConsiderForChart the toConsiderForChart to set
+	 */
+	public void setToConsiderForChart(boolean toConsiderForChart) {
+		this.toConsiderForChart = toConsiderForChart;
+	}
 
 	/**
 	 * @return the measures

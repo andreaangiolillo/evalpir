@@ -79,10 +79,13 @@ public class EvalEpir {
     	
     	m.calculateMeasures(pirs);
     	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
-    	
-//    	while (itm.hasNext()) {
-//    		System.out.println(((QueryRelFile)itm.next().getValue()).printMeasures());
-//    	}
+    	Query q ;
+    	while (itm.hasNext()) {
+    		q = itm.next().getValue();
+    		
+    		System.out.println(((QueryRelFile)q).printMeasures());
+    		
+    	}
 //    	
 //    	for(Query q : qRel) {
 //    		//System.out.print(((QueryRelFile)q).printMeasures());

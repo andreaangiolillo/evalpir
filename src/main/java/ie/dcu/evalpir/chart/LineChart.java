@@ -47,7 +47,7 @@ public class LineChart{
 		JFreeChart chart = createChart(dataset, user, nameTopic, m.getName(), topic);
 		chart.setBackgroundPaint(Color.WHITE);
 		
-		System.out.println("MEASURE NAME: " + m.getName());
+		//System.out.println("MEASURE NAME: " + m.getName());
         try {
 			ChartUtilities.saveChartAsPNG(new File(path + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
 		} catch (IOException e) {
@@ -115,20 +115,7 @@ public class LineChart{
 	 }
 	 
 	 private static void setXYAxis(JFreeChart chart, String measure, ArrayList<Query> topic) {
-		
-		NumberAxis xAxis = new NumberAxis();
-		xAxis.setTickUnit(new NumberTickUnit(1));
-		boolean isNormaliseMeasure = false;
-		String[] normaliseMeasure = new String[] {"precision@", "recall@", "ndcn", "precision", "recall", "fmeasure"};
-		int i = 0;
-		while(i < normaliseMeasure.length && !isNormaliseMeasure) {
-			if(measure.toLowerCase().contains(normaliseMeasure[i])){
-				isNormaliseMeasure = true;
-			}
-			
-			i++;
-		}
-		
+		//Setting the xAxis
 		String[]name = new String[topic.size()];
 		for(int j = 0; j < topic.size(); j++) {
 			name[j] = topic.get(j).getId();
@@ -137,14 +124,23 @@ public class LineChart{
 		SymbolAxis rangeAxis = new SymbolAxis("Query", name);
 		rangeAxis.setTickUnit(new NumberTickUnit(1));
 		rangeAxis.setRange(0,topic.size());
-		 
 		XYPlot plot = (XYPlot) chart.getPlot();
-		//plot.setRenderer(renderer);
-		//plot.setRangeAxis(rangeAxis);
 		plot.setDomainAxis(rangeAxis);
+		
+		//Setting the yAxis
+		boolean isNormaliseMeasure = false;
+		String[] normaliseMeasure = new String[] {"precision@", "recall@", "ndcg", "precision", "recall", "fmeasure"};
+		int i = 0;
+		while(i < normaliseMeasure.length && !isNormaliseMeasure) {
+			if(measure.toLowerCase().contains(normaliseMeasure[i])){
+				isNormaliseMeasure = true;
+			}
+			
+			i++;
+		}
 		if (isNormaliseMeasure) {
 			ValueAxis yAxis = plot.getRangeAxis();
-			yAxis.setRange(0, 1.0);
+			yAxis.setRange(0, 1);
 		}		
 	 }
 	
