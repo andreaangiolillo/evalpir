@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	
-	private Map<String, Measure> measures;
+	private Map<String, AbstractMeasure> measures;
 	private boolean toConsiderForChart;
 	
 	/***
@@ -15,7 +15,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 */
 	public QueryRelFile(String user, String topic, String id) {
 		super(user, topic, id);
-		this.measures = new HashMap<String, Measure>();
+		this.measures = new HashMap<String, AbstractMeasure>();
 		this.toConsiderForChart = false;
 	}
 
@@ -24,7 +24,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 */
 	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs) {
 		super(user, topic, id, docs);
-		this.measures = new HashMap<String, Measure>();
+		this.measures = new HashMap<String, AbstractMeasure>();
 		this.toConsiderForChart = false;
 	}
 
@@ -32,7 +32,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	/**
 	 * @param measures
 	 */
-	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs, HashMap<String, Measure> measures) {
+	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs, HashMap<String, AbstractMeasure> measures) {
 		super(user, topic, id, docs);
 		this.measures = measures;
 		this.toConsiderForChart = false;
@@ -42,7 +42,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 * 
 	 * @param m
 	 */
-	public void addMeasure(Measure m) {
+	public void addMeasure(AbstractMeasure m) {
 		getMeasures().put(m.getName().trim().toLowerCase(), m);
 	}
 	
@@ -58,7 +58,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 * @param name
 	 * @return
 	 */
-	public Measure searchMeasure(String name) {
+	public AbstractMeasure searchMeasure(String name) {
 		return getMeasures().get(name.trim().toLowerCase());
 	}
 
@@ -81,7 +81,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	/**
 	 * @return the measures
 	 */
-	public Map<String, Measure> getMeasures() {
+	public Map<String, AbstractMeasure> getMeasures() {
 		return measures;
 	}
 
@@ -116,7 +116,10 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		
 		while(it.hasNext()) {
 			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
-			stringDoc += ((Measure)pair.getValue()).printMeasure(getUser(), getTopic(), getId()) + "\n";
+			if(pair.getValue() instanceof Measure) {
+				stringDoc += ((Measure)pair.getValue()).printMeasure(getUser(), getTopic(), getId()) + "\n";
+			}
+			
 		}
 		
 		return stringDoc;

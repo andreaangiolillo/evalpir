@@ -137,6 +137,9 @@ public class InputReaderImpl /*implements InputReader*/{
 	    		if(!userKey.equalsIgnoreCase("")) {
 	    			doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
 		    		docs.put(doc.getId(), doc);
+		    		
+		    		
+		    		
 	    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
 	    				if(!queries.containsKey(queryKey)) {
 		    				query = new QueryRelFile(userKey, topicKey, queryKey, docs);												
@@ -155,8 +158,6 @@ public class InputReaderImpl /*implements InputReader*/{
 		    	queryKey = text[2].replaceAll("\\s+","");
 		    	docKey = text[3].replaceAll("\\s+","");
 		    	docValue1 = text[4].replaceAll("\\s+","");
-	    	
-		    	
 		    }
 		    
 		    doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));

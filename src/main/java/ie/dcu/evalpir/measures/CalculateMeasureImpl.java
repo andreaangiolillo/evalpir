@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import javax.sql.rowset.spi.TransactionalWriter;
 
+import org.antlr.v4.tool.ast.QuantifierAST;
 import org.apache.commons.lang3.ArrayUtils;
 
 import ie.dcu.evalpir.elements.Document;
@@ -17,6 +18,7 @@ import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
+import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Path;
@@ -94,21 +96,17 @@ public class CalculateMeasureImpl{
 	
 	
 	/**
-	 * Average Precision (AP) is the average precision at k values
-	 * computed after each relevant document is retrieved for a given topic,
-	 *  
-	 * If the query doesn't have at least one relevant document it returns 0.
-	 * 
+	 * This function is used to calculate the Precision/Recall Curve
 	 * @input queryRel
 	 * @input queryOutputPIR
-	 * @input interpolation if it is true calculates the Interpolation Average Precision on 11 level (0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100).
-	 * @return AP
+	 * @assumption If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc to be zero 
+	 * @return listPair
 	 * @Complexity O(n^2)
 	 * **/
-	public static double ap(Query queryRel, Query queryOutputPIR, boolean interpolation) {
-		int nRelevantDoc = (((QueryRelFile) queryRel).getNRelevantDoc() == 0) ? -1 : ((QueryRelFile) queryRel).getNRelevantDoc();
-		double aveP = 0.0;
-		if(nRelevantDoc != -1) {
+	public static ArrayList<Pair<Integer, Double>> precisionRecallCurve(Query queryRel, Query queryOutputPIR) {		
+		int nRelevantDoc = ((QueryRelFile) queryRel).getNRelevantDoc();
+		if(nRelevantDoc != 0) {
+			int nRelDocFind = 0;
 			Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
 			DocumentRelFile docRel;
 			DocumentOutputPIR docOut;
@@ -117,31 +115,55 @@ public class CalculateMeasureImpl{
 				Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
 				docOut = (DocumentOutputPIR)pairDocOUT.getValue();
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
-				if(docRel != null & docRel.getIsRelevance()) {
-					listPair.add(new Pair<Integer, Double>(docOut.getRank(), calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false)));
+				if(docRel != null && docRel.getIsRelevance()) {
+					nRelDocFind ++;
+					listPair.add(new Pair<Integer, Double>(docOut.getRank(), calculatePKRK(queryRel, queryOutputPIR , docOut.getRank(), false)));					
 				}
 			}
 			
-			if(interpolation) {
-				Collections.sort(listPair);
-				for (int i = 0; i < 11; i++) {
-					aveP += interpolation(i, listPair);
-				}
-				
-			}else {
-				for (Pair<Integer, Double> p : listPair) {
-					aveP += (Double)p.getValue();
-				}
-				
+			Collections.sort(listPair);
+			for(int i = 0; i < listPair.size(); i++) { // setting the key as the recall point where the doc was found
+				listPair.get(i).setKey(((i + 1) * 100)/ nRelevantDoc);
 			}
-			aveP = (interpolation) ? aveP/11 : aveP/nRelevantDoc;
-		}else {
-			return 0; // return 0 if there isn't a relevant document
 			
+			if(nRelevantDoc > nRelDocFind){// If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc to be zero 
+				while(nRelevantDoc > nRelDocFind) {
+					nRelDocFind ++;
+					listPair.add(new Pair<Integer, Double>((nRelDocFind * 100)/nRelevantDoc, 0.0));	
+				}
+			}
+			
+			return listPair;	
+		}
+	
+		return null;	
+	}
+	
+	/***
+	 * Average Precision (AP) is the average precision at k values
+	 * computed after each relevant document is retrieved for a given topic,
+	 *  
+	 * If the query doesn't have at least one relevant document it returns 0
+	 * @param queryRel
+	 * @param queryOutputPIR
+	 * @return
+	 */
+	public static double calculateAP(Query queryRel, Query queryOutputPIR) {
+		ArrayList<Pair<Integer, Double>> ap = precisionRecallCurve(queryRel, queryOutputPIR);
+		if(ap != null) {
+			double averagePrecision = 0.0;
+			int size = ap.size();
+			for(int i = 0; i < size; i++) {
+				averagePrecision += ap.get(i).getValue();
+			}
+						
+			return averagePrecision / size;		
 		}
 		
-		return aveP;
+		return 0.0;
 	}
+	
+	
 	
 	/**
 	 *  It implements an interpolated precision that takes the maximum precision 
@@ -455,10 +477,13 @@ public class CalculateMeasureImpl{
 		q.addMeasure(new Measure("NDCG@10"));
 		q.addMeasure(new Measure("NDCG@15"));
 		q.addMeasure(new Measure("NDCG@20"));
+		q.addMeasure(new Measure("Average Precision"));
+		q.addMeasure(new MeasureCompound("PrecisionRecallCurve"));
 		
 		return q;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void calculateMeasures(ArrayList<PIR> pirs) {
 		
 		ProgressBar pb = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
@@ -466,12 +491,14 @@ public class CalculateMeasureImpl{
 		Query queryPIR = null;
 		QueryRelFile queryRel;
 		/*Measures variables*/
-		Double qPrecisionK = 0.0;
-		Double qRecallK = 0.0;
-		Double qNDCG5, qNDCG10, qNDCG15, qNDCG20 = 0.0;
-		Double precision = 0.0;
-		Double recall = 0.0;
-		Double fMeasure = 0.0;
+		double qPrecisionK = 0.0;
+		double qRecallK = 0.0;
+		double qNDCG5, qNDCG10, qNDCG15, qNDCG20 = 0.0;
+		double precision = 0.0;
+		double recall = 0.0;
+		double fMeasure = 0.0;
+		double ap = 0.0;
+		
 		int k = 0;
 		//int nQuery = getRelevanceFile().size();
 		Iterator<Entry<String, Query>> it = getRelevanceFile().entrySet().iterator();
@@ -488,10 +515,11 @@ public class CalculateMeasureImpl{
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
 						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
 						
-						queryRel.searchMeasure("Precision@"+k).addPIR(pir.getName(), qPrecisionK);
-						queryRel.searchMeasure("Recall@"+k).addPIR(pir.getName(), qRecallK);
+						((Measure) queryRel.searchMeasure("Precision@"+k)).addPIR(pir.getName(), qPrecisionK);
+						((Measure) queryRel.searchMeasure("Recall@"+k)).addPIR(pir.getName(), qRecallK);
 						
 					}
+					
 					qNDCG5 = calculateNDCG(queryRel, queryPIR, 5);
 					qNDCG10 = calculateNDCG(queryRel, queryPIR, 10);
 					qNDCG15 = calculateNDCG(queryRel, queryPIR, 15);
@@ -499,14 +527,22 @@ public class CalculateMeasureImpl{
 					precision = precision(queryRel, queryPIR);
 					recall = recall(queryRel, queryPIR);
 					fMeasure = fMeasure(precision, recall, 0.5);
+					ap = calculateAP(queryRel, queryPIR);
 						
-					queryRel.searchMeasure("NDCG@5").addPIR(pir.getName(), qNDCG5);
-					queryRel.searchMeasure("NDCG@10").addPIR(pir.getName(), qNDCG10);
-					queryRel.searchMeasure("NDCG@15").addPIR(pir.getName(), qNDCG15);
-					queryRel.searchMeasure("NDCG@20").addPIR(pir.getName(), qNDCG20);
-					queryRel.searchMeasure("Precision").addPIR(pir.getName(), precision);
-					queryRel.searchMeasure("Recall").addPIR(pir.getName(), recall);
-					queryRel.searchMeasure("fMeasure0.5").addPIR(pir.getName(), fMeasure);
+					((Measure) queryRel.searchMeasure("NDCG@5")).addPIR(pir.getName(), qNDCG5);
+					((Measure) queryRel.searchMeasure("NDCG@10")).addPIR(pir.getName(), qNDCG10);
+					((Measure) queryRel.searchMeasure("NDCG@15")).addPIR(pir.getName(), qNDCG15);
+					((Measure) queryRel.searchMeasure("NDCG@20")).addPIR(pir.getName(), qNDCG20);
+					((Measure) queryRel.searchMeasure("Precision")).addPIR(pir.getName(), precision);
+					((Measure) queryRel.searchMeasure("Recall")).addPIR(pir.getName(), recall);
+					((Measure) queryRel.searchMeasure("fMeasure0.5")).addPIR(pir.getName(), fMeasure);
+					((Measure) queryRel.searchMeasure("Average Precision")).addPIR(pir.getName(), ap);
+					((MeasureCompound)queryRel.searchMeasure("PrecisionRecallCurve")).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
+					
+					if(queryRel.getId().equals("121")) {
+						
+					}
+				
 				}
 				
 			}

@@ -51,10 +51,10 @@ public class EvalEpir {
     	while (itd.hasNext()) {
     		q1 = itd.next().getValue();
     		
-    		if(q1.getId().equals("256")) {
-    			//System.out.println(q1.toString());
-    		//	System.out.println(((QueryRelFile)q1).getNRelevantDoc());
-    		}
+//    		if(q1.getId().equals("122") ) {
+//    			System.out.println(q1.toString());
+//    			System.out.println(((QueryRelFile)q1).getNRelevantDoc());
+//    		}
     		
     	}
 //    	
@@ -88,7 +88,7 @@ public class EvalEpir {
     	Query q ;
     	while (itm.hasNext()) {
     		q = itm.next().getValue();
-    		if(q.getUser().equals("151")) {
+    		if(q.getUser().equals("121")) {
     			//System.out.println(((QueryRelFile)q).printMeasures());
     		}
     		

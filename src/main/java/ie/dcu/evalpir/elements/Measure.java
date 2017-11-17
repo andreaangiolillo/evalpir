@@ -6,18 +6,13 @@ import java.util.Comparator;
 
 import de.vandermeer.asciitable.AsciiTable;
 
-public class Measure {
-	private String name;
-	private ArrayList<Pair<String, Double>> PIRvalue;
-	
-	
-	
-	
+public class Measure extends AbstractMeasure{
+	private ArrayList<Pair<String, Double>> PIRvalue;	
 	/**
 	 * 
 	 */
 	public Measure(String name) {
-		this.name = name;
+		super(name);
 		this.PIRvalue = new ArrayList<Pair<String,Double>>();
 	}
 
@@ -26,19 +21,18 @@ public class Measure {
 	 * @param value
 	 */
 	public Measure(String name, ArrayList<Pair<String, Double>> value) {
-		super();
-		this.name = name;
+		super(name);
 		this.PIRvalue = value;
 	}
 	
 	
 	public void  addPIR(String key, Double value) {
-		this.PIRvalue.add(new Pair(key, value));
+		this.PIRvalue.add(new Pair<String, Double>(key, value));
 	}
 	
 	
 	public double  getPIR(String key) {
-		for (Pair p : PIRvalue) {
+		for (Pair<String, Double> p : PIRvalue) {
 			if (p.getKey().equals(key)) {
 				return (Double) p.getValue();
 			}
@@ -46,7 +40,7 @@ public class Measure {
 		return 0;
 	}
 
-	public Pair getPIR(int i) {
+	public Pair<String, Double> getPIR(int i) {
 		return PIRvalue.get(i);
 	}
 		
@@ -54,7 +48,7 @@ public class Measure {
 	 * @return the name
 	 */
 	public String getName() {
-		return name;
+		return super.getName();
 	}
 
 

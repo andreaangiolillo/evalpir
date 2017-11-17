@@ -9,7 +9,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Measure;
+import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import me.tongfei.progressbar.ProgressBar;
@@ -17,6 +19,8 @@ import me.tongfei.progressbar.ProgressBar;
 
 public class CreatorChart {
 
+	final static String[] MEASURES = {"Recall", "Precision", "Average Precision", "NDCG@5", "NDCG@10", 
+										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" };
 	/**
 	 * It Creates the folder for the diagrams
 	 * @param nameFolder
@@ -28,10 +32,14 @@ public class CreatorChart {
 				path = new File(".").getCanonicalPath() + "/" + nameFolder;
 				File dir = new File(path);
 		        dir.mkdir();
-				return (path);
-				
-				
-			} catch (IOException e) {
+		        File subdir;
+		        for(int i = 0; i < MEASURES.length; i++) {
+		        	subdir = new File(path + "/" + MEASURES[i]); 
+		        	subdir.mkdir();
+		        }
+		  
+				return (path);	
+			}catch (IOException e) {
 				e.printStackTrace();
 			}
 			
@@ -48,13 +56,18 @@ public class CreatorChart {
 		String path = createFolder("Charts");
 		Map<String, ArrayList<Query>> topics = setTopic(queries);
 		Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
-		Measure[] measures;
+		AbstractMeasure[] measures;
 		ArrayList<Query> topic;
 		while(it.hasNext()) {
 			topic = it.next().getValue();
 			measures = getNameMeasures(topic);
-			for (Measure measure : measures) {
-				LineChart.CreateLineChart(path, topic, measure);
+			for (AbstractMeasure measure : measures) {
+				if(measure instanceof Measure) {
+					LineChart.CreateLineChartPerTopic(path, topic, (Measure)measure);
+				}else if(measure instanceof MeasureCompound) {
+					LineChart.CreateLineChartPerQuery(path, topic, measure.getName());
+				}
+				
 				pb.step();
 			}
 		}
@@ -101,19 +114,19 @@ public class CreatorChart {
 	 * @return Measures
 	 *
 	 * **/	
-	public static Measure[] getNameMeasures(final ArrayList<Query> topic) {
-		Measure [] nameMeasures = null;
+	public static AbstractMeasure[] getNameMeasures(final ArrayList<Query> topic) {
+		AbstractMeasure [] nameMeasures = null;
 		if (topic.get(0) instanceof QueryRelFile) {
-			Map<String, Measure> minMeasures = ((QueryRelFile)topic.get(0)).getMeasures();
+			Map<String, AbstractMeasure> minMeasures = ((QueryRelFile)topic.get(0)).getMeasures();
 			for (Query q : topic) {
-				Map<String, Measure> measure = ((QueryRelFile)q).getMeasures();
+				Map<String, AbstractMeasure> measure = ((QueryRelFile)q).getMeasures();
 				if( measure.size() < minMeasures.size()) {
 					minMeasures = measure;
 				}
 			}
 			
-		Collection<Measure> value = minMeasures.values();
-		nameMeasures = value.toArray(new Measure[value.size()]);
+		Collection<AbstractMeasure> value = minMeasures.values();
+		nameMeasures = value.toArray(new AbstractMeasure[value.size()]);
 		}
 		
 		return nameMeasures;

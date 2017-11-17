@@ -19,6 +19,13 @@ public class Pair<K extends Comparable<K>,T> implements Comparable<Pair<K,T>>{
 	public K getKey() {
 		return key;
 	}
+	
+	/**
+	 * @param key the key to set
+	 */
+	public void setKey(K key) {
+		this.key = key;
+	}
 	/**
 	 * @return the value
 	 */

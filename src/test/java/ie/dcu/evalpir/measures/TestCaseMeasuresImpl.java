@@ -94,8 +94,8 @@ public class TestCaseMeasuresImpl {
 		Query qOut = new Query("user", "topic", "queryOut", docs1);
 		
 		
-		assertEquals(0.783, CalculateMeasureImpl.ap(qRel, qOut, false), 0.001);
-		assertEquals(0.712121212, CalculateMeasureImpl.ap(qRel, qOut, true), 0.001);	
+		assertEquals(0.783, CalculateMeasureImpl.calculateAP(qRel, qOut), 0.001);
+		
 	}
 	
 	
