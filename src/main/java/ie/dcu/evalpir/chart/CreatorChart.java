@@ -53,7 +53,7 @@ public class CreatorChart {
 	  */
 	 public static void createChart(final Map<String,Query> queries) {
 		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
-		pb.maxHint(queries.size() * 40); // progressbar
+		pb.maxHint(queries.size()*10 ); // progressbar
 		String path = createFolder("Charts");
 		Map<String, ArrayList<Query>> topics = setTopic(queries);
 		Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
@@ -73,8 +73,9 @@ public class CreatorChart {
 			}
 		}
 		
-		pb.stepTo(queries.size() * 40);// progressbar
+		pb.stepTo(queries.size()*10 );// progressbar
 		pb.stop();// progressbar
+		System.out.print("\n");
 	 }
 	
 	 /**

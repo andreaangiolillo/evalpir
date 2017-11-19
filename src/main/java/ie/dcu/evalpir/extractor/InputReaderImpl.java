@@ -33,45 +33,12 @@ public class InputReaderImpl /*implements InputReader*/{
 	/**
 	 * @input logsfile
 	 * 
-	 **/
-//	public static Map<String ,Session> extracLogFile(File logsFile){
-//		BufferedReader br = null;
-//		String line = "";
-//		String cvsSplitBy = ","; 
-//		Map<String ,Session> sessions = new HashMap<String, Session>();		
-//		try {
-//			String[] row;
-//			br = new BufferedReader(new FileReader(logsFile.getPath()));
-//			Log log;
-//			Session session;
-//			br.readLine();//removing first row
-//			while ((line= br.readLine()) != null) {	
-//				row = (line  != null) ? line.split(cvsSplitBy) : null;
-//				log = new Log(row[5], row[4], row[1], row[3]);
-//				if(sessions.containsKey(row[8].toLowerCase())) {
-//					sessions.get(row[8]).addLog(log);
-//				}else {
-//					session = new Session(row[8].toLowerCase(), row[9].toLowerCase(), row[10].toLowerCase());
-//					session.addLog(log);
-//					sessions.put(session.getId(), session);
-//				}			
-//			}			
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	
-//		
-//		return sessions;
-//	}
-//	
+	 **/	
 	public static Map<String ,Session> extracLogFile(File logsFile){
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
+		ProgressBar progressBar = new ProgressBar("Logs File Extraction ", 1000000).start(); // progressbar
 		Map<String ,Session> sessions = new HashMap<String, Session>();		
 		try {
 			String[] row;
@@ -81,6 +48,7 @@ public class InputReaderImpl /*implements InputReader*/{
 			String key ;
 			br.readLine();//removing first row
 			while ((line= br.readLine()) != null) {	
+				progressBar.step();
 				row = (line  != null) ? line.split(cvsSplitBy) : null;
 				log = new Log(row[5], row[4], row[1], row[7], row[3]);
 				key = row[6].toLowerCase() + "," + row[10].toLowerCase();
@@ -102,8 +70,10 @@ public class InputReaderImpl /*implements InputReader*/{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
 		
+		progressBar.stepTo(1000000);
+		progressBar.stop();
+		System.out.print("\n");
 		return sessions;
 	}
 	
@@ -115,6 +85,7 @@ public class InputReaderImpl /*implements InputReader*/{
 	 * 
 	 */
 	public static Map<String, Query> extractRelevanceFile(File file) {
+		ProgressBar progressBar = new ProgressBar("Relevance File Extraction ", 1000000).start(); // progressbar
 	    BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
@@ -133,6 +104,7 @@ public class InputReaderImpl /*implements InputReader*/{
 		    br = new BufferedReader(new FileReader(file.getPath()));
 		    br.readLine();//removing first row
 		    while ((line= br.readLine()) != null) {	
+		    	progressBar.step();
 		    	text = (line  != null) ? line.split(cvsSplitBy) : null;
 	    		if(!userKey.equalsIgnoreCase("")) {
 	    			doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
@@ -177,7 +149,10 @@ public class InputReaderImpl /*implements InputReader*/{
 				}
 			}
 		}
-	
+		
+		progressBar.stepTo(1000000);
+		progressBar.stop();
+		System.out.print("\n");
 		return queries;
 	
 	}
@@ -189,6 +164,7 @@ public class InputReaderImpl /*implements InputReader*/{
 	 * 
 	 */
 	public static ArrayList<PIR> extractOutputPIR(File file) {
+		ProgressBar progressBar = new ProgressBar("Output File Extraction ", 10000000).start(); // progressbar
 	    BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
@@ -207,6 +183,7 @@ public class InputReaderImpl /*implements InputReader*/{
 		    br.readLine();//removing first row
 		   
 		    while ((line= br.readLine()) != null) {	
+		    	progressBar.step();
 		    	text = (line  != null) ? line.split(cvsSplitBy) : null;
 	    		if(!userKey.equalsIgnoreCase("")) {
 	    			
@@ -259,7 +236,10 @@ public class InputReaderImpl /*implements InputReader*/{
 				}
 			}
 		}
-	
+		
+		progressBar.stepTo(10000000);
+		progressBar.stop();
+		System.out.print("\n");
 		return pirs;
 	
 	}

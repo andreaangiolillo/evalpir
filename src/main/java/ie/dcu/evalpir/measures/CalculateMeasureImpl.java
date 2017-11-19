@@ -594,8 +594,6 @@ public class CalculateMeasureImpl{
 	 */
 	public void calculateMeasures(ArrayList<PIR> pirs) {
 		
-		ProgressBar pb = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
-		pb.maxHint(pirs.size()* pirs.get(0).getQueries().size()); // progressbar
 		Query queryPIR;
 		QueryRelFile queryRel;
 		/*Measures variables*/
@@ -614,7 +612,6 @@ public class CalculateMeasureImpl{
 			queryRel = (QueryRelFile) it.next().getValue();
 			//queryRel = createMeasure(queryRel);
 			for(PIR pir : pirs) {
-				pb.step();
 				queryPIR = pir.getQuery(queryRel.getId());
 				if(queryPIR != null) {
 					queryRel.setToConsiderForChart(true);
@@ -650,8 +647,6 @@ public class CalculateMeasureImpl{
 				}
 				
 			}
-			pb.stepTo(pirs.size()* pirs.get(0).getQueries().size());// progressbar
-			pb.stop();//progressbar
 		}	
 	}
 	

@@ -27,6 +27,7 @@ import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
 import ie.dcu.evalpir.measures.CalculateMeasureImpl;
+import me.tongfei.progressbar.ProgressBar;
 
 /**
  * @author Andrea Angiolillo
@@ -36,33 +37,38 @@ import ie.dcu.evalpir.measures.CalculateMeasureImpl;
  * 
  * 
  */
+//clean package assembly:single
 public class EvalEpir {
 	static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
 	static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
 	
     public static void main( String[] args ) {
     	
-    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
-    	File logsFile = new File(LOGS_FILE_PATH);
-    	File outputPIR = new File("src/main/resources/ar.csv");
-    	
+//    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
+//    	File logsFile = new File(LOGS_FILE_PATH);
+//    	File outputPIR = new File("src/main/resources/ar.csv");
+//    	
+    	File relevanceFile = new File(args[0]);
+    	File outputPIR = new File(args[1]); 
+    	File logsFile = new File(args[2]);
+    	   	
     	
     	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
     	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
     	Map<String, Session> logs = InputReaderImpl.extracLogFile(logsFile);
-    	
-    	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
-    	Iterator<Entry<String, Query>> itd = qRel.entrySet().iterator();
-    	Query q1;
-    	while (itd.hasNext()) {
-    		q1 = itd.next().getValue();
-    		
+//    	
+//    	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
+//    	Iterator<Entry<String, Query>> itd = qRel.entrySet().iterator();
+//    	Query q1;
+//    	while (itd.hasNext()) {
+//    		q1 = itd.next().getValue();
+//    		
 //    		if(q1.getId().equals("122") ) {
 //    			System.out.println(q1.toString());
 //    			System.out.println(((QueryRelFile)q1).getNRelevantDoc());
 //    		}
     		
-    	}
+//    	}
 //    	
 //    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
 //        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
@@ -76,22 +82,24 @@ public class EvalEpir {
 //        }
 //    	
 //    	
-    	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
+ //   	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
     	
-    	for (PIR p : pirs) {
-    		//System.out.println(p.toString());
-    	}
-    	
-    	
+//    	for (PIR p : pirs) {
+//    		//System.out.println(p.toString());
+//    	}
     	
     	
-    	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
     	
+    	
+		ProgressBar progressBar = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
     	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
-//    	
+   	
     	m.calculateMeasures(pirs);
-    	
+    	progressBar.stepTo(100);
+    	progressBar.stop();
+    	System.out.print("\n");
 //    	
+// 	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
 //    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
 //    	Query q ;
 //    	while (itm.hasNext()) {
@@ -125,8 +133,6 @@ public class EvalEpir {
 		CreatorChart.createChart(qRel);
 		
     	
-    	
-    	
 //    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
     	
     	
@@ -159,7 +165,7 @@ public class EvalEpir {
 //    	
 //    	InputCreator input = new InputCreatorImpl();
 //    	input.generateFilesInput(2, 2);
-    	System.out.println("\n\n----------------------Print Session Measures----------------------------------\n\n");
+//    	System.out.println("\n\n----------------------Print Session Measures----------------------------------\n\n");
     	
     	
 //    	Map<String, Topic> measures = m.calculateSessionMeasure(pirs);    	
