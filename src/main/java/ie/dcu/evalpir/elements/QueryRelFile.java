@@ -8,7 +8,7 @@ import java.util.Map;
 public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	
 	private Map<String, AbstractMeasure> measures;
-	private boolean toConsiderForChart;
+	private boolean toConsider;
 	
 	/***
 	 * 
@@ -16,7 +16,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	public QueryRelFile(String user, String topic, String id) {
 		super(user, topic, id);
 		this.measures = new HashMap<String, AbstractMeasure>();
-		this.toConsiderForChart = false;
+		this.toConsider = false;
 	}
 
 	/***
@@ -25,7 +25,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs) {
 		super(user, topic, id, docs);
 		this.measures = new HashMap<String, AbstractMeasure>();
-		this.toConsiderForChart = false;
+		this.toConsider = false;
 	}
 
 
@@ -35,7 +35,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs, HashMap<String, AbstractMeasure> measures) {
 		super(user, topic, id, docs);
 		this.measures = measures;
-		this.toConsiderForChart = false;
+		this.toConsider = false;
 	}
 	
 	/**
@@ -58,24 +58,42 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 * @param name
 	 * @return
 	 */
+	public AbstractMeasure searchAddMeasure(String name, boolean compound) {
+		
+		if(getMeasures().get(name.trim().toLowerCase()) == null) {
+			if(compound) {
+				addMeasure(new MeasureCompound(name.trim()));
+			}else {
+				addMeasure(new Measure(name.trim()));
+			}
+		}
+		
+		
+		return getMeasures().get(name.trim().toLowerCase());
+	}
+	
+	/***
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public AbstractMeasure searchMeasure(String name) {
 		return getMeasures().get(name.trim().toLowerCase());
 	}
-
 	
 
 	/**
 	 * @return the toConsiderForChart
 	 */
 	public boolean isToConsiderForChart() {
-		return toConsiderForChart;
+		return toConsider;
 	}
 
 	/**
 	 * @param toConsiderForChart the toConsiderForChart to set
 	 */
 	public void setToConsiderForChart(boolean toConsiderForChart) {
-		this.toConsiderForChart = toConsiderForChart;
+		this.toConsider = toConsiderForChart;
 	}
 
 	/**

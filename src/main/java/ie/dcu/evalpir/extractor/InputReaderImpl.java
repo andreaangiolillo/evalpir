@@ -83,7 +83,7 @@ public class InputReaderImpl /*implements InputReader*/{
 			while ((line= br.readLine()) != null) {	
 				row = (line  != null) ? line.split(cvsSplitBy) : null;
 				log = new Log(row[5], row[4], row[1], row[7], row[3]);
-				key = row[9].toLowerCase() + row[10].toLowerCase();
+				key = row[9].toLowerCase() + "," + row[10].toLowerCase();
 				if(sessions.containsKey(key)) {
 					if(!sessions.get(key).getId().contains(row[8].toLowerCase())) {
 						sessions.get(key).addId(row[8].toLowerCase());
@@ -138,12 +138,10 @@ public class InputReaderImpl /*implements InputReader*/{
 	    			doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
 		    		docs.put(doc.getId(), doc);
 		    		
-		    		
-		    		
 	    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
 	    				if(!queries.containsKey(queryKey)) {
 		    				query = new QueryRelFile(userKey, topicKey, queryKey, docs);												
-				    		queries.put(queryKey,query);
+				    		queries.put(query.getId(),query);
 	    				}else {
 	    					storeDocs = queries.get(queryKey).getDocs();
 	    					storeDocs.putAll(docs);
@@ -163,7 +161,7 @@ public class InputReaderImpl /*implements InputReader*/{
 		    doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
 		    docs.put(doc.getId(), doc);
 		    query = new QueryRelFile(userKey, topicKey, queryKey, docs);
-		    queries.put(queryKey, query);	    
+		    queries.put(query.getId(), query);	    
 		}catch (NumberFormatException e) {
 					e.printStackTrace();
 		}catch (FileNotFoundException e) {

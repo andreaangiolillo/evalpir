@@ -14,6 +14,7 @@ import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
+import ie.dcu.evalpir.measures.CalculateMeasureImpl;
 import me.tongfei.progressbar.ProgressBar;
 
 
@@ -90,7 +91,7 @@ public class CreatorChart {
 			q = it.next().getValue();	
 			if(((QueryRelFile)q).isToConsiderForChart()) {
 				key = q.getTopic() +  "," + q.getUser();
-				if(!topicUser.containsKey(q.getTopic() +  "," + q.getUser())) {
+				if(!topicUser.containsKey(key)) {
 					ArrayList<Query> topic = new ArrayList<Query>();
 					topic.add(q);
 					topicUser.put(key, topic);

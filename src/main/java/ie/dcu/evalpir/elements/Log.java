@@ -1,10 +1,12 @@
 package ie.dcu.evalpir.elements;
 
+import java.sql.Timestamp;
+
 public class Log {
 
 	private String document;
 	private String type;
-	private String timestamp;
+	private Timestamp timestamp;
 	private String query;
 	private String rank;
 	
@@ -18,7 +20,7 @@ public class Log {
 		super();
 		this.document = document;
 		this.type = type;
-		this.timestamp = timestamp;
+		this.timestamp = java.sql.Timestamp.valueOf(timestamp);
 		this.rank = rank;
 		this.query = query;
 	}
@@ -41,7 +43,7 @@ public class Log {
 	/**
 	 * @return the timestamp
 	 */
-	public String getTimestamp() {
+	public Timestamp getTimestamp() {
 		return timestamp;
 	}
 

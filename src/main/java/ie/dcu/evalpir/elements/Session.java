@@ -1,6 +1,9 @@
 package ie.dcu.evalpir.elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,7 +20,7 @@ public class Session{
 	private String user;
 	private String topic;
 	private ArrayList<Log> logs;
-	private ArrayList<String> query;
+	private ArrayList<Log> query;
 	private ArrayList<Log> docOpened;
 	private boolean sessionMeasure;
 	
@@ -32,7 +35,7 @@ public class Session{
 		this.user = user;
 		this.topic = topic;
 		this.logs = new ArrayList<Log>();
-		this.query = new ArrayList<String>();
+		this.query = new ArrayList<Log>();
 		this.docOpened = new ArrayList<Log>();
 		this.sessionMeasure = false;
 	}
@@ -48,7 +51,7 @@ public class Session{
 		this.user = user;
 		this.topic = topic;
 		this.logs = logs;
-		this.query = new ArrayList<String>();
+		this.query = new ArrayList<Log>();
 		this.docOpened = new ArrayList<Log>();
 		this.sessionMeasure = false;
 	}
@@ -59,7 +62,7 @@ public class Session{
 	
 	public void addLog(Log l) {
 		if(l.getType().equalsIgnoreCase(QUERY_SUBMISSION)) {
-			query.add(l.getQuery()); 
+			query.add(l); 
 		}else if(l.getType().equalsIgnoreCase(OPEN_DOCUMENT)) {
 			docOpened.add(l);
 		}
@@ -98,14 +101,14 @@ public class Session{
 	 * @param query
 	 * @return
 	 */
-	public int setMaxK(ArrayList<Query> query) {
-		ArrayList<Log> logs = getnDocOpened();
+	public int setMaxK(String queryId) {
+		ArrayList<Log> logs = getDocOpened();
 		int k = 0;
 		int rank = 0;
 		
-		for (Log l : logs) {
-			rank = Integer.parseInt(l.getRank());
-			if (rank > k){
+		for(Log log : logs) {
+			rank = Integer.parseInt(log.getRank());
+			if ((rank > k) && (log.getQuery().equalsIgnoreCase(queryId))){
 				k = rank;
 			}
 		}
@@ -118,11 +121,12 @@ public class Session{
 	 * @return
 	 */
 	public int setAverageK(ArrayList<Query> query) {
-		ArrayList<Log> logs = getnDocOpened();
+		ArrayList<Log> logs = getDocOpened();
 		int k = 0;
 		int rank = 0;
 		Map<String, Integer> maxRankQuery = new Hashtable<String, Integer>();
-		for (Log l : logs) {
+		
+		for(Log l : logs) {
 			rank = Integer.parseInt(l.getRank());
 			if(!maxRankQuery.containsKey(l.getQuery())) {
 				maxRankQuery.put(l.getQuery(), rank);
@@ -139,19 +143,30 @@ public class Session{
 		return k/logs.size();
 	}
 	
+	public void sortLog(ArrayList<Log> myList) {
+		Collections.sort(myList, new Comparator<Log>() {
+			  public int compare(Log o1, Log o2) {
+			      return o1.getTimestamp().compareTo(o2.getTimestamp());
+			  }
+			});
+	}
+	
+	
 	
 	
 	/**
 	 * @return the nQuery
 	 */
-	public ArrayList<String> getQuery() {
+	public ArrayList<Log> getQuery() {
+		sortLog(query);
 		return query;
 	}
 
 	/**
 	 * @return the nDocOpened
 	 */
-	public ArrayList<Log> getnDocOpened() {
+	public ArrayList<Log> getDocOpened() {
+		sortLog(docOpened);
 		return docOpened;
 	}
 
@@ -173,6 +188,7 @@ public class Session{
 	 * @return the logs
 	 */
 	public ArrayList<Log> getLogs() {
+		sortLog(logs);
 		return logs;
 	}
 

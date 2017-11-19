@@ -25,7 +25,10 @@ import ie.dcu.evalpir.elements.Path;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
+import ie.dcu.evalpir.elements.Topic;
+import ie.dcu.evalpir.exceptions.DifferentQueryException;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
+import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
 import me.tongfei.progressbar.ProgressBar;
 
 /**
@@ -45,7 +48,6 @@ public class CalculateMeasureImpl{
 	 * @param 
 	 */
 	public CalculateMeasureImpl(Map<String, Query> relevanceFile, Map<String, Session> logsfile) {
-		//this.measures = new LinkedHashMap<String,String>();
 		this.relevanceFile = relevanceFile;
 		this.logsFile = logsfile;
 	}
@@ -163,6 +165,26 @@ public class CalculateMeasureImpl{
 		return 0.0;
 	}
 	
+	/**
+	 * 
+	 * @param queryRel
+	 * @param queryOutputPIR
+	 * @return
+	 */
+	public static double calculateMAP(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR) {
+		double map = 0.0;
+		int size = queryRel.size();
+		if (size != queryOutputPIR.size()) {
+			throw new DifferentSizeException();
+		}
+		
+		for (int i = 0; i < queryRel.size(); i++) {
+			map += calculateAP(queryRel.get(i), queryOutputPIR.get(i));
+		}
+		
+		return map/size;
+		
+	}
 	
 	
 	/**
@@ -363,8 +385,13 @@ public class CalculateMeasureImpl{
 		}
 		
 		for (int i = 0; i < queryRel.size(); i++) {
-			sDCG += !ideal ? Math.pow(1 + log(i + 1, logbase), -1) * DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
+			if(queryRel.get(i).getId().equalsIgnoreCase(queryOutputPIR.get(i).getId())) {
+				sDCG += !ideal ? Math.pow(1 + log(i + 1, logbase), -1) * DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
 						  :	Math.pow(1 + log(i + 1, logbase), -1) * IDCG(queryRel.get(i), queryOutputPIR.get(i), k);
+			}else {
+				throw new DifferentQueryException("Different queries: \nQueryRelID: " + queryRel.get(i).getId() + ", QueryOutputPIR: " + queryOutputPIR.get(i).getId());
+			}
+			
 		}
 		
 		return sDCG;
@@ -376,12 +403,45 @@ public class CalculateMeasureImpl{
 	 * @param queryRel
 	 * @param queryOutputPIR
 	 * @param logbase
-	 * @param ideal
 	 * @return
 	 */
-	public static double NsDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int k, int logbase, boolean ideal) {
-		return sDCG(queryRel, queryOutputPIR, k, logbase, false) / sDCG(queryRel, queryOutputPIR, k, logbase, true);
+	public static double NsDCG(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR, int k, int logbase, Map<String, Session> sessions) {
+		ArrayList<Query> queryRelSortedbyTime = sortByTimestamp(queryRel, sessions);
+		ArrayList<Query> queryPIRSortedbyTime = sortByTimestamp(queryOutputPIR, sessions);
+		
+		return sDCG(queryRelSortedbyTime, queryPIRSortedbyTime, k, logbase, false) / sDCG(queryRelSortedbyTime, queryPIRSortedbyTime, k, logbase, true);
 	}
+	
+	/**
+	 * 
+	 * @param queries
+	 * @param sessions
+	 * @return
+	 */
+	public static ArrayList<Query> sortByTimestamp(Map<String, Query> queries, Map<String, Session> sessions){
+		Iterator<Entry<String, Query>> itQ = queries.entrySet().iterator();
+		ArrayList<Log> session;
+		Query query =  itQ.next().getValue();
+		if(sessions.get(query.getUser() + "," + query.getTopic()) == null) {
+			throw new QueryNotInTheLogFileException("The queries in User:" + query.getUser() +" Topic: " + query.getTopic() + " are not in the logfile" );
+		}
+		
+		session = sessions.get(query.getUser() + "," + query.getTopic()).getQuery();
+		
+		ArrayList<Query> queriesSorted = new ArrayList<Query>();
+		
+		for(Log log : session) {
+			if(queries.containsKey(log.getQuery())){
+				queriesSorted.add(queries.get(log.getQuery()));
+			}else {
+				throw new QueryNotInTheLogFileException("The querie: " + log.getQuery() + " is not in the logfile" );
+			}	
+		}
+		
+		return queriesSorted;
+	}
+	
+	
 
 //	public void modelFreeSession(ArrayList<Query> queryRel, Session s) {
 //		
@@ -459,36 +519,68 @@ public class CalculateMeasureImpl{
 		
 	}
 	
+//	/**
+//	 * @param q
+//	 * @return
+//	 */
+//	public QueryRelFile createMeasure(QueryRelFile q) {
+//		int k = q.getNRelevantDoc();
+//		for (; k != 0; k --) {
+//			q.addMeasure(new Measure("Precision@"+k));
+//			q.addMeasure(new Measure("Recall@"+k));
+//		}
+//		
+//		q.addMeasure(new Measure("Precision"));
+//		q.addMeasure(new Measure("Recall"));
+//		q.addMeasure(new Measure("fMeasure0.5"));
+//		q.addMeasure(new Measure("NDCG@5"));
+//		q.addMeasure(new Measure("NDCG@10"));
+//		q.addMeasure(new Measure("NDCG@15"));
+//		q.addMeasure(new Measure("NDCG@20"));
+//		q.addMeasure(new Measure("Average Precision"));
+//		q.addMeasure(new MeasureCompound("PrecisionRecallCurve"));
+//		
+//		return q;
+//	}
+	
 	/**
-	 * @param q
-	 * @return
+	 * 
+	 * @param pirs
 	 */
-	public QueryRelFile createMeasure(QueryRelFile q) {
-		int k = q.getNRelevantDoc();
-		for (; k != 0; k --) {
-			q.addMeasure(new Measure("Precision@"+k));
-			q.addMeasure(new Measure("Recall@"+k));
+	public void calculateSessionMeasure(ArrayList<PIR> pirs) {
+		Map<String, Topic> topicsRel = setTopic(getRelevanceFile());
+		Map<String, Topic> topicsPir;
+		Iterator<Entry<String, Topic>> itRel = topicsRel.entrySet().iterator();
+		Entry<String, Topic> topicRel;
+		
+		double nsDCG = 0.0;
+		double man = 0.0;
+		for(PIR pir : pirs) {
+			topicsPir = setTopic(pir.getQueries());
+			while(itRel.hasNext()) {
+				topicRel = itRel.next();
+				if(topicsPir.containsKey(topicRel.getKey())) {
+					nsDCG = NsDCG(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), 10, 4, getLogsFile());
+					((Measure)topicRel.getValue().searchAddMeasure("nSDCG", false)).addPIR(pir.getName(), nsDCG);
+					
+				}
+			}
+			
 		}
 		
-		q.addMeasure(new Measure("Precision"));
-		q.addMeasure(new Measure("Recall"));
-		q.addMeasure(new Measure("fMeasure0.5"));
-		q.addMeasure(new Measure("NDCG@5"));
-		q.addMeasure(new Measure("NDCG@10"));
-		q.addMeasure(new Measure("NDCG@15"));
-		q.addMeasure(new Measure("NDCG@20"));
-		q.addMeasure(new Measure("Average Precision"));
-		q.addMeasure(new MeasureCompound("PrecisionRecallCurve"));
 		
-		return q;
+	
 	}
 	
-	@SuppressWarnings("unchecked")
+	/***
+	 * 
+	 * @param pirs
+	 */
 	public void calculateMeasures(ArrayList<PIR> pirs) {
 		
 		ProgressBar pb = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
 		pb.maxHint(pirs.size()* pirs.get(0).getQueries().size()); // progressbar
-		Query queryPIR = null;
+		Query queryPIR;
 		QueryRelFile queryRel;
 		/*Measures variables*/
 		double qPrecisionK = 0.0;
@@ -504,7 +596,7 @@ public class CalculateMeasureImpl{
 		Iterator<Entry<String, Query>> it = getRelevanceFile().entrySet().iterator();
 		while (it.hasNext()) {
 			queryRel = (QueryRelFile) it.next().getValue();
-			queryRel = createMeasure(queryRel);
+			//queryRel = createMeasure(queryRel);
 			for(PIR pir : pirs) {
 				pb.step();
 				queryPIR = pir.getQuery(queryRel.getId());
@@ -515,8 +607,8 @@ public class CalculateMeasureImpl{
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
 						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
 						
-						((Measure) queryRel.searchMeasure("Precision@"+k)).addPIR(pir.getName(), qPrecisionK);
-						((Measure) queryRel.searchMeasure("Recall@"+k)).addPIR(pir.getName(), qRecallK);
+						((Measure) queryRel.searchAddMeasure("Precision@"+k, false)).addPIR(pir.getName(), qPrecisionK);
+						((Measure) queryRel.searchAddMeasure("Recall@"+k, false)).addPIR(pir.getName(), qRecallK);
 						
 					}
 					
@@ -529,15 +621,15 @@ public class CalculateMeasureImpl{
 					fMeasure = fMeasure(precision, recall, 0.5);
 					ap = calculateAP(queryRel, queryPIR);
 						
-					((Measure) queryRel.searchMeasure("NDCG@5")).addPIR(pir.getName(), qNDCG5);
-					((Measure) queryRel.searchMeasure("NDCG@10")).addPIR(pir.getName(), qNDCG10);
-					((Measure) queryRel.searchMeasure("NDCG@15")).addPIR(pir.getName(), qNDCG15);
-					((Measure) queryRel.searchMeasure("NDCG@20")).addPIR(pir.getName(), qNDCG20);
-					((Measure) queryRel.searchMeasure("Precision")).addPIR(pir.getName(), precision);
-					((Measure) queryRel.searchMeasure("Recall")).addPIR(pir.getName(), recall);
-					((Measure) queryRel.searchMeasure("fMeasure0.5")).addPIR(pir.getName(), fMeasure);
-					((Measure) queryRel.searchMeasure("Average Precision")).addPIR(pir.getName(), ap);
-					((MeasureCompound)queryRel.searchMeasure("PrecisionRecallCurve")).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
+					((Measure) queryRel.searchAddMeasure("NDCG@5", false)).addPIR(pir.getName(), qNDCG5);
+					((Measure) queryRel.searchAddMeasure("NDCG@10",false)).addPIR(pir.getName(), qNDCG10);
+					((Measure) queryRel.searchAddMeasure("NDCG@15", false)).addPIR(pir.getName(), qNDCG15);
+					((Measure) queryRel.searchAddMeasure("NDCG@20", false )).addPIR(pir.getName(), qNDCG20);
+					((Measure) queryRel.searchAddMeasure("Precision", false)).addPIR(pir.getName(), precision);
+					((Measure) queryRel.searchAddMeasure("Recall", false)).addPIR(pir.getName(), recall);
+					((Measure) queryRel.searchAddMeasure("fMeasure0.5", false)).addPIR(pir.getName(), fMeasure);
+					((Measure) queryRel.searchAddMeasure("Average Precision", false)).addPIR(pir.getName(), ap);
+					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true)).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
 				
 				}
 				
@@ -570,6 +662,35 @@ public class CalculateMeasureImpl{
 		return getLogsFile().get(key);
 		
 	}
+	
+	 /**
+	  * 
+	  * @param queries
+	  * @return
+	  */
+	public static Map<String, Topic> setTopic(final Map<String,Query> queries){
+		Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
+		Query q;
+		String key ="";
+		Map<String, Topic> topicUser = new HashMap<String, Topic>();
+		while(it.hasNext()) {
+			q = it.next().getValue();	
+			key = q.getTopic() +  "," + q.getUser();
+			if(!topicUser.containsKey(key)) {
+				Map<String, Query> qs = new HashMap<String, Query>();
+				qs.put(q.getId(), q);
+				Topic topic = new Topic(q.getUser(), q.getTopic(), qs);
+				topicUser.put(key, topic);
+			}else {
+				topicUser.get(key).addQuery(q);
+			}	
+		}
+		
+		return topicUser;
+	}
+	
+	
+	
 	
 }
 

@@ -58,16 +58,16 @@ public class EvalEpir {
     		
     	}
 //    	
-//    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
-//        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
-//    	
-//        while(it.hasNext()) {
-//        	Entry<String, Session> a = it.next();
-//        	if(a.getValue().getSessionMeasure()) {
-//        		System.out.println(a.getValue().toString());
-//        	}
-//        
-//        }
+    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
+        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
+    	
+        while(it.hasNext()) {
+        	Entry<String, Session> a = it.next();
+        	if(a.getValue().getSessionMeasure()) {
+        		System.out.println(a.getValue().toString());
+        	}
+        
+        }
 //    	
 //    	
     	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
@@ -81,19 +81,19 @@ public class EvalEpir {
     	
     	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
     	
-    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
-    	
-    	m.calculateMeasures(pirs);
-    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
-    	Query q ;
-    	while (itm.hasNext()) {
-    		q = itm.next().getValue();
-    		if(q.getUser().equals("121")) {
-    			//System.out.println(((QueryRelFile)q).printMeasures());
-    		}
-    		
-    		
-    	}
+//    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
+//    	
+//    	m.calculateMeasures(pirs);
+//    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
+//    	Query q ;
+//    	while (itm.hasNext()) {
+//    		q = itm.next().getValue();
+//    		if(q.getUser().equals("121")) {
+//    			//System.out.println(((QueryRelFile)q).printMeasures());
+//    		}
+//    		
+//    		
+//    	}
 //    	
 //    	for(Query q : qRel) {
 //    		//System.out.print(((QueryRelFile)q).printMeasures());
@@ -114,7 +114,7 @@ public class EvalEpir {
 //    	CalculateMeasureImpl.findPaths(44, 11, 4, p, memo);
     	
     	
-		CreatorChart.createChart(qRel);
+//		CreatorChart.createChart(qRel);
 		
     	
     	
