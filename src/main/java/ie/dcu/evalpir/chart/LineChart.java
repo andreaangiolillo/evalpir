@@ -174,7 +174,7 @@ public class LineChart{
 		AbstractMeasure measure;
 		for(int i = 0; i < topic.size(); i++) {
 			measure = ((QueryRelFile) topic.get(i)).searchMeasure(measureName);
-			if(((MeasureCompound)measure).getPIRvalue() != null) {
+			if(((MeasureCompound)measure).getPIRvalue() != null && ((QueryRelFile)topic.get(i)).getNRelevantDoc() > 0 ) {
 				XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
 				String user = topic.get(i).getUser();
 				String nameTopic = topic.get(i).getTopic();

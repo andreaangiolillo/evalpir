@@ -538,10 +538,6 @@ public class CalculateMeasureImpl{
 					((Measure) queryRel.searchMeasure("fMeasure0.5")).addPIR(pir.getName(), fMeasure);
 					((Measure) queryRel.searchMeasure("Average Precision")).addPIR(pir.getName(), ap);
 					((MeasureCompound)queryRel.searchMeasure("PrecisionRecallCurve")).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
-					
-					if(queryRel.getId().equals("121")) {
-						
-					}
 				
 				}
 				
