@@ -1,5 +1,7 @@
 package ie.dcu.evalpir.elements;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -68,7 +70,7 @@ public class Measure extends AbstractMeasure{
 		Collections.sort(getPIRvalue(), new Comparator<Pair<String, Double>>(){
 			public int compare(Pair<String, Double> o1, Pair<String, Double> o2) {
 				// TODO Auto-generated method stub
-				return o1.getValue().compareTo(o2.getValue());
+				return -o1.getValue().compareTo(o2.getValue());
 			}
 		});
 	}
@@ -88,12 +90,15 @@ public class Measure extends AbstractMeasure{
 		at.addRule();
 		ArrayList<Pair<String, Double>> m = getPIRvalue();
 		int nMeasure = m.size();
+		DecimalFormat df = new DecimalFormat("#.######");
+		df.setRoundingMode(RoundingMode.CEILING);
+
 		
 		for (int i = 0; i < nMeasure; i++) {
 			if (i == 0) {
-				at.addRow(m.get(i).getKey(), m.get(i).getValue(), "---", "---");
+				at.addRow(m.get(i).getKey(), df.format(m.get(i).getValue()), "---", "---");
 			}else {
-				at.addRow(m.get(i).getKey(), m.get(i).getValue(),m.get(0).getValue() - m.get(i).getValue(), m.get(i - 1).getValue() - m.get(i).getValue());
+				at.addRow(m.get(i).getKey(), df.format(m.get(i).getValue()), df.format(m.get(0).getValue() - m.get(i).getValue()), df.format(m.get(i - 1).getValue() - m.get(i).getValue()));
 			}
 	
 			at.addRule();

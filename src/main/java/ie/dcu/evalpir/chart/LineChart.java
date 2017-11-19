@@ -49,7 +49,7 @@ public class LineChart{
 		String nameTopic = topic.get(0).getTopic();
 		JFreeChart chart = createChart(dataset, user, nameTopic, m.getName(), topic);
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
-		theme.setPlotBackgroundPaint(Color.DARK_GRAY);
+		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
 		ChartFactory.setChartTheme(theme);
 	
         try {
@@ -169,7 +169,7 @@ public class LineChart{
 	private static void initUIPerQuery(String path, ArrayList<Query> topic, String measureName) {
 		
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
-		theme.setPlotBackgroundPaint(Color.darkGray);
+		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
 		ChartFactory.setChartTheme(theme);
 		AbstractMeasure measure;
 		for(int i = 0; i < topic.size(); i++) {

@@ -44,7 +44,7 @@ public class EvalEpir {
     	
     	File relevanceFile = new File(RELEVANCE_FILE_PATH);
     	File logsFile = new File(LOGS_FILE_PATH);
-    	File outputPIR = new File("src/main/resources/a.csv");
+    	File outputPIR = new File("src/main/resources/ar.csv");
     	
     	
     	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
@@ -122,7 +122,7 @@ public class EvalEpir {
 //    	CalculateMeasureImpl.findPaths(44, 11, 4, p, memo);
     	
     	
-//		CreatorChart.createChart(qRel);
+		CreatorChart.createChart(qRel);
 		
     	
     	
@@ -172,7 +172,7 @@ public class EvalEpir {
 //    		
 //    	}
     	
-    	
+    
     	
     	/*----------------------Print Session Measures on .txt----------------------------------*/
     	
@@ -180,24 +180,14 @@ public class EvalEpir {
 		try {
 			out = new PrintStream(new FileOutputStream("output.txt"));
 			System.setOut(out);
-			
-			
-			
-			
 	    	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
 	    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
 	    	Query q ;
 	    	while (itm.hasNext()) {
 	    		q = itm.next().getValue();
-	    		//if(q.getUser().equals("121")) {
 	    			System.out.println(((QueryRelFile)q).printMeasures());
-	    		//}
-	    		
-	    		
 	    	}
-			
 
-			
 			System.out.println("\n\n----------------------Print Session Measures----------------------------------\n\n");
 	    	Map<String, Topic> measures = m.calculateSessionMeasure(pirs);    	
 	    	
@@ -213,10 +203,6 @@ public class EvalEpir {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-    	
-    	
-    	
     }
     
     
@@ -227,7 +213,7 @@ public class EvalEpir {
     	Map<String, Document> dcs;
     	Iterator<Entry<String, Document>> it;
     	Random rand = new Random();
-    	int  n = rand.nextInt(1000) + 1;
+    	int  n = rand.nextInt(10) + 1;
     	HashSet<Integer> listRandom = new HashSet<Integer>();
     	PrintWriter pw = null;
     	DocumentOutputPIR d;
@@ -245,15 +231,18 @@ public class EvalEpir {
     		dcs = q.getDocs();
     		it = dcs.entrySet().iterator();
     		while(it.hasNext()) {
-    			while(listRandom.contains(n)) {
-    				n = rand.nextInt(1000) + 1;
+    			d = ((DocumentOutputPIR)it.next().getValue());
+    			if (d.getRank()<11) {
+    				while(listRandom.contains(n)) {
+        				n = rand.nextInt(10) + 1;
+        			}
+    				listRandom.add(n);
+    				d.setRank(n);
     			}
     			
-    			listRandom.add(n);
-    			d = ((DocumentOutputPIR)it.next().getValue());
-    			d.setRank(n);
     			builder.append(q.getUser() + "," + q.getTopic()+ "," + q.getId()+ "," + d.getId()+ "," + d.getRank()+ "," + d.getSimilarity() + "," + "random");
     			builder.append("\n");
+    			
     		}
     		
     		listRandom = new HashSet<Integer>();
