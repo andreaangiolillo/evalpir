@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 import javax.sql.rowset.spi.TransactionalWriter;
 
-import org.antlr.v4.tool.ast.QuantifierAST;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import ie.dcu.evalpir.elements.Document;
@@ -164,28 +164,6 @@ public class CalculateMeasureImpl{
 		
 		return 0.0;
 	}
-	
-	/**
-	 * 
-	 * @param queryRel
-	 * @param queryOutputPIR
-	 * @return
-	 */
-	public static double calculateMAP(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR) {
-		double map = 0.0;
-		int size = queryRel.size();
-		if (size != queryOutputPIR.size()) {
-			throw new DifferentSizeException();
-		}
-		
-		for (int i = 0; i < queryRel.size(); i++) {
-			map += calculateAP(queryRel.get(i), queryOutputPIR.get(i));
-		}
-		
-		return map/size;
-		
-	}
-	
 	
 	/**
 	 *  It implements an interpolated precision that takes the maximum precision 
@@ -394,6 +372,10 @@ public class CalculateMeasureImpl{
 			
 		}
 		
+		if(sDCG == 0) {
+			System.out.println("SIZEEEE " + queryRel.size());
+		}
+		
 		return sDCG;
 	}
 
@@ -408,7 +390,6 @@ public class CalculateMeasureImpl{
 	public static double NsDCG(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR, int k, int logbase, Map<String, Session> sessions) {
 		ArrayList<Query> queryRelSortedbyTime = sortByTimestamp(queryRel, sessions);
 		ArrayList<Query> queryPIRSortedbyTime = sortByTimestamp(queryOutputPIR, sessions);
-		
 		return sDCG(queryRelSortedbyTime, queryPIRSortedbyTime, k, logbase, false) / sDCG(queryRelSortedbyTime, queryPIRSortedbyTime, k, logbase, true);
 	}
 	
@@ -421,24 +402,29 @@ public class CalculateMeasureImpl{
 	public static ArrayList<Query> sortByTimestamp(Map<String, Query> queries, Map<String, Session> sessions){
 		Iterator<Entry<String, Query>> itQ = queries.entrySet().iterator();
 		ArrayList<Log> session;
-		Query query =  itQ.next().getValue();
-		if(sessions.get(query.getUser() + "," + query.getTopic()) == null) {
-			throw new QueryNotInTheLogFileException("The queries in User:" + query.getUser() +" Topic: " + query.getTopic() + " are not in the logfile" );
-		}
-		
-		session = sessions.get(query.getUser() + "," + query.getTopic()).getQuery();
-		
 		ArrayList<Query> queriesSorted = new ArrayList<Query>();
-		
-		for(Log log : session) {
-			if(queries.containsKey(log.getQuery())){
-				queriesSorted.add(queries.get(log.getQuery()));
-			}else {
-				throw new QueryNotInTheLogFileException("The querie: " + log.getQuery() + " is not in the logfile" );
-			}	
+		if(queries.size() != 1) {
+			Query query =  itQ.next().getValue();
+			//System.out.println(sessions.toString());
+			if(sessions.get((query.getUser() + "," + query.getTopic()).toLowerCase()) == null) {
+				throw new QueryNotInTheLogFileException("The queries in User:" + query.getUser() +" Topic: " + query.getTopic() + " are not in the logfile" );
+			}
+			
+			session = sessions.get((query.getUser() + "," + query.getTopic()).toLowerCase()).getQuery();			
+			for(Log log : session) {
+				if(queries.containsKey(log.getQuery())){
+					queriesSorted.add(queries.get(log.getQuery()));
+				}else {
+					throw new QueryNotInTheLogFileException("The querie: " + log.getQuery() + " is not in the logfile" );
+				}	
+			}
+			
+		}else {
+			queriesSorted.add(itQ.next().getValue());
 		}
 		
 		return queriesSorted;
+		
 	}
 	
 	
@@ -543,11 +529,41 @@ public class CalculateMeasureImpl{
 //		return q;
 //	}
 	
+	
+	/**
+	 * 
+	 * @param queryRel
+	 * @param queryOutputPIR
+	 * @return
+	 */
+	public static double calculateMAP(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR) {
+		double map = 0.0;
+		int size = queryRel.size();
+		if (size != queryOutputPIR.size()) {
+			throw new DifferentSizeException();
+		}
+		
+		Iterator <Entry<String, Query>> itRel = queryRel.entrySet().iterator();
+		Query qRel;
+		while(itRel.hasNext()) {
+			qRel = itRel.next().getValue();
+			if(!queryOutputPIR.containsKey(qRel.getId())) {
+				throw new DifferentQueryException();
+			}
+			map += calculateAP(qRel, queryOutputPIR.get(qRel.getId()));
+			
+		}
+
+		return map/size;		
+	}
+	
+	
+	
 	/**
 	 * 
 	 * @param pirs
 	 */
-	public void calculateSessionMeasure(ArrayList<PIR> pirs) {
+	public Map<String, Topic> calculateSessionMeasure(ArrayList<PIR> pirs) {
 		Map<String, Topic> topicsRel = setTopic(getRelevanceFile());
 		Map<String, Topic> topicsPir;
 		Iterator<Entry<String, Topic>> itRel = topicsRel.entrySet().iterator();
@@ -561,15 +577,15 @@ public class CalculateMeasureImpl{
 				topicRel = itRel.next();
 				if(topicsPir.containsKey(topicRel.getKey())) {
 					nsDCG = NsDCG(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), 10, 4, getLogsFile());
+					man = calculateMAP(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries());
 					((Measure)topicRel.getValue().searchAddMeasure("nSDCG", false)).addPIR(pir.getName(), nsDCG);
-					
+					((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false)).addPIR(pir.getName(), man);		
 				}
 			}
 			
 		}
 		
-		
-	
+		return topicsRel;
 	}
 	
 	/***

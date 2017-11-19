@@ -2,6 +2,9 @@ package ie.dcu.evalpir;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,13 +15,16 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import ie.dcu.evalpir.chart.CreatorChart;
+import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
+import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Path;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
+import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
 import ie.dcu.evalpir.measures.CalculateMeasureImpl;
 
@@ -58,16 +64,16 @@ public class EvalEpir {
     		
     	}
 //    	
-    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
-        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
-    	
-        while(it.hasNext()) {
-        	Entry<String, Session> a = it.next();
-        	if(a.getValue().getSessionMeasure()) {
-        		System.out.println(a.getValue().toString());
-        	}
-        
-        }
+//    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
+//        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
+//    	
+//        while(it.hasNext()) {
+//        	Entry<String, Session> a = it.next();
+//        	if(a.getValue().getSessionMeasure()) {
+//        		System.out.println(a.getValue().toString());
+//        	}
+//        
+//        }
 //    	
 //    	
     	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
@@ -81,20 +87,22 @@ public class EvalEpir {
     	
     	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
     	
-//    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
+    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
 //    	
-//    	m.calculateMeasures(pirs);
+    	m.calculateMeasures(pirs);
+    	
+//    	
 //    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
 //    	Query q ;
 //    	while (itm.hasNext()) {
 //    		q = itm.next().getValue();
-//    		if(q.getUser().equals("121")) {
-//    			//System.out.println(((QueryRelFile)q).printMeasures());
-//    		}
+//    		//if(q.getUser().equals("121")) {
+//    			System.out.println(((QueryRelFile)q).printMeasures());
+//    		//}
 //    		
 //    		
 //    	}
-//    	
+////    	
 //    	for(Query q : qRel) {
 //    		//System.out.print(((QueryRelFile)q).printMeasures());
 //    	}
@@ -151,45 +159,63 @@ public class EvalEpir {
 //    	
 //    	InputCreator input = new InputCreatorImpl();
 //    	input.generateFilesInput(2, 2);
+    	System.out.println("\n\n----------------------Print Session Measures----------------------------------\n\n");
     	
-      
-//    	InputReaderImpl reader = new InputReaderImpl();
-//    
-//		ArrayList<User>  qRel = reader.extract(RELEVANCE_FILE_PATH, true);
-//    	ArrayList<User>  result = reader.extract("src/main/resources/result.test.nUser.5.nTopic.6.Fri Sep 29 10:31:28 IST 2017.csv", false);
+    	
+//    	Map<String, Topic> measures = m.calculateSessionMeasure(pirs);    	
 //    	
-//    	System.out.println(result.get(0).getTopics().get(1).getQueries().get(0).getDocs().size());
-//    	System.out.println(result.get(4).toString());
-//    	System.out.println("Number of users:" + result.size() );
-//    	
-//    	Query qRelevance = qRel.get(0).getTopics().get(0).findQuery("1");
-//    	Query qResult = result.get(0).getTopics().get(0).findQuery("1");;
-//
-//    	MeasureImpl m = new MeasureImpl();
-//    	m.evaluationProcess(qRel, result, 5);
-//    	System.out.println(m.calculateNDCG(qRelevance, qResult, 5));
-    	
-
-    	
-//    	System.out.print(qRelevance.entriesSortedByValues(qRelevance.getDocs()));
-    	
-    	//System.out.println(m.calculatePK(qRelevance, qResult, 20));
-    	//m.meanAverageMeasure(qRel, result, 10);
-    	
-////    	
-    	
-//    	System.out.println(qRel.get("0MOVS-AP1").toString());
-//    	
-//    	for (String[] string : input2.get("0MOVS-YP6")) {
-//    		System.out.println(string[0] + " " + string[1] + " " + string[2]);
-//			
-//		}
-//    	System.out.println(input1.get("0MOVS-AP")[1]);
-//    	System.out.println(input1.get("0MOVS-AP")[2]);
-//    	CheckInput checker = new CheckInputImpl();
-//    	if (!checker.checkInputFiles( args )){
-//    		throw new InvalidInputException("The input files don't meet the constrains");
+//    	Iterator<Entry<String, Topic>> itTopic = measures.entrySet().iterator();
+//    	Iterator<Entry<String, AbstractMeasure>> itM;
+//    	while(itTopic.hasNext()) {
+//    		
+//    		System.out.println(itTopic.next().getValue().printMeasures());
+//    		
 //    	}
+    	
+    	
+    	
+    	/*----------------------Print Session Measures on .txt----------------------------------*/
+    	
+    	PrintStream out;
+		try {
+			out = new PrintStream(new FileOutputStream("output.txt"));
+			System.setOut(out);
+			
+			
+			
+			
+	    	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
+	    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
+	    	Query q ;
+	    	while (itm.hasNext()) {
+	    		q = itm.next().getValue();
+	    		//if(q.getUser().equals("121")) {
+	    			System.out.println(((QueryRelFile)q).printMeasures());
+	    		//}
+	    		
+	    		
+	    	}
+			
+
+			
+			System.out.println("\n\n----------------------Print Session Measures----------------------------------\n\n");
+	    	Map<String, Topic> measures = m.calculateSessionMeasure(pirs);    	
+	    	
+	    	Iterator<Entry<String, Topic>> itTopic = measures.entrySet().iterator();
+	    	Iterator<Entry<String, AbstractMeasure>> itM;
+	    	while(itTopic.hasNext()) {
+	    		
+	    		System.out.println(itTopic.next().getValue().printMeasures());
+	    		
+	    	}
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+    	
+    	
     	
     }
     
@@ -234,12 +260,8 @@ public class EvalEpir {
     	}
     	pw.write(builder.toString());
     	pw.close();
-    	
-    	
-    	
-    	
-    }
-       
+
+    }   
 }
 
 
