@@ -17,6 +17,7 @@ import org.jfree.chart.axis.AxisSpace;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.SymbolAxis;
+import org.jfree.chart.axis.TickUnitSource;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
@@ -25,6 +26,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleInsets;
 
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Measure;
@@ -155,8 +157,18 @@ public class LineChart{
 		}
 		if (isNormaliseMeasure) {
 			ValueAxis yAxis = plot.getRangeAxis();
+			
 			yAxis.setRange(0, 1);
-		}		
+			yAxis.setRangeWithMargins(0,1);
+			yAxis.setLowerBound(0);
+			rangeAxis.setRangeWithMargins(0,rangeAxis.getUpperBound());
+			
+			
+		}	
+	
+		
+		
+		
 	 }
 	 
 	 
@@ -205,16 +217,23 @@ public class LineChart{
 	        );
 	        
 	        XYPlot plot = (XYPlot) chart.getPlot();
+	        
+	       
 	        ValueAxis xAxis = plot.getDomainAxis();
 	        xAxis.setRange(0, 100);
+	        xAxis.setRangeWithMargins(0, 100);
+	        xAxis.setLowerMargin(0);
 	        ValueAxis yAxis = plot.getRangeAxis();
 			yAxis.setRange(0, 1);
+			yAxis.setRangeWithMargins(0,1);
 	        XYLineAndShapeRenderer r = (XYLineAndShapeRenderer) plot.getRenderer();
 			r.setAutoPopulateSeriesShape(true);
 			for (int i = 0; i < dataset.getSeries().size(); i++){			
 				r.setSeriesShapesVisible (i, true);
 				r.setSeriesStroke(i, new BasicStroke(2));
 			}
+			
+	
 			
 	        return chart;
 	
