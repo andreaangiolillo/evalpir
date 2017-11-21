@@ -86,7 +86,7 @@ public class Measure extends AbstractMeasure{
 		at.addRule();
 		at.addRow(getName(),"User: " + user,"Topic: " + topic,"Query: " + query );
 		at.addRule();
-		at.addRow("System", "Value", "---", "---");
+		at.addRow("System", "Value", "S1 - Si", "(Si-1) - Si");
 		at.addRule();
 		ArrayList<Pair<String, Double>> m = getPIRvalue();
 		int nMeasure = m.size();

@@ -1,6 +1,5 @@
 package ie.dcu.evalpir.measures;
 
-import java.util.ArrayList;
 
 
 import ie.dcu.evalpir.elements.Query;

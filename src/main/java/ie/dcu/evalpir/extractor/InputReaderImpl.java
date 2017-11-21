@@ -7,17 +7,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import me.tongfei.progressbar.ProgressBar;
+import ie.dcu.evalpir.elements.ConsolePrinter;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.PIR;
-import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
@@ -35,10 +31,10 @@ public class InputReaderImpl /*implements InputReader*/{
 	 * 
 	 **/	
 	public static Map<String ,Session> extracLogFile(File logsFile){
+		ConsolePrinter.startTask("Extracting " + logsFile.getName());
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
-		ProgressBar progressBar = new ProgressBar("Logs File Extraction ", 1000000).start(); // progressbar
 		Map<String ,Session> sessions = new HashMap<String, Session>();		
 		try {
 			String[] row;
@@ -47,8 +43,8 @@ public class InputReaderImpl /*implements InputReader*/{
 			Session session;
 			String key ;
 			br.readLine();//removing first row
-			while ((line= br.readLine()) != null) {	
-				progressBar.step();
+			while ((line= br.readLine()) != null) {
+				
 				row = (line  != null) ? line.split(cvsSplitBy) : null;
 				log = new Log(row[5], row[4], row[1], row[7], row[3]);
 				key = row[6].toLowerCase() + "," + row[10].toLowerCase();
@@ -71,9 +67,7 @@ public class InputReaderImpl /*implements InputReader*/{
 			e.printStackTrace();
 		}
 		
-		progressBar.stepTo(1000000);
-		progressBar.stop();
-		System.out.print("\n");
+		ConsolePrinter.endTask("Extracting " + logsFile.getName());
 		return sessions;
 	}
 	
@@ -85,7 +79,7 @@ public class InputReaderImpl /*implements InputReader*/{
 	 * 
 	 */
 	public static Map<String, Query> extractRelevanceFile(File file) {
-		ProgressBar progressBar = new ProgressBar("Relevance File Extraction ", 1000000).start(); // progressbar
+		ConsolePrinter.startTask("Extracting " + file.getName());
 	    BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
@@ -104,7 +98,6 @@ public class InputReaderImpl /*implements InputReader*/{
 		    br = new BufferedReader(new FileReader(file.getPath()));
 		    br.readLine();//removing first row
 		    while ((line= br.readLine()) != null) {	
-		    	progressBar.step();
 		    	text = (line  != null) ? line.split(cvsSplitBy) : null;
 	    		if(!userKey.equalsIgnoreCase("")) {
 	    			doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
@@ -149,10 +142,7 @@ public class InputReaderImpl /*implements InputReader*/{
 				}
 			}
 		}
-		
-		progressBar.stepTo(1000000);
-		progressBar.stop();
-		System.out.print("\n");
+		ConsolePrinter.endTask("Extracting " + file.getName());
 		return queries;
 	
 	}
@@ -164,7 +154,7 @@ public class InputReaderImpl /*implements InputReader*/{
 	 * 
 	 */
 	public static ArrayList<PIR> extractOutputPIR(File file) {
-		ProgressBar progressBar = new ProgressBar("Output File Extraction ", 10000000).start(); // progressbar
+		ConsolePrinter.startTask("Extracting " + file.getName());
 	    BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ","; 
@@ -183,7 +173,6 @@ public class InputReaderImpl /*implements InputReader*/{
 		    br.readLine();//removing first row
 		   
 		    while ((line= br.readLine()) != null) {	
-		    	progressBar.step();
 		    	text = (line  != null) ? line.split(cvsSplitBy) : null;
 	    		if(!userKey.equalsIgnoreCase("")) {
 	    			
@@ -236,10 +225,7 @@ public class InputReaderImpl /*implements InputReader*/{
 				}
 			}
 		}
-		
-		progressBar.stepTo(10000000);
-		progressBar.stop();
-		System.out.print("\n");
+		ConsolePrinter.endTask("Extracting " + file.getName());
 		return pirs;
 	
 	}

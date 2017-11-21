@@ -8,11 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.sql.rowset.spi.TransactionalWriter;
-
-
-import org.apache.commons.lang3.ArrayUtils;
-
+import ie.dcu.evalpir.elements.ConsolePrinter;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -21,7 +17,6 @@ import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
-import ie.dcu.evalpir.elements.Path;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
@@ -29,7 +24,6 @@ import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.exceptions.DifferentQueryException;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
-import me.tongfei.progressbar.ProgressBar;
 
 /**
  * @author Andrea Angiolillo
@@ -593,7 +587,7 @@ public class CalculateMeasureImpl{
 	 * @param pirs
 	 */
 	public void calculateMeasures(ArrayList<PIR> pirs) {
-		
+		ConsolePrinter.startTask("Calculating Measures");
 		Query queryPIR;
 		QueryRelFile queryRel;
 		/*Measures variables*/
@@ -647,7 +641,9 @@ public class CalculateMeasureImpl{
 				}
 				
 			}
-		}	
+		}
+		
+		ConsolePrinter.endTask("Calculating Measures");
 	}
 	
 	/**

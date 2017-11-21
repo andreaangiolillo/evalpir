@@ -3,7 +3,6 @@ package ie.dcu.evalpir;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -13,21 +12,20 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-
 import ie.dcu.evalpir.chart.CreatorChart;
 import ie.dcu.evalpir.elements.AbstractMeasure;
+import ie.dcu.evalpir.elements.ConsolePrinter;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.PIR;
-import ie.dcu.evalpir.elements.Path;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
 import ie.dcu.evalpir.measures.CalculateMeasureImpl;
-import me.tongfei.progressbar.ProgressBar;
+
 
 /**
  * @author Andrea Angiolillo
@@ -47,7 +45,9 @@ public class EvalEpir {
 //    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
 //    	File logsFile = new File(LOGS_FILE_PATH);
 //    	File outputPIR = new File("src/main/resources/ar.csv");
-//    	
+    	
+    	ConsolePrinter.startEval();
+    	
     	File relevanceFile = new File(args[0]);
     	File outputPIR = new File(args[1]); 
     	File logsFile = new File(args[2]);
@@ -56,6 +56,7 @@ public class EvalEpir {
     	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
     	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
     	Map<String, Session> logs = InputReaderImpl.extracLogFile(logsFile);
+    	
 //    	
 //    	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
 //    	Iterator<Entry<String, Query>> itd = qRel.entrySet().iterator();
@@ -91,13 +92,11 @@ public class EvalEpir {
     	
     	
     	
-		ProgressBar progressBar = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
+		//ProgressBar progressBar = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
     	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
    	
     	m.calculateMeasures(pirs);
-    	progressBar.stepTo(100);
-    	progressBar.stop();
-    	System.out.print("\n");
+
 //    	
 // 	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
 //    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
@@ -186,7 +185,7 @@ public class EvalEpir {
 		try {
 			out = new PrintStream(new FileOutputStream("output.txt"));
 			System.setOut(out);
-	    	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
+	    	System.out.println("\n----------------------Print Measures----------------------------------\n");
 	    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
 	    	Query q ;
 	    	while (itm.hasNext()) {
@@ -194,7 +193,7 @@ public class EvalEpir {
 	    			System.out.println(((QueryRelFile)q).printMeasures());
 	    	}
 
-			System.out.println("\n\n----------------------Print Session Measures----------------------------------\n\n");
+			System.out.println("\n----------------------Print Session Measures----------------------------------\n");
 	    	Map<String, Topic> measures = m.calculateSessionMeasure(pirs);    	
 	    	
 	    	Iterator<Entry<String, Topic>> itTopic = measures.entrySet().iterator();
@@ -204,11 +203,15 @@ public class EvalEpir {
 	    		System.out.println(itTopic.next().getValue().printMeasures());
 	    		
 	    	}
+	    	
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		
     }
     
     

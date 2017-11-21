@@ -8,14 +8,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import ie.dcu.evalpir.elements.AbstractMeasure;
+import ie.dcu.evalpir.elements.ConsolePrinter;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
-import ie.dcu.evalpir.measures.CalculateMeasureImpl;
-import me.tongfei.progressbar.ProgressBar;
+
 
 
 public class CreatorChart {
@@ -52,8 +51,7 @@ public class CreatorChart {
 	  * @param queries
 	  */
 	 public static void createChart(final Map<String,Query> queries) {
-		ProgressBar pb = new ProgressBar("Creating Charts", 100).start(); // progressbar
-		pb.maxHint(queries.size()*10 ); // progressbar
+		ConsolePrinter.startTask("Creating Charts");
 		String path = createFolder("Charts");
 		Map<String, ArrayList<Query>> topics = setTopic(queries);
 		Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
@@ -68,14 +66,10 @@ public class CreatorChart {
 				}else if(measure instanceof MeasureCompound) {
 					LineChart.CreateLineChartPerQuery(path, topic, measure.getName());
 				}
-				
-				pb.step();
 			}
 		}
+		ConsolePrinter.endTask("Creating Charts");
 		
-		pb.stepTo(queries.size()*10 );// progressbar
-		pb.stop();// progressbar
-		System.out.print("\n");
 	 }
 	
 	 /**
