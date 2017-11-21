@@ -1,2 +1,2 @@
 # evalpir
-Evaluation EPIR
+Evaluation PIR
