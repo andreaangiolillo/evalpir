@@ -240,9 +240,6 @@ public class LineChart{
 	
 	}
 	
-	
-	
-	
 	private static XYSeriesCollection createDataset(final MeasureCompound m) {
 		Iterator<Entry<String, ArrayList<Pair<Integer, Double>>>> it = m.getPIRvalueSortedByKey().entrySet().iterator();
 		XYSeries[] series = new XYSeries[m.getPIRvalue().size()];
