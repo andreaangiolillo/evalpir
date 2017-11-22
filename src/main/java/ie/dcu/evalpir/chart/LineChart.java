@@ -5,7 +5,9 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -16,6 +18,7 @@ import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -29,6 +32,16 @@ import ie.dcu.evalpir.elements.QueryRelFile;
 
 public class LineChart{
 	
+	Map<String, Color> pirColor;
+	
+	
+	
+	public LineChart() {
+		super();
+		this.pirColor = new HashMap<String, Color>();
+	}
+
+
 	public static void CreateLineChartPerTopic(String path, ArrayList<Query> topic, Measure m) {
 			initUIPerTopic(path, topic, m);
 	}
@@ -67,6 +80,7 @@ public class LineChart{
 	private static XYSeriesCollection createDataset(ArrayList<Query> topic, Measure m) {
 		int nQuery = topic.size();
 		int nPIR = m.getPIRvalue().size();
+		m.sortbyKey();
 		XYSeries[] series = new XYSeries[nPIR];
 		Measure measure;
 		Double value = 0.0;
@@ -75,7 +89,7 @@ public class LineChart{
 				if(i == 0) {
 					series[j] = new XYSeries(m.getPIR(j).getKey());
 				}
-				
+	
 				measure = (Measure)((QueryRelFile)topic.get(i)).searchMeasure(m.getName());
 				if(measure != null) {
 					value = (Double)measure.getPIR(j).getValue();
@@ -87,10 +101,10 @@ public class LineChart{
 			}
 		}
 		
-		XYSeriesCollection dataset = new XYSeriesCollection();
-		
+		XYSeriesCollection dataset = new XYSeriesCollection();	
 		for (XYSeries s : series) {
 			dataset.addSeries(s);
+			
 		}
 		
 		return dataset;
@@ -114,9 +128,9 @@ public class LineChart{
 			r.setAutoPopulateSeriesShape(true);
 			for (int i = 0; i < dataset.getSeries().size(); i++){			
 				r.setSeriesShapesVisible (i, true);
-				r.setSeriesStroke(i, new BasicStroke(2));
+				r.setSeriesStroke(i, new BasicStroke(3));
 			}
-			
+					
 	        return chart;
 	        
 	 }
@@ -156,9 +170,6 @@ public class LineChart{
 			
 			
 		}	
-	
-		
-		
 		
 	 }
 	 
@@ -221,10 +232,8 @@ public class LineChart{
 			r.setAutoPopulateSeriesShape(true);
 			for (int i = 0; i < dataset.getSeries().size(); i++){			
 				r.setSeriesShapesVisible (i, true);
-				r.setSeriesStroke(i, new BasicStroke(2));
+				r.setSeriesStroke(i, new BasicStroke(3));
 			}
-			
-	
 			
 	        return chart;
 	
@@ -235,14 +244,14 @@ public class LineChart{
 	
 	
 	private static XYSeriesCollection createDataset(final MeasureCompound m) {
-	
-		Iterator<Entry<String, ArrayList<Pair<Integer, Double>>>> it = m.getPIRvalue().entrySet().iterator();
+		Iterator<Entry<String, ArrayList<Pair<Integer, Double>>>> it = m.getPIRvalueSortedByKey().entrySet().iterator();
 		XYSeries[] series = new XYSeries[m.getPIRvalue().size()];
 		ArrayList<Pair<Integer, Double>> value;
 		int i = 0;
 		while(it.hasNext()) {
 			Entry<String, ArrayList<Pair<Integer, Double>>> measurePerPir = it.next();
 			series[i] = new XYSeries(measurePerPir.getKey());
+			
 			value = measurePerPir.getValue();
 			if (value != null) {
 				for(int j = 0; j < value.size(); j++) {
@@ -255,8 +264,7 @@ public class LineChart{
 			
 		}
 		
-		XYSeriesCollection dataset = new XYSeriesCollection();
-		
+		XYSeriesCollection dataset = new XYSeriesCollection();	
 		for (XYSeries s : series) {
 			dataset.addSeries(s);
 		}

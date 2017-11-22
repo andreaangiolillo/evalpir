@@ -62,11 +62,21 @@ public class Measure extends AbstractMeasure{
 	public ArrayList<Pair<String, Double>> getPIRvalue() {
 		return PIRvalue;
 	}
+	
+	public ArrayList<Pair<String, Double>> getPIRvalueSortedByKey() {
+		sortbyKey();
+		return PIRvalue;
+	}
+	
+	public ArrayList<Pair<String, Double>> getPIRvalueSortedByValue() {
+		sortbyValue();
+		return PIRvalue;
+	}
 
 	/**
 	 * 
 	 */
-	public void sort() {
+	public void sortbyValue() {
 		Collections.sort(getPIRvalue(), new Comparator<Pair<String, Double>>(){
 			public int compare(Pair<String, Double> o1, Pair<String, Double> o2) {
 				// TODO Auto-generated method stub
@@ -75,13 +85,21 @@ public class Measure extends AbstractMeasure{
 		});
 	}
 	
+	public void sortbyKey() {
+		Collections.sort(getPIRvalue(), new Comparator<Pair<String, Double>>(){
+			public int compare(Pair<String, Double> o1, Pair<String, Double> o2) {
+				// TODO Auto-generated method stub
+				return o1.getKey().compareTo(o2.getKey());
+			}
+		});
+	}
 	
 	
 	/**
 	 * 
 	 */
 	public String printMeasure(String user, String topic, String query) {
-		sort();
+		sortbyValue();
 		AsciiTable at = new AsciiTable();
 		at.addRule();
 		at.addRow(getName(),"User: " + user,"Topic: " + topic,"Query: " + query );

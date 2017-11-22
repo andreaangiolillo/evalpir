@@ -42,16 +42,16 @@ public class EvalEpir {
 	
     public static void main( String[] args ) {
     	
-//    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
-//    	File logsFile = new File(LOGS_FILE_PATH);
-//    	File outputPIR = new File("src/main/resources/ar.csv");
+    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
+    	File logsFile = new File(LOGS_FILE_PATH);
+    	File outputPIR = new File("src/main/resources/ar.csv");
     	
     	ConsolePrinter.startEval();
     	
-    	File relevanceFile = new File(args[0]);
-    	File outputPIR = new File(args[1]); 
-    	File logsFile = new File(args[2]);
-    	   	
+//    	File relevanceFile = new File(args[0]);
+//    	File outputPIR = new File(args[1]); 
+//    	File logsFile = new File(args[2]);
+//    	   	
     	
     	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
     	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);

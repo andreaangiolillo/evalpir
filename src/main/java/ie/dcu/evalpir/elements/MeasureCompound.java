@@ -3,6 +3,7 @@ package ie.dcu.evalpir.elements;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * 
@@ -51,7 +52,10 @@ public class MeasureCompound extends AbstractMeasure {
 		return PIRvalue.get(key);
 	}
 	
-	
+	public Map<String, ArrayList<Pair<Integer,Double>>> getPIRvalueSortedByKey() {
+		Map<String, ArrayList<Pair<Integer,Double>>> map = new TreeMap<String, ArrayList<Pair<Integer,Double>>>(PIRvalue);
+		return map;
+	}
 	
 	
 	/**

@@ -1,5 +1,6 @@
 package ie.dcu.evalpir.chart;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ public class CreatorChart {
 
 	final static String[] MEASURES = {"Recall", "Precision", "Average Precision", "NDCG@5", "NDCG@10", 
 										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" };
+	
+	
 	/**
 	 * It Creates the folder for the diagrams
 	 * @param nameFolder
