@@ -16,7 +16,7 @@ public class Query {
 	private String user;
 	private String topic;
 	private String id;
-	private Map<String,Document> docs;
+	private Map<String,Document> docs; // key = docID, value = Document
 	
 
 	/**

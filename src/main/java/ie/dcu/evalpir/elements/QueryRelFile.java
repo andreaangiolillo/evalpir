@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	
-	private Map<String, AbstractMeasure> measures;
+	private Map<String, AbstractMeasure> measures; // key = measureName, value = Measure
 	private boolean toConsider;
 	
 	/***

@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -56,6 +58,7 @@ public class EvalEpir {
     	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
     	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
     	Map<String, Session> logs = InputReaderImpl.extracLogFile(logsFile);
+    	
     	
 //    	
 //    	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
