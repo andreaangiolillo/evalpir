@@ -27,6 +27,7 @@ import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
 import ie.dcu.evalpir.measures.CalculateMeasureImpl;
+import ie.dcu.evalpir.measures.CalculateSessionMeasure;
 
 
 /**
@@ -96,7 +97,7 @@ public class EvalEpir {
     	
     	
 		//ProgressBar progressBar = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
-    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel, logs);
+    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel);
    	
     	m.calculateMeasures(pirs);
 
@@ -197,7 +198,8 @@ public class EvalEpir {
 	    	}
 
 			System.out.println("\n----------------------Print Session Measures----------------------------------\n");
-	    	Map<String, Topic> measures = m.calculateSessionMeasure(pirs);    	
+			CalculateSessionMeasure m1 = new CalculateSessionMeasure(qRel, logs);
+	    	Map<String, Topic> measures = m1.calculateSessionMeasure(pirs);    	
 	    	
 	    	Iterator<Entry<String, Topic>> itTopic = measures.entrySet().iterator();
 	    	Iterator<Entry<String, AbstractMeasure>> itM;

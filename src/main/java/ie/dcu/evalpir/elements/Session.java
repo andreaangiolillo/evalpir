@@ -3,6 +3,7 @@ package ie.dcu.evalpir.elements;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -97,51 +98,53 @@ public class Session{
 
 	
 	/**
-	 * @param query
+	 * This method return the deepest document opened in a ranked list into the session
+	 * If there are not documents opened in the log file it return 10
 	 * @return
 	 */
-	public int setMaxK(String queryId) {
-		ArrayList<Log> logs = getDocOpened();
-		int k = 0;
-		int rank = 0;
-		
-		for(Log log : logs) {
-			rank = Integer.parseInt(log.getRank());
-			if ((rank > k) && (log.getQuery().equalsIgnoreCase(queryId))){
-				k = rank;
+	public int getMaxK() {
+		if(getDocOpened().size() != 0) {
+			ArrayList<Log> logs = getDocOpened();
+			int k = 0;
+			int rank = 0;
+			
+			for(Log log : logs) {
+				rank = Integer.parseInt(log.getRank());
+				if (rank > k){
+					k = rank;
+				}
 			}
+			
+			return k;
 		}
 		
-		return k;
+		return 10;
 	}
 	
 	/**
-	 * @param query
+	 * This method returns the position average of the documents opened across the session
+	 * If there are not documents opened in the log file it return 10
 	 * @return
 	 */
-	public int setAverageK(ArrayList<Query> query) {
-		ArrayList<Log> logs = getDocOpened();
-		int k = 0;
-		int rank = 0;
-		Map<String, Integer> maxRankQuery = new Hashtable<String, Integer>();
+	public int getAverageK() {
 		
-		for(Log l : logs) {
-			rank = Integer.parseInt(l.getRank());
-			if(!maxRankQuery.containsKey(l.getQuery())) {
-				maxRankQuery.put(l.getQuery(), rank);
-			}else if(rank > maxRankQuery.get(l.getQuery())){
-				maxRankQuery.put(l.getQuery(), rank);
+		if(getDocOpened().size() != 0) {
+			int k = 0;
+			Iterator<Entry<String, Integer>> it = getPath().entrySet().iterator();
+			while(it.hasNext()) {
+				k += it.next().getValue();
 			}
+			
+			return k/getDocOpened().size();	
 		}
 		
-		Iterator<Entry<String, Integer>> it = maxRankQuery.entrySet().iterator();
-		while(it.hasNext()) {
-			k += it.next().getValue();
-		}
-		
-		return k/logs.size();
+		return 10;
 	}
 	
+	/**
+	 * 
+	 * @param myList
+	 */
 	public void sortLog(ArrayList<Log> myList) {
 		Collections.sort(myList, new Comparator<Log>() {
 			  public int compare(Log o1, Log o2) {
@@ -151,6 +154,24 @@ public class Session{
 	}
 	
 	
+	
+	/**
+	 * This method returns the last document opened in each ranked list across the session
+	 * @return
+	 */
+	public Map<String, Integer> getPath() {
+		ArrayList<Log> logs = getDocOpened();
+		Map<String, Integer> path = new HashMap<String, Integer>();
+		int rank = 0;
+		for(Log log : logs) {
+			rank = Integer.parseInt(log.getRank());
+			if(!path.containsKey(log.getQuery()) || rank > path.get(log.getQuery())) {
+				path.put(log.getQuery(), rank);
+			}
+		}	
+		
+		return path;
+	}
 	
 	
 	/**

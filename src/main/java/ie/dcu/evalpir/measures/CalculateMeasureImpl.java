@@ -41,9 +41,8 @@ public class CalculateMeasureImpl{
 	 * Constructor
 	 * @param 
 	 */
-	public CalculateMeasureImpl(Map<String, Query> relevanceFile, Map<String, Session> logsfile) {
-		this.relevanceFile = relevanceFile;
-		this.logsFile = logsfile;
+	public CalculateMeasureImpl(Map<String, Query> relevanceFile) {
+		this.relevanceFile = relevanceFile;  // key = queryID, value = Query
 	}
 	
 	
@@ -95,7 +94,7 @@ public class CalculateMeasureImpl{
 	 * This function is used to calculate the Precision/Recall Curve
 	 * @input queryRel
 	 * @input queryOutputPIR
-	 * @assumption If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc to be zero 
+	 * @assumption If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc is 0 
 	 * @return listPair
 	 * @Complexity O(n^2)
 	 * **/
@@ -118,11 +117,11 @@ public class CalculateMeasureImpl{
 			}
 			
 			Collections.sort(listPair);
-			for(int i = 0; i < listPair.size(); i++) { // setting the key as the recall point where the doc was found
+			for(int i = 0; i < listPair.size(); i++) { // setting the key (the recall point) where the doc was found
 				listPair.get(i).setKey(((i + 1) * 100)/ nRelevantDoc);
 			}
 			
-			if(nRelevantDoc > nRelDocFind){// If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc to be zero 
+			if(nRelevantDoc > nRelDocFind){// If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc is 0 
 				while(nRelevantDoc > nRelDocFind) {
 					nRelDocFind ++;
 					listPair.add(new Pair<Integer, Double>((nRelDocFind * 100)/nRelevantDoc, 0.0));	
@@ -323,164 +322,26 @@ public class CalculateMeasureImpl{
 	 * @Complexity Complexity: O(n)
 	 */
 	public static double calculatePKRK(Query queryRel, Query queryOutputPIR , int k, boolean recall) {
-		double relDoc = 0; // number of relevant docs found
+		double relDocFounded = 0; // number of relevant docs found
 		double nRelevantDoc = ((QueryRelFile) queryRel).getNRelevantDoc(); // number of relevant docs in queryRel
 		if(nRelevantDoc != 0) {
-			//System.out.print("SIZEEE" + queryRel.getId() + " " + queryRel.getTopic() + " " + queryRel.getUser());
 			Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
 			DocumentRelFile docRel;
 			DocumentOutputPIR docOut;
 			while (itDocOutputPIR.hasNext()) {
-				Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
-				docOut = (DocumentOutputPIR)pairDocOUT.getValue();
+				docOut = (DocumentOutputPIR)(Map.Entry<?,?>)itDocOutputPIR.next().getValue();
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				if((docRel != null) && (docOut.getRank() <= k) && (docRel.getIsRelevance() == true)) {
-					relDoc ++;
+					relDocFounded ++;
 				}
 			}
 			
 			double denominator = (recall == true) ? nRelevantDoc : k; 
-//			if(queryOutputPIR.getId().equalsIgnoreCase("110")) {
-//				System.out.println("Query " + queryOutputPIR.getId() + " RelDOc " + relDoc + " denominator " + denominator + " recall: " + recall);
-//				System.out.println(((QueryRelFile) queryRel).toString());
-//			}
-			
-			return (relDoc / denominator);
+			return (relDocFounded / denominator);
 		}
 		
 		return 0;
 	}	
-	
-	/** Session measures **/
-	
-	
-	/**
-	 * @param measures must be normalized
-	 * @return
-	 */
-	public static double[] extendSingleQueryMeasure(Double[] measure) {
-		double[] session = new double[measure.length];
-		for (int i = 0; i < measure.length; i++) {
-			session[i] += (i == 0) ? measure[i] * Math.exp(-(1 + measure[i]))
-								: session[i - 1] + measure[i] * Math.exp(-1 + (measure[i] - measure[i - 1]));
-		}
-		
-		return session;
-	}
-	
-	/**
-	 * sDCG(q) = (1 + log_bq q)-1 * DCG
-	 * where bq ∈ R is the logarithm base for the query discount; 1 < bq < 1000
-	 * q is the position of the query.
-	 * @param queryRel
-	 * @param queryOutputPIR
-	 * @param logbase
-	 * @param ideal
-	 * @return
-	 */
-	public static double sDCG(ArrayList<Query> queryRel, ArrayList<Query> queryOutputPIR, int k,  int logbase, boolean ideal) {
-		double sDCG = 0.0;
-		if (queryRel.size() != queryOutputPIR.size()) {
-			throw new DifferentSizeException();
-		}
-		
-		for (int i = 0; i < queryRel.size(); i++) {
-			if(queryRel.get(i).getId().equalsIgnoreCase(queryOutputPIR.get(i).getId())) {
-				sDCG += !ideal ? Math.pow(1 + log(i + 1, logbase), -1) * DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
-						  :	Math.pow(1 + log(i + 1, logbase), -1) * IDCG(queryRel.get(i), k);
-			}else {
-				throw new DifferentQueryException("Different queries: \nQueryRelID: " + queryRel.get(i).getId() + ", QueryOutputPIR: " + queryOutputPIR.get(i).getId());
-			}
-			
-		}
-		
-		if(sDCG == 0) {
-			System.out.println("SIZEEEE " + queryRel.size());
-		}
-		
-		return sDCG;
-	}
-
-	
-	/**
-	 * Normalized session discounted cumulative gain
-	 * @param queryRel
-	 * @param queryOutputPIR
-	 * @param logbase
-	 * @return
-	 */
-	public static double NsDCG(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR, int k, int logbase, Map<String, Session> sessions) {
-		ArrayList<Query> queryRelSortedbyTime = sortByTimestamp(queryRel, sessions);
-		ArrayList<Query> queryPIRSortedbyTime = sortByTimestamp(queryOutputPIR, sessions);
-		return sDCG(queryRelSortedbyTime, queryPIRSortedbyTime, k, logbase, false) / sDCG(queryRelSortedbyTime, queryPIRSortedbyTime, k, logbase, true);
-	}
-	
-	/**
-	 * 
-	 * @param queries
-	 * @param sessions
-	 * @return
-	 */
-	public static ArrayList<Query> sortByTimestamp(Map<String, Query> queries, Map<String, Session> sessions){
-		Iterator<Entry<String, Query>> itQ = queries.entrySet().iterator();
-		ArrayList<Log> session;
-		ArrayList<Query> queriesSorted = new ArrayList<Query>();
-		if(queries.size() != 1) {
-			Query query =  itQ.next().getValue();
-			//System.out.println(sessions.toString());
-			if(sessions.get((query.getUser() + "," + query.getTopic()).toLowerCase()) == null) {
-				throw new QueryNotInTheLogFileException("The queries in User:" + query.getUser() +" Topic: " + query.getTopic() + " are not in the logfile" );
-			}
-			
-			session = sessions.get((query.getUser() + "," + query.getTopic()).toLowerCase()).getQuery();			
-			for(Log log : session) {
-				if(queries.containsKey(log.getQuery())){
-					queriesSorted.add(queries.get(log.getQuery()));
-				}else {
-					throw new QueryNotInTheLogFileException("The querie: " + log.getQuery() + " is not in the logfile" );
-				}	
-			}
-			
-		}else {
-			queriesSorted.add(itQ.next().getValue());
-		}
-		
-		return queriesSorted;
-		
-	}
-	
-	
-
-//	public void modelFreeSession(ArrayList<Query> queryRel, Session s) {
-//		
-//		int j = s.getQuery().size();
-//		int k = 10;
-//		ArrayList<Integer> path;
-//		ArrayList<Path> paths = new ArrayList<Path>();
-//		Map <String, ArrayList<Path>> pathsession = new HashMap<String, ArrayList<Path>>();
-//		for(int i = 0; i < j; i++) {
-//			for(int z = 0; z < k; z++){
-//				if(i == 0) {
-//					path = new ArrayList<Integer>();
-//					path.add(z + 1);
-//					paths = new ArrayList<Path>();
-//					paths.add(new Path(path));
-//					pathsession.put(k + "," + i, paths);
-//				}else {
-//					paths = pathsession.get(k + "," + (i - 1));
-//					for(Path p : paths) {
-//						p.addElement(z + 1);
-//					}
-//					
-//					pathsession.put(k + "," + i, paths);
-//				}
-//				
-//				
-//				
-//				
-//			}
-//		}
-//	}
 	
 	public static ArrayList<ArrayList<Integer>>  partition(int n, int k, int j, ArrayList<Integer> prefix, ArrayList<ArrayList<Integer>> memo) {
 		if(prefix.size()> j || (n == 0 && prefix.size() < j)) {
@@ -525,89 +386,6 @@ public class CalculateMeasureImpl{
 		return "UserID: " + userID + (topicId.equalsIgnoreCase("") ? "" : " TopicID: " + topicId)
 				+ (queryId.equalsIgnoreCase("") ? "" : " QueryID: " + queryId) + " Precision@" + k + ": " + String.valueOf(measure) + "\n";  
 		
-	}
-	
-//	/**
-//	 * @param q
-//	 * @return
-//	 */
-//	public QueryRelFile createMeasure(QueryRelFile q) {
-//		int k = q.getNRelevantDoc();
-//		for (; k != 0; k --) {
-//			q.addMeasure(new Measure("Precision@"+k));
-//			q.addMeasure(new Measure("Recall@"+k));
-//		}
-//		
-//		q.addMeasure(new Measure("Precision"));
-//		q.addMeasure(new Measure("Recall"));
-//		q.addMeasure(new Measure("fMeasure0.5"));
-//		q.addMeasure(new Measure("NDCG@5"));
-//		q.addMeasure(new Measure("NDCG@10"));
-//		q.addMeasure(new Measure("NDCG@15"));
-//		q.addMeasure(new Measure("NDCG@20"));
-//		q.addMeasure(new Measure("Average Precision"));
-//		q.addMeasure(new MeasureCompound("PrecisionRecallCurve"));
-//		
-//		return q;
-//	}
-	
-	
-	/**
-	 * 
-	 * @param queryRel
-	 * @param queryOutputPIR
-	 * @return
-	 */
-	public static double calculateMAP(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR) {
-		double map = 0.0;
-		int size = queryRel.size();
-		if (size != queryOutputPIR.size()) {
-			throw new DifferentSizeException();
-		}
-		
-		Iterator <Entry<String, Query>> itRel = queryRel.entrySet().iterator();
-		Query qRel;
-		while(itRel.hasNext()) {
-			qRel = itRel.next().getValue();
-			if(!queryOutputPIR.containsKey(qRel.getId())) {
-				throw new DifferentQueryException();
-			}
-			map += calculateAP(qRel, queryOutputPIR.get(qRel.getId()));
-			
-		}
-
-		return map/size;		
-	}
-	
-	
-	
-	/**
-	 * 
-	 * @param pirs
-	 */
-	public Map<String, Topic> calculateSessionMeasure(ArrayList<PIR> pirs) {
-		Map<String, Topic> topicsRel = setTopic(getRelevanceFile());
-		Map<String, Topic> topicsPir;
-		Iterator<Entry<String, Topic>> itRel = topicsRel.entrySet().iterator();
-		Entry<String, Topic> topicRel;
-		
-		double nsDCG = 0.0;
-		double man = 0.0;
-		for(PIR pir : pirs) {
-			topicsPir = setTopic(pir.getQueries());
-			while(itRel.hasNext()) {
-				topicRel = itRel.next();
-				if(topicsPir.containsKey(topicRel.getKey())) {
-					nsDCG = NsDCG(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), 10, 4, getLogsFile());
-					man = calculateMAP(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries());
-					((Measure)topicRel.getValue().searchAddMeasure("nSDCG", false)).addPIR(pir.getName(), nsDCG);
-					((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false)).addPIR(pir.getName(), man);		
-				}
-			}
-			
-		}
-		
-		return topicsRel;
 	}
 	
 	/***
@@ -698,31 +476,7 @@ public class CalculateMeasureImpl{
 		
 	}
 	
-	 /**
-	  * 
-	  * @param queries
-	  * @return
-	  */
-	public static Map<String, Topic> setTopic(final Map<String,Query> queries){
-		Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
-		Query q;
-		String key ="";
-		Map<String, Topic> topicUser = new HashMap<String, Topic>();
-		while(it.hasNext()) {
-			q = it.next().getValue();	
-			key = q.getTopic() +  "," + q.getUser();
-			if(!topicUser.containsKey(key)) {
-				Map<String, Query> qs = new HashMap<String, Query>();
-				qs.put(q.getId(), q);
-				Topic topic = new Topic(q.getUser(), q.getTopic(), qs);
-				topicUser.put(key, topic);
-			}else {
-				topicUser.get(key).addQuery(q);
-			}	
-		}
-		
-		return topicUser;
-	}
+	
 	
 	
 	

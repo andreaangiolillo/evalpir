@@ -37,10 +37,8 @@ public class TestCaseMeasuresImpl {
 		
 		File outputPIR = new File("src/main/resources/result.test.nUser.2.nTopic.2.Tue Oct 03 12:55:33 IST 2017.csv");
 	    result = reader.extractOutputPIR(outputPIR);
-	    
-	    File logfile = new File(LOGS_FILE_PATH);
-	    logsfile = reader.extracLogFile(logfile);
-	    m = new CalculateMeasureImpl(rel, logsfile);	
+	  
+	    m = new CalculateMeasureImpl(rel);	
 	}
 
 	
