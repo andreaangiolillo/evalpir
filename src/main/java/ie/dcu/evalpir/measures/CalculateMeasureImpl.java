@@ -329,7 +329,7 @@ public class CalculateMeasureImpl{
 			DocumentRelFile docRel;
 			DocumentOutputPIR docOut;
 			while (itDocOutputPIR.hasNext()) {
-				docOut = (DocumentOutputPIR)(Map.Entry<?,?>)itDocOutputPIR.next().getValue();
+				docOut = (DocumentOutputPIR)itDocOutputPIR.next().getValue();
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				if((docRel != null) && (docOut.getRank() <= k) && (docRel.getIsRelevance() == true)) {
 					relDocFounded ++;

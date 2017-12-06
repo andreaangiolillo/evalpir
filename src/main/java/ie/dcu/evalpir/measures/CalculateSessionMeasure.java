@@ -12,6 +12,7 @@ import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
+import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
@@ -146,30 +147,48 @@ public class CalculateSessionMeasure {
 			return map/size;		
 		}
 		
-		
 		/**
 		 * 
 		 * @param pirs
 		 */
 		public Map<String, Topic> calculateSessionMeasure(ArrayList<PIR> pirs) {
 			Map<String, Topic> topicsRel = setTopic(getRelevanceFile());
-			Map<String, Topic> topicsPir;
-			Iterator<Entry<String, Topic>> itRel = topicsRel.entrySet().iterator();
+			Map<String, Topic> topicsPir = null;
+			Iterator<Entry<String, Topic>> itRel;
 			Entry<String, Topic> topicRel;
+			Session session;
 			
 			double nsDCG = 0.0;
 			double man = 0.0;
+			double rPC = 0.0;
+			double rRC = 0.0;
+			
 			for(PIR pir : pirs) {
 				topicsPir = setTopic(pir.getQueries());
+				itRel = topicsRel.entrySet().iterator();
 				while(itRel.hasNext()) {
 					topicRel = itRel.next();
 					if(topicsPir.containsKey(topicRel.getKey())) {
+						session = getLogsFile().get(topicRel.getKey());
 						nsDCG = NsDCG(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), 10, 4, getLogsFile());
 						man = calculateMAP(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries());
+						rPC = rPC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath());
+						rRC = rRC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath());
+						
 						((Measure)topicRel.getValue().searchAddMeasure("nSDCG", false)).addPIR(pir.getName(), nsDCG);
-						((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false)).addPIR(pir.getName(), man);		
+						//System.out.println("PRINT MEASURE " + topicRel.getValue().printMeasures());
+						((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false)).addPIR(pir.getName(), man);
+						((Measure)topicRel.getValue().searchAddMeasure("Session_Precision", false)).addPIR(pir.getName(), rPC);
+						((Measure)topicRel.getValue().searchAddMeasure("Session_Recall", false)).addPIR(pir.getName(), rRC);
+						((MeasureCompound)topicRel.getValue().searchAddMeasure("Session_PrecisionRecallCurve", true)).addPIR(pir.getName(), precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath()));
+						if(topicRel.getKey().equalsIgnoreCase("153,SPRT-YP")) {
+							System.out.println(precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath()));
+						}
+						
 					}
+					
 				}
+				//System.out.println("NAME PIR: " + pir.getName());
 				
 			}
 			
@@ -182,20 +201,20 @@ public class CalculateSessionMeasure {
 		  * @return
 		  */
 		public static Map<String, Topic> setTopic(final Map<String,Query> queries){
-			Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
-			Query q;
+			Iterator<Entry<String, Query>> itQueries = queries.entrySet().iterator();
+			Query query;
 			String key ="";
 			Map<String, Topic> topicUser = new HashMap<String, Topic>();
-			while(it.hasNext()) {
-				q = it.next().getValue();	
-				key = q.getTopic() +  "," + q.getUser();
+			while(itQueries.hasNext()) {
+				query = itQueries.next().getValue();	
+				key = query.getUser().toLowerCase() +  "," +  query.getTopic().toLowerCase() ;
 				if(!topicUser.containsKey(key)) {
-					Map<String, Query> qs = new HashMap<String, Query>();
-					qs.put(q.getId(), q);
-					Topic topic = new Topic(q.getUser(), q.getTopic(), qs);
+					Map<String, Query> quertTopic = new HashMap<String, Query>();
+					quertTopic.put(query.getId(), query);
+					Topic topic = new Topic(query.getUser(), query.getTopic(), quertTopic);
 					topicUser.put(key, topic);
 				}else {
-					topicUser.get(key).addQuery(q);
+					topicUser.get(key).addQuery(query);
 				}	
 			}
 			
@@ -233,19 +252,19 @@ public class CalculateSessionMeasure {
 		 * 
 		 * 
 		 * @assumption at least the one document, the first one, is views in each ranked lists
-		 * @param queryRel
+		 * @param queriesRel
 		 * @param logsfile
 		 */
-		public static int rR(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR, Map<String, Integer> path){
+		public static int rR(Map<String, Query> queriesRel, Map<String, Query> queriesPIR, Map<String, Integer> path){
 			int nRelevantDocFinded = 0;
-			Iterator<Entry<String, Query>> itQuery = queryOutputPIR.entrySet().iterator();
+			Iterator<Entry<String, Query>> itQuery = queriesPIR.entrySet().iterator();
 			Query queryPIR = null;
 			int rankDoc = 0;
 			while(itQuery.hasNext()) {
 				queryPIR = itQuery.next().getValue();
 				rankDoc = (path.get(queryPIR.getId().toLowerCase()) == null) ? 1 : path.get(queryPIR.getId().toLowerCase()); 
-				if(queryRel.get(queryPIR.getId().toLowerCase()) != null) {
-					nRelevantDocFinded += relevanceCount(queryRel.get(queryPIR.getId().toLowerCase()), queryPIR, rankDoc);
+				if(queriesRel.get(queryPIR.getId().toLowerCase()) != null) {
+					nRelevantDocFinded += relevanceCount(queriesRel.get(queryPIR.getId().toLowerCase()), queryPIR, rankDoc);
 				}else {
 					throw new DifferentQueryException();
 				}	
@@ -257,13 +276,13 @@ public class CalculateSessionMeasure {
 		/**
 		 * It computes the number of relevant document in the ranked list in input
 		 * @param queryRel
-		 * @param queryOutputPIR
+		 * @param queryPIR
 		 * @param k
 		 * @see http://ir.cis.udel.edu/~carteret/papers/sigir11b.pdf (rR@j,k)
 		 * @return
 		 */
-		public static int relevanceCount(Query queryRel, Query queryOutputPIR, int k) {
-			Iterator<Entry<String, Document>> itDocPIR = queryOutputPIR.getDocs().entrySet().iterator();
+		public static int relevanceCount(Query queryRel, Query queryPIR, int k) {
+			Iterator<Entry<String, Document>> itDocPIR = queryPIR.getDocs().entrySet().iterator();
 			Map<String, Document> relevanceDocs = queryRel.getDocs();
 			DocumentRelFile docRel = null;
 			DocumentOutputPIR docPIR = null;
@@ -281,15 +300,15 @@ public class CalculateSessionMeasure {
 		}
 		
 		/**
-		 * 
-		 * @param queryRel
-		 * @param queryOutputPIR
+		 * number of relevant documents views in the ranked lists / total number of document viewed in the ranked lists
+		 * @param queriesRel
+		 * @param queriesPIR
 		 * @param path
 		 * @see http://ir.cis.udel.edu/~carteret/papers/sigir11b.pdf (rPC)
 		 * @return
 		 */
-		public static int rPC(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR, Map<String, Integer> path){
-			return rR(queryRel, queryOutputPIR, path)/totDocumentViewSession(path);
+		public static double rPC(Map<String, Query> queriesRel, Map<String, Query> queriesPIR, Map<String, Integer> path){
+			return (double)rR(queriesRel, queriesPIR, path)/(double)totDocumentViewSession(path);
 		}
 		
 		/**
@@ -308,14 +327,15 @@ public class CalculateSessionMeasure {
 		}
 		
 		/**
+		 * number of relevant documents views in the ranked lists / total number of relevant documents in the ranked list
 		 * @param queryRel
 		 * @param queryOutputPIR
 		 * @param path
 		 * @see http://ir.cis.udel.edu/~carteret/papers/sigir11b.pdf (rRC)
 		 * @return
 		 */
-		public static int rRC(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR, Map<String, Integer> path){
-			return rR(queryRel, queryOutputPIR, path)/totRelevantDocSession(queryRel);	
+		public static double rRC(Map<String, Query> queryRel, Map<String, Query> queryOutputPIR, Map<String, Integer> path){
+			return (double)rR(queryRel, queryOutputPIR, path)/(double)totRelevantDocSession(queryRel);	
 		}
 		
 		/**
@@ -380,7 +400,7 @@ public class CalculateSessionMeasure {
 				docPIR = (DocumentOutputPIR)entryPIR.getValue();
 				keyDocPIR = entryPIR.getKey();
 				docRel = (DocumentRelFile)docsRel.get(keyDocPIR);
-				if(docRel.getIsRelevance()) {
+				if(docRel != null && docRel.getIsRelevance()) {
 					listPair.add(new Pair<Integer, Double>(docPIR.getRank(), precisionK(docsRel, docsPIR, docPIR.getRank())));
 					nRelDocFind++;
 				}	

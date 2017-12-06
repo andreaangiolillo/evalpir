@@ -175,13 +175,29 @@ public class LineChart{
 	 
 	 
 	 
+	 
+	 
+	 
+	public static void createLineChartForSessionMeasure(String path, String user, String topic, MeasureCompound measure) {
+		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
+		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
+		ChartFactory.setChartTheme(theme);
+		XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
+		JFreeChart chart = createChart(dataset, user, topic, "", measure.getName());
+		try {
+        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measure.getName() + "/"  +"User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 750, 500);
+        } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	 
 	public static void CreateLineChartPerQuery(String path, ArrayList<Query> topic, String measureName) {
 		initUIPerQuery(path, topic, measureName);
 	}
 	 
 	 
 	private static void initUIPerQuery(String path, ArrayList<Query> topic, String measureName) {
-		
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
 		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
 		ChartFactory.setChartTheme(theme);

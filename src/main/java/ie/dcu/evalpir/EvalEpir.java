@@ -94,12 +94,11 @@ public class EvalEpir {
 //    	}
     	
     	
-    	
-    	
-		//ProgressBar progressBar = new ProgressBar("Measures Calculation ", 100).start(); // progressbar
     	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel);
    	
     	m.calculateMeasures(pirs);
+		CalculateSessionMeasure m1 = new CalculateSessionMeasure(qRel, logs);
+    	Map<String, Topic> measures = m1.calculateSessionMeasure(pirs); 
 
 //    	
 // 	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
@@ -133,7 +132,8 @@ public class EvalEpir {
 //    	CalculateMeasureImpl.findPaths(44, 11, 4, p, memo);
     	
     	
-		CreatorChart.createChart(qRel);
+		//CreatorChart.createChart(qRel);
+		CreatorChart.createChartSession(measures);
 		
     	
 //    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
@@ -197,16 +197,10 @@ public class EvalEpir {
 	    			System.out.println(((QueryRelFile)q).printMeasures());
 	    	}
 
-			System.out.println("\n----------------------Print Session Measures----------------------------------\n");
-			CalculateSessionMeasure m1 = new CalculateSessionMeasure(qRel, logs);
-	    	Map<String, Topic> measures = m1.calculateSessionMeasure(pirs);    	
-	    	
+			System.out.println("\n----------------------Print Session Measures----------------------------------\n");   	
 	    	Iterator<Entry<String, Topic>> itTopic = measures.entrySet().iterator();
-	    	Iterator<Entry<String, AbstractMeasure>> itM;
 	    	while(itTopic.hasNext()) {
-	    		
-	    		System.out.println(itTopic.next().getValue().printMeasures());
-	    		
+	    		System.out.println(itTopic.next().getValue().printMeasures());	    		
 	    	}
 	    	
 			

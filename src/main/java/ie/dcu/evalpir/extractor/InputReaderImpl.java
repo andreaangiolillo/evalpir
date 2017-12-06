@@ -47,7 +47,7 @@ public class InputReaderImpl /*implements InputReader*/{
 				
 				row = (line  != null) ? line.split(cvsSplitBy) : null;
 				log = new Log(row[5], row[4], row[1], row[7], row[3]);
-				key = row[6].toLowerCase() + "," + row[10].toLowerCase();
+				key = row[6].toLowerCase() + "," + row[10].toLowerCase(); // user + "," + topic
 				if(sessions.containsKey(key)) {
 					if(!sessions.get(key).getId().contains(row[8].toLowerCase())) {
 						sessions.get(key).addId(row[8].toLowerCase());

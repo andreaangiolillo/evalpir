@@ -83,8 +83,7 @@ public class Topic {
 	 * @return
 	 */
 	public AbstractMeasure searchAddMeasure(String name, boolean compound) {
-		
-		if(getMeasures().get(name.trim().toLowerCase()) == null) {
+		if(searchMeasure(name) == null) {
 			if(compound) {
 				addMeasure(new MeasureCompound(name.trim()));
 			}else {
@@ -93,7 +92,7 @@ public class Topic {
 		}
 		
 		
-		return getMeasures().get(name.trim().toLowerCase());
+		return searchMeasure(name);
 	}
 	
 	

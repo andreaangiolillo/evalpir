@@ -157,16 +157,23 @@ public class Session{
 	
 	/**
 	 * This method returns the last document opened in each ranked list across the session
+	 * If a query has not documents opened is set to 1
 	 * @return
 	 */
 	public Map<String, Integer> getPath() {
-		ArrayList<Log> logs = getDocOpened();
+		ArrayList<Log> queries = getQuery();
 		Map<String, Integer> path = new HashMap<String, Integer>();
+		for (Log query : queries){
+			path.put(query.getQuery().trim().toLowerCase(), 1);
+		
+		}
+		
+		ArrayList<Log> docsOpened = getDocOpened();	
 		int rank = 0;
-		for(Log log : logs) {
-			rank = Integer.parseInt(log.getRank());
-			if(!path.containsKey(log.getQuery()) || rank > path.get(log.getQuery())) {
-				path.put(log.getQuery(), rank);
+		for(Log docOpened : docsOpened) {
+			rank = Integer.parseInt(docOpened.getRank()) + 1;
+			if(rank > path.get(docOpened.getQuery().trim().toLowerCase())) {
+				path.put(docOpened.getQuery().trim().toLowerCase(), rank);
 			}
 		}	
 		

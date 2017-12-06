@@ -15,13 +15,14 @@ import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
+import ie.dcu.evalpir.elements.Topic;
 
 
 
 public class CreatorChart {
 
 	final static String[] MEASURES = {"Recall", "Precision", "Average Precision", "NDCG@5", "NDCG@10", 
-										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" };
+										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve"};
 	
 	
 	/**
@@ -74,7 +75,43 @@ public class CreatorChart {
 		ConsolePrinter.endTask("Creating Charts");
 		
 	 }
-	
+	 
+	 public static void createChartSession(final Map<String, Topic> topics) {
+		 String path = createFolder("Charts");
+		 Iterator<Entry<String, Topic>> itTopic = topics.entrySet().iterator();
+		 Topic topic;
+		 MeasureCompound measure;
+		 while(itTopic.hasNext()) {
+			 topic = itTopic.next().getValue();
+			 measure = (MeasureCompound)topic.searchMeasure("Session_PrecisionRecallCurve");
+			 System.out.println(topic.getUserId() + " " +topic.getTopicId());
+			 System.out.println(measure.getPIRvalue().size());
+			 
+			 //LineChart.createLineChartForSessionMeasure(path, topic.getUserId(), topic.getTopicId(), measure);
+		 }
+		 
+		 
+		 
+//			ConsolePrinter.startTask("Creating Charts");
+//			String path = createFolder("Charts");
+//			Map<String, ArrayList<Query>> topics = setTopic(queries);
+//			Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
+//			AbstractMeasure[] measures;
+//			ArrayList<Query> topic;
+//			while(it.hasNext()) {
+//				topic = it.next().getValue();
+//				measures = getNameMeasures(topic);
+//				for (AbstractMeasure measure : measures) {
+//					if(measure instanceof Measure) {
+//						LineChart.CreateLineChartPerTopic(path, topic, (Measure)measure);
+//					}else if(measure instanceof MeasureCompound) {
+//						LineChart.CreateLineChartPerQuery(path, topic, measure.getName());
+//					}
+//				}
+//			}
+//			ConsolePrinter.endTask("Creating Charts");
+//			
+		 }
 	 /**
 	  * 
 	  * @param queries
