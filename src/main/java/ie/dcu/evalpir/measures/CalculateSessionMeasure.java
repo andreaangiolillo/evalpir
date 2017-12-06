@@ -1,6 +1,7 @@
 package ie.dcu.evalpir.measures;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -336,86 +337,96 @@ public class CalculateSessionMeasure {
 		
 		/**
 		 * 
+		 * @param docsRel
+		 * @param docsPIR
+		 * @param k
+		 * @return
+		 */
+		public static double precisionK(Map<String,Document> docsRel, Map<String,Document> docsPIR, int k){
+			double relDocFounded = 0;
+			Iterator<Entry<String, Document>> itDocsPIR = docsPIR.entrySet().iterator();
+			DocumentRelFile docRel;
+			DocumentOutputPIR docPIR;
+			Entry<String, Document> entryPIR;
+			while (itDocsPIR.hasNext()) {
+				entryPIR = itDocsPIR.next();
+				docPIR = (DocumentOutputPIR)entryPIR.getValue();
+				docRel = (DocumentRelFile)docsRel.get(entryPIR.getKey());			
+				if((docRel != null) && (docPIR.getRank() <= k) && (docRel.getIsRelevance() == true)) {
+					relDocFounded ++;
+				}
+			}
+			
+			return (relDocFounded / k);
+		}
+		
+		
+		/**
+		 * 
 		 * @return
 		 */
 		public static ArrayList<Pair<Integer, Double>> precisionRecallCurve(Map<String, Query> queriesRel, Map<String, Query> queriesOutputPIR,  Session session, Map<String, Integer> path) {
-			int totRelevantDoc = totRelevantDocSession(queriesRel);
-			int nRelDocFinded = 0;
-			
-			ArrayList<Log> queriesLog = session.getQuery();
-			QueryRelFile queryRel;
-			Query queryPIR;
+			ArrayList<Pair<Integer, Double>> listPair = new ArrayList<Pair<Integer, Double>>();
+			Map<String,Document> docsRel = mergeRelevanceDocs(queriesRel);
+			Map<String,Document> docsPIR = mergeRankedList(queriesOutputPIR, session, path);
+			Iterator<Entry<String, Document>>itPIR = docsPIR.entrySet().iterator();
 			DocumentOutputPIR docPIR;
 			DocumentRelFile docRel;
-			int k = 0;
-			Iterator<Entry<String, Document>> itDocs;
-			
-			ArrayList<Pair<Integer, Double>> listPair = new ArrayList<Pair<Integer, Double>>();
-			for(Log queryLog : queriesLog) {
-				queryPIR = queriesOutputPIR.get(queryLog.getQuery().toLowerCase());
-				queryRel = (QueryRelFile)queriesRel.get(queryLog.getQuery().toLowerCase());
-				k = path.get(queryLog.getQuery().toLowerCase());
-				if(queryPIR == null || queryRel == null) {
-					throw new DifferentQueryException("Query: " + queryLog.getQuery().toLowerCase() + " is into session but it is not into relfile/outputfile ");
-				}
-				
-				itDocs = queryPIR.getDocs().entrySet().iterator();
-				while(itDocs.hasNext()) {
-					docPIR = (DocumentOutputPIR)itDocs.next().getValue();
-					docRel = (DocumentRelFile)queryRel.findDoc(docPIR.getId().toLowerCase());
-					if(docRel != null && docRel.getIsRelevance() && docPIR.getRank() < k) {
-						nRelDocFinded ++;
-						listPair.add(new Pair<Integer, Double>(docPIR.getRank(), 0.0));					
-					}
-					
-				}
-				
-				
+			String keyDocPIR = "";
+			Entry<String, Document> entryPIR;
+			int nRelDocFind = 0;
+			while(itPIR.hasNext()) {
+				entryPIR = itPIR.next();
+				docPIR = (DocumentOutputPIR)entryPIR.getValue();
+				keyDocPIR = entryPIR.getKey();
+				docRel = (DocumentRelFile)docsRel.get(keyDocPIR);
+				if(docRel.getIsRelevance()) {
+					listPair.add(new Pair<Integer, Double>(docPIR.getRank(), precisionK(docsRel, docsPIR, docPIR.getRank())));
+					nRelDocFind++;
+				}	
 				
 			}
-				
-			return null;
+			
+			int nRelevantDoc = totRelevantDocSession(queriesRel);
+			Collections.sort(listPair);
+			for(int i = 0; i < listPair.size(); i++) { // setting the key (the recall point) where the doc was found
+				listPair.get(i).setKey(((i + 1) * 100)/ nRelevantDoc);
+			}
+			
+			if(nRelevantDoc > nRelDocFind){// If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc is 0 
+				while(nRelevantDoc > nRelDocFind) {
+					nRelDocFind ++;
+					listPair.add(new Pair<Integer, Double>((nRelDocFind * 100)/nRelevantDoc, 0.0));	
+				}
+			}
+			
+			return listPair;
 		}
 		
 		
 		
-		
-		public static int nRelevantDocumentFounded(QueryRelFile queryRel, Query queryPIR, int k) {
+		/***
+		 * 
+		 * @param queryRel
+		 * @param queryPIR
+		 * @param k
+		 * @return
+		 */
+		public static int nRelevantDocumentFound(QueryRelFile queryRel, Query queryPIR, int k) {
 			int nRelevantDocumentFounded = 0;
+			DocumentOutputPIR doc;
+			DocumentRelFile docRel;
+			Iterator<Entry<String, Document>> itDocPIR = queryPIR.getDocs().entrySet().iterator();
+			while(itDocPIR.hasNext()) {
+				doc = (DocumentOutputPIR)itDocPIR.next().getValue();
+				docRel = (DocumentRelFile)queryRel.findDoc(doc.getId().toLowerCase());
+				if(docRel != null && docRel.getIsRelevance() && doc.getRank() <=  k) {
+					nRelevantDocumentFounded ++;
+				}
+			}
 			
-			
-			
-			
-			return 0;
+			return nRelevantDocumentFounded;
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 		
 		/**
@@ -423,10 +434,9 @@ public class CalculateSessionMeasure {
 		 * @param queries
 		 * @return
 		 */
-		public static Map<String, Document> mergeRankedList(Map<String, Query> queries, Session session, Map<String, Integer> path){
+		public static Map<String, Document> mergeRankedList(final Map<String, Query> queries, final Session session, final Map<String, Integer> path){
 			ArrayList<Log> queryLog = session.getQuery();
 			Query query = null;
-			Map<String, Document> documentMerged = new HashMap<String, Document>();
 			Map<String, Document> documentToMerge = new HashMap<String, Document>();
 			DocumentOutputPIR doc;
 			int rank = 0;
@@ -437,22 +447,20 @@ public class CalculateSessionMeasure {
 				if(query == null) {
 					throw new DifferentQueryException("QueryID: " + queryLog.get(i).getQuery());
 				}
-				k = path.get(query.getId().toLowerCase());
-				documentToMerge = new HashMap<String, Document>(query.getDocs());
-				itDocs = documentToMerge.entrySet().iterator();
+				
+				k = path.get(query.getId().toLowerCase()); // to find the query's stopping point
+				itDocs = query.getDocs().entrySet().iterator();
 				while(itDocs.hasNext()) {
 					doc = ((DocumentOutputPIR)itDocs.next().getValue());
-					if(doc.getRank() > k) {
-						documentToMerge.remove(doc.getId().toLowerCase());
-						rank--;
-					}
-					doc.setRank(rank + doc.getRank());
+					if((doc.getRank() <= k)) {
+						documentToMerge.put(query.getId() + "," + doc.getId() , new DocumentOutputPIR(doc.getId(), doc.getRank() + rank, doc.getSimilarity()));
+					}		
 				}
-				documentMerged.putAll(documentToMerge);
-				rank += documentToMerge.size();	
+			
+				rank = documentToMerge.size();	
 			}
 			
-			return documentMerged;
+			return documentToMerge;
 		}
 		
 		/**
@@ -460,11 +468,19 @@ public class CalculateSessionMeasure {
 		 * @param queries
 		 * @return
 		 */
-		public static ArrayList<Document> mergeRelevanceDocs(Map<String, Query> queries){
-			ArrayList<Document> documentMerged = new ArrayList<Document>();
+		public static Map<String, Document> mergeRelevanceDocs(final Map<String, Query> queries){
+			Map<String, Document> documentMerged = new HashMap<String, Document>();
 			Iterator<Entry<String, Query>> itQuery = queries.entrySet().iterator();
+			Iterator<Entry<String, Document>> itDocs;
+			Query query;
+			Document doc;
 			while(itQuery.hasNext()) {
-				documentMerged.addAll(itQuery.next().getValue().getDocs().values());
+				query = itQuery.next().getValue();
+				itDocs = query.getDocs().entrySet().iterator();
+				while(itDocs.hasNext()) {
+					doc = itDocs.next().getValue();
+					documentMerged.put(query.getId() + "," + doc.getId(), doc);
+				}
 			}
 			
 			return documentMerged;
