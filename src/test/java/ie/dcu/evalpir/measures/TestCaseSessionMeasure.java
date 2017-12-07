@@ -184,14 +184,14 @@ public class TestCaseSessionMeasure {
 		Map<String, Document> docsMergedPIR = CalculateSessionMeasure.mergeRankedList(qPIR, s, s.getPath());
 		
 		/* TEST MergeRankedList*/
-		assertEquals(12, docsMergedPIR.size());
+		assertEquals(14, docsMergedPIR.size());
 		
 		/* TEST Precision**/
 		assertEquals(1.0, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 1), 0.01);
 		assertEquals(0.5, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 4), 0.01);
 		assertEquals(0.5, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 6), 0.01);
-		assertEquals(0.44, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 9), 0.01);
-		assertEquals(0.41, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 12), 0.01);
+		assertEquals(0.55, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 9), 0.01);
+		assertEquals(0.5, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 12), 0.01);
 	}
 
 	@Test
@@ -245,18 +245,18 @@ public class TestCaseSessionMeasure {
 	
 	@Test
 	public void TestrR() {
-		assertEquals(5,CalculateSessionMeasure.rR(qRel, qPIR, s.getPath()));
+		assertEquals(7,CalculateSessionMeasure.rR(qRel, qPIR, s.getPath()));
 		
 	}
 	
 	@Test
 	public void TestrRC() {
-		assertEquals(0.625,CalculateSessionMeasure.rRC(qRel, qPIR, s.getPath()), 0.01);
+		assertEquals(0.875,CalculateSessionMeasure.rRC(qRel, qPIR, s.getPath()), 0.01);
 	}
 	
 	@Test
 	public void TestrPC() {
-		assertEquals(0.41,CalculateSessionMeasure.rPC(qRel, qPIR, s.getPath()), 0.01);
+		assertEquals(0.46,CalculateSessionMeasure.rPC(qRel, qPIR, s.getPath()), 0.01);
 	}
 
 	@Test

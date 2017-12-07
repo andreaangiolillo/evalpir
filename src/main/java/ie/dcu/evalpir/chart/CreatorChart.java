@@ -84,10 +84,14 @@ public class CreatorChart {
 		 while(itTopic.hasNext()) {
 			 topic = itTopic.next().getValue();
 			 measure = (MeasureCompound)topic.searchMeasure("Session_PrecisionRecallCurve");
-			 System.out.println(topic.getUserId() + " " +topic.getTopicId());
-			 System.out.println(measure.getPIRvalue().size());
+//			 System.out.println("SIZE: " + topics.size());
+//			 System.out.println(topic.getUserId() + " " +topic.getTopicId());
+//			// System.out.println(topic.printMeasures());
+//			 System.out.println(measure.getPIRvalue().size());
+			 if(measure != null) {
+				 LineChart.createLineChartForSessionMeasure(path, topic.getUserId(), topic.getTopicId(), measure);
+			 }
 			 
-			 //LineChart.createLineChartForSessionMeasure(path, topic.getUserId(), topic.getTopicId(), measure);
 		 }
 		 
 		 

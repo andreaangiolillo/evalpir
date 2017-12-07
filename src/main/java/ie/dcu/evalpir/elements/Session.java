@@ -106,7 +106,7 @@ public class Session{
 		if(getDocOpened().size() != 0) {
 			ArrayList<Log> logs = getDocOpened();
 			int k = 0;
-			int rank = 0;
+			int rank = -1;
 			
 			for(Log log : logs) {
 				rank = Integer.parseInt(log.getRank());
@@ -115,7 +115,7 @@ public class Session{
 				}
 			}
 			
-			return k;
+			return k + 1;  // sum + 1 because in the logsfile tha rank starts to 0 
 		}
 		
 		return 10;
@@ -131,8 +131,8 @@ public class Session{
 		if(getDocOpened().size() != 0) {
 			int k = 0;
 			Iterator<Entry<String, Integer>> it = getPath().entrySet().iterator();
-			while(it.hasNext()) {
-				k += it.next().getValue();
+			while(it.hasNext()) { 
+				k += it.next().getValue() + 1; // sum + 1 because in the logsfile tha rank starts to 0 
 			}
 			
 			return k/getDocOpened().size();	
@@ -158,6 +158,7 @@ public class Session{
 	/**
 	 * This method returns the last document opened in each ranked list across the session
 	 * If a query has not documents opened is set to 1
+	 * In the logsfile the rank starts to 0 so the rank is incremented by 1
 	 * @return
 	 */
 	public Map<String, Integer> getPath() {

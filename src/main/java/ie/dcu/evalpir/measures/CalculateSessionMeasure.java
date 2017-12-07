@@ -158,7 +158,8 @@ public class CalculateSessionMeasure {
 			Entry<String, Topic> topicRel;
 			Session session;
 			
-			double nsDCG = 0.0;
+			double nsDCGMax = 0.0;
+			double nsDCGAverage = 0.0;
 			double man = 0.0;
 			double rPC = 0.0;
 			double rRC = 0.0;
@@ -170,21 +171,19 @@ public class CalculateSessionMeasure {
 					topicRel = itRel.next();
 					if(topicsPir.containsKey(topicRel.getKey())) {
 						session = getLogsFile().get(topicRel.getKey());
-						nsDCG = NsDCG(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), 10, 4, getLogsFile());
+						nsDCGAverage = NsDCG(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getAverageK(), 4, getLogsFile());
+						nsDCGMax = NsDCG(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getMaxK(), 4, getLogsFile());
 						man = calculateMAP(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries());
 						rPC = rPC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath());
 						rRC = rRC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath());
 						
-						((Measure)topicRel.getValue().searchAddMeasure("nSDCG", false)).addPIR(pir.getName(), nsDCG);
+						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_AverageK@" + session.getAverageK(), false)).addPIR(pir.getName(), nsDCGAverage);
+						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_MaxK@" + session.getMaxK(), false)).addPIR(pir.getName(), nsDCGMax);
 						//System.out.println("PRINT MEASURE " + topicRel.getValue().printMeasures());
 						((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false)).addPIR(pir.getName(), man);
 						((Measure)topicRel.getValue().searchAddMeasure("Session_Precision", false)).addPIR(pir.getName(), rPC);
 						((Measure)topicRel.getValue().searchAddMeasure("Session_Recall", false)).addPIR(pir.getName(), rRC);
 						((MeasureCompound)topicRel.getValue().searchAddMeasure("Session_PrecisionRecallCurve", true)).addPIR(pir.getName(), precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath()));
-						if(topicRel.getKey().equalsIgnoreCase("153,SPRT-YP")) {
-							System.out.println(precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath()));
-						}
-						
 					}
 					
 				}
