@@ -1,4 +1,4 @@
-package ie.dcu.evalpir.chart;
+package ie.dcu.evalpir.output.chart;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

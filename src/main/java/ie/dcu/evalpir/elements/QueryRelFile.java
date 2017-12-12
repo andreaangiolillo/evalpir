@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.vandermeer.asciitable.AsciiTable;
+import de.vandermeer.asciitable.CWC_LongestLine;
+
 public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	
 	private Map<String, AbstractMeasure> measures; // key = measureName, value = Measure
@@ -128,18 +131,24 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 * 
 	 * @return
 	 */
-	public String printMeasures() {
+	public String printMeasures(String user, String topic) {
 		String stringDoc = "";
 		Iterator<?> it = getMeasures().entrySet().iterator();
-		
+		AsciiTable tb = new AsciiTable();
+		CWC_LongestLine cwc = new CWC_LongestLine();
+		tb.getRenderer().setCWC(cwc);
+		tb.addRule();
+		tb.addRow("User: " + user, "Topic: " + topic, "Query: " + getId(), "S1 - Si", "(Si-1) - Si");
+		tb.addRule();
 		while(it.hasNext()) {
 			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
 			if(pair.getValue() instanceof Measure) {
-				stringDoc += ((Measure)pair.getValue()).printMeasure(getUser(), getTopic(), getId()) + "\n";
+				stringDoc = ((Measure)pair.getValue()).printMeasure(tb) + "\n";
 			}
 			
 		}
 		
+		System.out.print(stringDoc);
 		return stringDoc;
 	}
 	

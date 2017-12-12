@@ -1,4 +1,4 @@
-package ie.dcu.evalpir.chart;
+package ie.dcu.evalpir.output.chart;
 
 import java.awt.Color;
 import java.io.File;

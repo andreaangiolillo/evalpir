@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.vandermeer.asciitable.AsciiTable;
+import de.vandermeer.asciitable.CWC_LongestLine;
+
 public class Topic {
 	private String userId;
 	private String topicId;
@@ -107,17 +110,24 @@ public class Topic {
 	
 	
 	public String printMeasures() {
+		
 		String stringDoc = "";
 		Iterator<?> it = getMeasures().entrySet().iterator();
-		
+		AsciiTable tb = new AsciiTable();
+		CWC_LongestLine cwc = new CWC_LongestLine();
+		tb.getRenderer().setCWC(cwc);
+		tb.addRule();
+		tb.addRow("User: " + getUserId(), "Topic: " + getTopicId(), "", "S1 - Si", "(Si-1) - Si");
+		tb.addRule();
 		while(it.hasNext()) {
 			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
 			if(pair.getValue() instanceof Measure) {
-				stringDoc += ((Measure)pair.getValue()).printMeasure(getUserId(), getTopicId(), "") + "\n";
+				stringDoc = ((Measure)pair.getValue()).printMeasure(tb) + "\n";
 			}
 			
 		}
 		
+		System.out.println(stringDoc);
 		return stringDoc;
 	}
 	

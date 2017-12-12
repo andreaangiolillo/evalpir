@@ -98,14 +98,14 @@ public class Measure extends AbstractMeasure{
 	/**
 	 * 
 	 */
-	public String printMeasure(String user, String topic, String query) {
+	public String printMeasure(AsciiTable at) {
 		sortbyValue();
-		AsciiTable at = new AsciiTable();
-		at.addRule();
-		at.addRow(getName(),"User: " + user,"Topic: " + topic,"Query: " + query );
-		at.addRule();
-		at.addRow("System", "Value", "S1 - Si", "(Si-1) - Si");
-		at.addRule();
+		//AsciiTable at = new AsciiTable();
+		//at.addRule();
+		//at.addRow(getName(),"User: " + user,"Topic: " + topic,"Query: " + query );
+		//at.addRule();
+		//at.addRow("System", "Value", "S1 - Si", "(Si-1) - Si");
+		//at.addRule();
 		ArrayList<Pair<String, Double>> m = getPIRvalue();
 		int nMeasure = m.size();
 		DecimalFormat df = new DecimalFormat("#.######");
@@ -114,9 +114,9 @@ public class Measure extends AbstractMeasure{
 		
 		for (int i = 0; i < nMeasure; i++) {
 			if (i == 0) {
-				at.addRow(m.get(i).getKey(), df.format(m.get(i).getValue()), "---", "---");
+				at.addRow(getName(), m.get(i).getKey(), df.format(m.get(i).getValue()), "---", "---");
 			}else {
-				at.addRow(m.get(i).getKey(), df.format(m.get(i).getValue()), df.format(m.get(0).getValue() - m.get(i).getValue()), df.format(m.get(i - 1).getValue() - m.get(i).getValue()));
+				at.addRow("", m.get(i).getKey(), df.format(m.get(i).getValue()), df.format(m.get(0).getValue() - m.get(i).getValue()), df.format(m.get(i - 1).getValue() - m.get(i).getValue()));
 			}
 	
 			at.addRule();

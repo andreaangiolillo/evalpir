@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import ie.dcu.evalpir.chart.CreatorChart;
+
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.ConsolePrinter;
 import ie.dcu.evalpir.elements.Document;
@@ -28,6 +28,8 @@ import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
 import ie.dcu.evalpir.measures.CalculateMeasureImpl;
 import ie.dcu.evalpir.measures.CalculateSessionMeasure;
+import ie.dcu.evalpir.output.chart.CreatorChart;
+import ie.dcu.evalpir.output.table.TableGenerator;
 
 
 /**
@@ -45,16 +47,16 @@ public class EvalEpir {
 	
     public static void main( String[] args ) {
     	
-//    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
-//    	File logsFile = new File(LOGS_FILE_PATH);
-//    	File outputPIR = new File("src/main/resources/ar.csv");
-//    	
+    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
+    	File logsFile = new File(LOGS_FILE_PATH);
+    	File outputPIR = new File("src/main/resources/ar.csv");
+    	
     	ConsolePrinter.startEval();
     	
-    	File relevanceFile = new File(args[0]);
-    	File outputPIR = new File(args[1]); 
-    	File logsFile = new File(args[2]);
-    	   	
+//    	File relevanceFile = new File(args[0]);
+//    	File outputPIR = new File(args[1]); 
+//    	File logsFile = new File(args[2]);
+//    	   	
     	
     	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
     	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
@@ -132,9 +134,11 @@ public class EvalEpir {
 //    	CalculateMeasureImpl.findPaths(44, 11, 4, p, memo);
     	
     	
-		CreatorChart.createChart(qRel);
-		CreatorChart.createChartSession(measures);
+//		CreatorChart.createChart(qRel);
+//		CreatorChart.createChartSession(measures);
+//		
 		
+		TableGenerator.printMeasures(qRel, measures);
     	
 //    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
     	
@@ -185,30 +189,7 @@ public class EvalEpir {
     	
     	/*----------------------Print Session Measures on .txt----------------------------------*/
     	
-    	PrintStream out;
-		try {
-			out = new PrintStream(new FileOutputStream("output.txt"));
-			System.setOut(out);
-	    	System.out.println("\n----------------------Print Measures----------------------------------\n");
-	    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
-	    	Query q ;
-	    	while (itm.hasNext()) {
-	    		q = itm.next().getValue();
-	    			System.out.println(((QueryRelFile)q).printMeasures());
-	    	}
-
-			System.out.println("\n----------------------Print Session Measures----------------------------------\n");   	
-	    	Iterator<Entry<String, Topic>> itTopic = measures.entrySet().iterator();
-	    	while(itTopic.hasNext()) {
-	    		System.out.println(itTopic.next().getValue().printMeasures());	    		
-	    	}
-	    	
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+    	
 		
 		
     }
