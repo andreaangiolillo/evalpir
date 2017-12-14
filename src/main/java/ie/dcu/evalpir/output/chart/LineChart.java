@@ -59,13 +59,13 @@ public class LineChart{
 	
         try {
 			if(m.getName().contains("Precision@")) {
-				ChartUtilities.saveChartAsPNG(new File(path +"/Precision@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
+				ChartUtilities.saveChartAsPNG(new File(path +"/Precision@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
 
 			}else if (m.getName().contains("Recall@")) {
-				ChartUtilities.saveChartAsPNG(new File(path +"/Recall@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
+				ChartUtilities.saveChartAsPNG(new File(path +"/Recall@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
 
 			}else {
-				ChartUtilities.saveChartAsPNG(new File(path +"/" + m.getName() + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
+				ChartUtilities.saveChartAsPNG(new File(path +"/" + m.getName() + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
 
 			}
         	
@@ -86,15 +86,18 @@ public class LineChart{
 		for (int i = 0; i < nQuery; i++) {			
 			for (int j = 0; j < nPIR; j++) { 
 				if(i == 0) {
+					//System.out.println("Series name: " +m.getPIR(j).getKey());
 					series[j] = new XYSeries(m.getPIR(j).getKey());
 				}
 	
 				measure = (Measure)((QueryRelFile)topic.get(i)).searchMeasure(m.getName());
+				measure.sortbyKey();
 				if(measure != null) {
 					value = (Double)measure.getPIR(j).getValue();
 					
 				}
 				//System.out.println("Number of PIR: " + nPIR +"\n j: " + j);
+				//System.out.println("PIR Name: " + measure.getPIR(j).getKey() );
 				series[j].add(i, value);
 				value = 0.0;
 			}
@@ -186,7 +189,7 @@ public class LineChart{
 		String filename = "";
 		try {
 			
-        	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 750, 500);
+        	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 1366, 768);
         } catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -213,7 +216,7 @@ public class LineChart{
 				
 				try {
 				
-		        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measureName + "/" + "Query" + topic.get(i).getId() + "_" + measureName +".png"), chart, 750, 500);
+		        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measureName + "/" + "Query" + topic.get(i).getId() + "_" + measureName +".png"), chart, 1366, 768);
 		        } catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -51,26 +51,28 @@ public class EvalEpir {
 	
     public static void main( String[] args ) {
     	
-    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
-    	File logsFile = new File(LOGS_FILE_PATH);
-    	File outputPIR = new File("src/main/resources/ar.csv");
+//    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
+//    	File logsFile = new File(LOGS_FILE_PATH);
+//    	File outputPIR = new File("src/main/resources/ar.csv");
     	
     	ConsolePrinter.startEval();
+    	
+    	String[] args1 = {RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/model1.csv","src/main/resources/model2.csv","src/main/resources/model3.csv"};
     	
 //    	if(args.length < 3) {
 //    		throw new InvalidInputException("The input file must be 3 at least: \n1) Relevance Documents \n2) LogsFile \n3) System to be evaluated ");
 //    	}
 //    	
-//    	File relevanceFile = new File(args[0]);
-//    	File logsFile = new File(args[1]);
+    	File relevanceFile = new File(args1[0]);
+    	File logsFile = new File(args1[1]);
 
     	
     	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
     	Map<String, Session> logs = InputReaderImpl.extracLogFile(logsFile);
-    	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
+    	//ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
     	
     	
-//    	ArrayList<PIR> pirs = extractingModels(args);
+    	ArrayList<PIR> pirs = extractingModels(args1);
     	
     	
 //    	
@@ -223,51 +225,7 @@ public class EvalEpir {
     }
     
     
-    public static void randomPIR(PIR p) {
-    	
-    	PIR p1 = new PIR(p);
-    	Map<String, Query> qs = p1.getQueries();
-    	Map<String, Document> dcs;
-    	Iterator<Entry<String, Document>> it;
-    	Random rand = new Random();
-    	int  n = rand.nextInt(10) + 1;
-    	HashSet<Integer> listRandom = new HashSet<Integer>();
-    	PrintWriter pw = null;
-    	DocumentOutputPIR d;
-    	try {
-    	    pw = new PrintWriter(new File("src/main/resources/NewData.csv"));
-    	} catch (FileNotFoundException e) {
-    	    e.printStackTrace();
-    	}
-    	StringBuilder builder = new StringBuilder();
-    	
-    	//50 is the maximum and the 1 i
-    	Iterator <Entry<String, Query>> its = qs.entrySet().iterator();
-    	while (its.hasNext()){
-    		Query q = its.next().getValue();
-    		dcs = q.getDocs();
-    		it = dcs.entrySet().iterator();
-    		while(it.hasNext()) {
-    			d = ((DocumentOutputPIR)it.next().getValue());
-    			if (d.getRank()<11) {
-    				while(listRandom.contains(n)) {
-        				n = rand.nextInt(10) + 1;
-        			}
-    				listRandom.add(n);
-    				d.setRank(n);
-    			}
-    			
-    			builder.append(q.getUser() + "," + q.getTopic()+ "," + q.getId()+ "," + d.getId()+ "," + d.getRank()+ "," + d.getSimilarity() + "," + "random");
-    			builder.append("\n");
-    			
-    		}
-    		
-    		listRandom = new HashSet<Integer>();
-    	}
-    	pw.write(builder.toString());
-    	pw.close();
-
-    }   
+    
 }
 
 
