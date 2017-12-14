@@ -1,4 +1,4 @@
-package ie.dcu.evalpir.elements;
+package ie.dcu.evalpir.output.table;
 
 
 public class ConsolePrinter {

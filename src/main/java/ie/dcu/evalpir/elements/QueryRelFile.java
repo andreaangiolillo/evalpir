@@ -1,9 +1,13 @@
 package ie.dcu.evalpir.elements;
 
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeMap;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestLine;
@@ -126,6 +130,17 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		
 		return nRelDoc;
 	}
+	
+	/**
+	 * 
+	 */
+	public TreeMap<String, AbstractMeasure>  sortMeasureForKey() {
+		TreeMap<String, AbstractMeasure> measureSorted = new TreeMap<String, AbstractMeasure>(getMeasures());
+		return measureSorted;
+
+		
+	}
+	
 
 	/**
 	 * 
@@ -133,7 +148,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 */
 	public String printMeasures(String user, String topic) {
 		String stringDoc = "";
-		Iterator<?> it = getMeasures().entrySet().iterator();
+		Iterator<?> it = sortMeasureForKey().entrySet().iterator();
 		AsciiTable tb = new AsciiTable();
 		CWC_LongestLine cwc = new CWC_LongestLine();
 		tb.getRenderer().setCWC(cwc);

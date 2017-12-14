@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ie.dcu.evalpir.elements.ConsolePrinter;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -24,6 +23,7 @@ import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.exceptions.DifferentQueryException;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
+import ie.dcu.evalpir.output.table.ConsolePrinter;
 
 /**
  * @author Andrea Angiolillo
@@ -404,7 +404,7 @@ public class CalculateMeasureImpl{
 		double recall = 0.0;
 		double fMeasure = 0.0;
 		double ap = 0.0;
-		
+		String zeroToSort = "";
 		int k = 0;
 		//int nQuery = getRelevanceFile().size();
 		Iterator<Entry<String, Query>> it = getRelevanceFile().entrySet().iterator();
@@ -419,9 +419,9 @@ public class CalculateMeasureImpl{
 					for (; k != 0; k --) {
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
 						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
-						
-						((Measure) queryRel.searchAddMeasure("Precision@"+k, false)).addPIR(pir.getName(), qPrecisionK);
-						((Measure) queryRel.searchAddMeasure("Recall@"+k, false)).addPIR(pir.getName(), qRecallK);
+						zeroToSort = (k > 9) ? "" : "0";
+						((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort+ k, false)).addPIR(pir.getName(), qPrecisionK);
+						((Measure) queryRel.searchAddMeasure("Recall@"+ zeroToSort + k, false)).addPIR(pir.getName(), qRecallK);
 						
 					}
 					
@@ -434,7 +434,7 @@ public class CalculateMeasureImpl{
 					fMeasure = fMeasure(precision, recall, 0.5);
 					ap = calculateAP(queryRel, queryPIR);
 						
-					((Measure) queryRel.searchAddMeasure("NDCG@5", false)).addPIR(pir.getName(), qNDCG5);
+					((Measure) queryRel.searchAddMeasure("NDCG@05", false)).addPIR(pir.getName(), qNDCG5);
 					((Measure) queryRel.searchAddMeasure("NDCG@10",false)).addPIR(pir.getName(), qNDCG10);
 					((Measure) queryRel.searchAddMeasure("NDCG@15", false)).addPIR(pir.getName(), qNDCG15);
 					((Measure) queryRel.searchAddMeasure("NDCG@20", false )).addPIR(pir.getName(), qNDCG20);

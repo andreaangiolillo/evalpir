@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import ie.dcu.evalpir.elements.ConsolePrinter;
+
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -17,6 +17,7 @@ import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
+import ie.dcu.evalpir.output.table.ConsolePrinter;
 
 /**
  * @author Andrea Angiolillo

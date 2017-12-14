@@ -9,41 +9,48 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import ie.dcu.evalpir.elements.AbstractMeasure;
-import ie.dcu.evalpir.elements.ConsolePrinter;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Topic;
+import ie.dcu.evalpir.output.table.ConsolePrinter;
 
 
 
 public class CreatorChart {
 
-	final static String[] MEASURES = {"Recall", "Precision", "Average Precision", "NDCG@5", "NDCG@10", 
+	final static String[] MEASURES_LINECHART = {"Recall", "Precision", "Average Precision", "NDCG@05", "NDCG@10", 
 										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve"};
 	
 	
+	final static String[] MEASURES_BARCHART = { "Recall", "Precision", "Average Precision", "NDCG@05", "NDCG@10", 
+			"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5"};
+
 	/**
 	 * It Creates the folder for the diagrams
 	 * @param nameFolder
 	 * @return
 	 */
-	 public static String createFolder(String nameFolder){
+	 public static String createFolder(String folderName){
 	    	String path;
 			try {
-				path = new File(".").getCanonicalPath() + "/" + nameFolder;
+				path = new File(".").getCanonicalPath() + "/Charts/" + folderName + "/";
 				File dir = new File(path);
-		        dir.mkdir();
-		        File subdir;
-		        for(int i = 0; i < MEASURES.length; i++) {
-		        	subdir = new File(path + "/" + MEASURES[i]); 
+		        dir.mkdirs();
+		     
+				File subdir;
+				String[] measures = (folderName.equalsIgnoreCase("LineChart")) ? MEASURES_LINECHART : MEASURES_BARCHART;
+		        for(int i = 0; i < measures.length; i++) {
+		        	subdir = new File(path + measures[i]); 
 		        	subdir.mkdir();
 		        }
-		  
+		        
 				return (path);	
 			}catch (IOException e) {
+				
 				e.printStackTrace();
 			}
 			
@@ -56,7 +63,9 @@ public class CreatorChart {
 	  */
 	 public static void createChart(final Map<String,Query> queries) {
 		ConsolePrinter.startTask("Creating Charts");
-		String path = createFolder("Charts");
+		String pathL = createFolder("LineChart");
+		String pathB = createFolder("BarChart");
+
 		Map<String, ArrayList<Query>> topics = setTopic(queries);
 		Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
 		AbstractMeasure[] measures;
@@ -66,9 +75,12 @@ public class CreatorChart {
 			measures = getNameMeasures(topic);
 			for (AbstractMeasure measure : measures) {
 				if(measure instanceof Measure) {
-					LineChart.CreateLineChartPerTopic(path, topic, (Measure)measure);
+					LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
+					BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure);
+					
+					
 				}else if(measure instanceof MeasureCompound) {
-					LineChart.CreateLineChartPerQuery(path, topic, measure.getName());
+					LineChart.CreateLineChartPerQuery(pathL, topic, measure.getName());
 				}
 			}
 		}
@@ -77,7 +89,7 @@ public class CreatorChart {
 	 }
 	 
 	 public static void createChartSession(final Map<String, Topic> topics) {
-		 String path = createFolder("Charts");
+		 String path = createFolder("LineChart");
 		 Iterator<Entry<String, Topic>> itTopic = topics.entrySet().iterator();
 		 Topic topic;
 		 MeasureCompound measure;

@@ -13,10 +13,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.antlr.v4.codegen.model.ThrowNoViableAlt;
+
 import java.util.Random;
 
 import ie.dcu.evalpir.elements.AbstractMeasure;
-import ie.dcu.evalpir.elements.ConsolePrinter;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.Measure;
@@ -25,10 +27,12 @@ import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.elements.Topic;
+import ie.dcu.evalpir.exceptions.InvalidInputException;
 import ie.dcu.evalpir.extractor.InputReaderImpl;
 import ie.dcu.evalpir.measures.CalculateMeasureImpl;
 import ie.dcu.evalpir.measures.CalculateSessionMeasure;
 import ie.dcu.evalpir.output.chart.CreatorChart;
+import ie.dcu.evalpir.output.table.ConsolePrinter;
 import ie.dcu.evalpir.output.table.TableGenerator;
 
 
@@ -53,15 +57,23 @@ public class EvalEpir {
     	
     	ConsolePrinter.startEval();
     	
+//    	if(args.length < 3) {
+//    		throw new InvalidInputException("The input file must be 3 at least: \n1) Relevance Documents \n2) LogsFile \n3) System to be evaluated ");
+//    	}
+//    	
 //    	File relevanceFile = new File(args[0]);
-//    	File outputPIR = new File(args[1]); 
-//    	File logsFile = new File(args[2]);
-//    	   	
+//    	File logsFile = new File(args[1]);
+
     	
     	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
-    	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
     	Map<String, Session> logs = InputReaderImpl.extracLogFile(logsFile);
+    	ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
     	
+    	
+//    	ArrayList<PIR> pirs = extractingModels(args);
+    	
+    	
+//    	
     	
 //    	
 //    	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
@@ -134,8 +146,8 @@ public class EvalEpir {
 //    	CalculateMeasureImpl.findPaths(44, 11, 4, p, memo);
     	
     	
-//		CreatorChart.createChart(qRel);
-//		CreatorChart.createChartSession(measures);
+		CreatorChart.createChart(qRel);
+		CreatorChart.createChartSession(measures);
 //		
 		
 		TableGenerator.printMeasures(qRel, measures);
@@ -192,6 +204,22 @@ public class EvalEpir {
     	
 		
 		
+    }
+    
+    /**
+     * 
+     * @param args
+     * @return
+     */
+    public static ArrayList<PIR> extractingModels(String[] args) {
+    	File outputPIR; 
+    	ArrayList<PIR> allModel = new ArrayList<PIR>();
+    	for (int i = 2; i < args.length; i++) {
+    		outputPIR = new File(args[i]);
+    		allModel.addAll(InputReaderImpl.extractOutputPIR(outputPIR));	
+    	}
+    	
+    	return allModel;
     }
     
     

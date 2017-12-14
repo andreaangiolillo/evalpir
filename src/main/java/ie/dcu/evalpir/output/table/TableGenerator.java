@@ -1,5 +1,6 @@
 package ie.dcu.evalpir.output.table;
 
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -19,24 +20,24 @@ public class TableGenerator {
 		at.addRule();
 		at.addRow("User: userId", "Topic: topicId", "Query: queryId", "S1 - Si", "(Si-1) - Si");
 		at.addRule();
-		at.addRow("Measure@K", "ModelName1", "Value",  "S1 - Si", "(Si-1) - Si");
+		at.addRow("Measure@K", "SystemName1", "Value",  "S1 - Si", "(Si-1) - Si");
 		at.addRule();
-		at.addRow("", "ModelName2", "Value",  "S1 - Si", "(Si-1) - Si");
+		at.addRow("", "SystemName2", "Value",  "S1 - Si", "(Si-1) - Si");
 		at.addRule();
-		at.addRow("", "ModelName3", "Value",  "S1 - Si", "(Si-1) - Si");
+		at.addRow("", "SystemName3", "Value",  "S1 - Si", "(Si-1) - Si");
 		at.addRule();
-		at.addRow("Measure@J", "ModelName3", "Value",  "S1 - Si", "(Si-1) - Si");
+		at.addRow("Measure@J", "SystemName3", "Value",  "S1 - Si", "(Si-1) - Si");
 		at.addRule();
-		at.addRow("", "ModelName1", "Value",  "S1 - Si", "(Si-1) - Si");
+		at.addRow("", "SystemName1", "Value",  "S1 - Si", "(Si-1) - Si");
 		at.addRule();
-		at.addRow("", "ModelName2", "Value",  "S1 - Si", "(Si-1) - Si");
+		at.addRow("", "SystemName2", "Value",  "S1 - Si", "(Si-1) - Si");
 		at.addRule();
 	
 		System.out.println(at.render());
 	}
 	
 	public static void printMeasures(Map<String, Query> relevantQueries, Map<String, Topic> sessionMeasures) {
-		
+		ConsolePrinter.startTask("Creating output.csv");
 		PrintStream out;
 		try {
 			out = new PrintStream(new FileOutputStream("output.txt"));
@@ -57,6 +58,8 @@ public class TableGenerator {
 	    		itTopic.next().getValue().printMeasures();	    		
 	    	}
 	    	
+	    	System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
+	    	ConsolePrinter.endTask("Creating output.csv");
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

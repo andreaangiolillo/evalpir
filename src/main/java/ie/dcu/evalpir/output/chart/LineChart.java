@@ -22,6 +22,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
@@ -33,8 +34,7 @@ import ie.dcu.evalpir.elements.QueryRelFile;
 public class LineChart{
 	
 	Map<String, Color> pirColor;
-	
-	
+
 	
 	public LineChart() {
 		super();
@@ -48,8 +48,6 @@ public class LineChart{
 
 	
 	private static void initUIPerTopic(String path, ArrayList<Query> topic, Measure m) {
-	
-		
 		XYSeriesCollection dataset = createDataset(topic, m);
 		String user = topic.get(0).getUser();
 		String nameTopic = topic.get(0).getTopic();
@@ -58,15 +56,16 @@ public class LineChart{
 		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
 		ChartFactory.setChartTheme(theme);
 	
+	
         try {
 			if(m.getName().contains("Precision@")) {
-				ChartUtilities.saveChartAsPNG(new File(path + "/Precision@/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
+				ChartUtilities.saveChartAsPNG(new File(path +"/Precision@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
 
 			}else if (m.getName().contains("Recall@")) {
-				ChartUtilities.saveChartAsPNG(new File(path + "/Recall@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
+				ChartUtilities.saveChartAsPNG(new File(path +"/Recall@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
 
 			}else {
-				ChartUtilities.saveChartAsPNG(new File(path + "/" + m.getName() + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
+				ChartUtilities.saveChartAsPNG(new File(path +"/" + m.getName() + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 750, 500);
 
 			}
         	
@@ -184,8 +183,10 @@ public class LineChart{
 		ChartFactory.setChartTheme(theme);
 		XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
 		JFreeChart chart = createChart(dataset, user, topic, "", measure.getName());
+		String filename = "";
 		try {
-        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measure.getName() + "/"  +"User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 750, 500);
+			
+        	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 750, 500);
         } catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -209,8 +210,9 @@ public class LineChart{
 				String user = topic.get(i).getUser();
 				String nameTopic = topic.get(i).getTopic();
 				JFreeChart chart = createChart(dataset, user, nameTopic,topic.get(i).getId(), measureName);
-			
+				
 				try {
+				
 		        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measureName + "/" + "Query" + topic.get(i).getId() + "_" + measureName +".png"), chart, 750, 500);
 		        } catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -284,5 +286,37 @@ public class LineChart{
 		
 		return dataset;
 	}
+	
+	
+//
+//	/**
+//	 * It Creates the folder for the diagrams
+//	 * @param nameFolder
+//	 * @return
+//	 */
+//	 public static String createFolder(String path, String nameFolder){
+//			path = path + "/LineChart/" + nameFolder + "/";
+//			File dir = new File(path);
+//			dir.mkdirs();
+//			System.out.println(path);
+////			File subdir = new File(path + nameFolder +"/");
+////			subdir.mkdir();
+//			return (path);
+//			
+//			
+//	 }
+//	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }

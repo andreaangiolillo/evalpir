@@ -163,7 +163,6 @@ public class CalculateSessionMeasure {
 			double man = 0.0;
 			double rPC = 0.0;
 			double rRC = 0.0;
-			
 			for(PIR pir : pirs) {
 				topicsPir = setTopic(pir.getQueries());
 				itRel = topicsRel.entrySet().iterator();
@@ -176,10 +175,8 @@ public class CalculateSessionMeasure {
 						man = calculateMAP(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries());
 						rPC = rPC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath());
 						rRC = rRC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath());
-						
 						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_AverageK@" + session.getAverageK(), false)).addPIR(pir.getName(), nsDCGAverage);
-						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_MaxK@" + session.getMaxK(), false)).addPIR(pir.getName(), nsDCGMax);
-						//System.out.println("PRINT MEASURE " + topicRel.getValue().printMeasures());
+						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_MaxK@" +  session.getMaxK(), false)).addPIR(pir.getName(), nsDCGMax);	
 						((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false)).addPIR(pir.getName(), man);
 						((Measure)topicRel.getValue().searchAddMeasure("Session_Precision", false)).addPIR(pir.getName(), rPC);
 						((Measure)topicRel.getValue().searchAddMeasure("Session_Recall", false)).addPIR(pir.getName(), rRC);
