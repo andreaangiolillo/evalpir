@@ -20,6 +20,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -132,7 +133,7 @@ public class LineChart{
 				r.setSeriesShapesVisible (i, true);
 				r.setSeriesStroke(i, new BasicStroke(3));
 			}
-					
+		
 	        return chart;
 	        
 	 }
@@ -186,7 +187,7 @@ public class LineChart{
 		ChartFactory.setChartTheme(theme);
 		XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
 		JFreeChart chart = createChart(dataset, user, topic, "", measure.getName());
-		String filename = "";
+		
 		try {
 			
         	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 1366, 768);
