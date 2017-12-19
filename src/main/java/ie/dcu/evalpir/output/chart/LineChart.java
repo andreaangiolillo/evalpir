@@ -41,8 +41,7 @@ public class LineChart{
 		super();
 		this.pirColor = new HashMap<String, Color>();
 	}
-
-
+	
 	public static void CreateLineChartPerTopic(String path, ArrayList<Query> topic, Measure m) {
 			initUIPerTopic(path, topic, m);
 	}
@@ -56,20 +55,14 @@ public class LineChart{
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
 		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
 		ChartFactory.setChartTheme(theme);
-	
-	
         try {
 			if(m.getName().contains("Precision@")) {
 				ChartUtilities.saveChartAsPNG(new File(path +"/Precision@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
-
 			}else if (m.getName().contains("Recall@")) {
 				ChartUtilities.saveChartAsPNG(new File(path +"/Recall@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
-
 			}else {
 				ChartUtilities.saveChartAsPNG(new File(path +"/" + m.getName() + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
-
 			}
-        	
         } catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -176,20 +169,13 @@ public class LineChart{
 		
 	 }
 	 
-	 
-	 
-	 
-	 
-	 
 	public static void createLineChartForSessionMeasure(String path, String user, String topic, MeasureCompound measure) {
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
 		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
 		ChartFactory.setChartTheme(theme);
 		XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
 		JFreeChart chart = createChart(dataset, user, topic, "", measure.getName());
-		
 		try {
-			
         	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 1366, 768);
         } catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -200,7 +186,6 @@ public class LineChart{
 	public static void CreateLineChartPerQuery(String path, ArrayList<Query> topic, String measureName) {
 		initUIPerQuery(path, topic, measureName);
 	}
-	 
 	 
 	private static void initUIPerQuery(String path, ArrayList<Query> topic, String measureName) {
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
@@ -214,7 +199,6 @@ public class LineChart{
 				String user = topic.get(i).getUser();
 				String nameTopic = topic.get(i).getTopic();
 				JFreeChart chart = createChart(dataset, user, nameTopic,topic.get(i).getId(), measureName);
-				
 				try {
 				
 		        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measureName + "/" + "Query" + topic.get(i).getId() + "_" + measureName +".png"), chart, 1366, 768);
@@ -241,8 +225,6 @@ public class LineChart{
 	        );
 	        
 	        XYPlot plot = (XYPlot) chart.getPlot();
-	        
-	       
 	        ValueAxis xAxis = plot.getDomainAxis();
 	        xAxis.setRange(0, 100);
 	        xAxis.setRangeWithMargins(0, 100);
@@ -258,8 +240,6 @@ public class LineChart{
 			}
 			
 	        return chart;
-	
-	
 	}
 	
 	private static XYSeriesCollection createDataset(final MeasureCompound m) {
@@ -275,12 +255,10 @@ public class LineChart{
 			if (value != null) {
 				for(int j = 0; j < value.size(); j++) {
 					series[i].add(value.get(j).getKey(), value.get(j).getValue());
-					
 				}
 			}
+			
 			i++;
-			
-			
 		}
 		
 		XYSeriesCollection dataset = new XYSeriesCollection();	
@@ -289,38 +267,6 @@ public class LineChart{
 		}
 		
 		return dataset;
-	}
-	
-	
-//
-//	/**
-//	 * It Creates the folder for the diagrams
-//	 * @param nameFolder
-//	 * @return
-//	 */
-//	 public static String createFolder(String path, String nameFolder){
-//			path = path + "/LineChart/" + nameFolder + "/";
-//			File dir = new File(path);
-//			dir.mkdirs();
-//			System.out.println(path);
-////			File subdir = new File(path + nameFolder +"/");
-////			subdir.mkdir();
-//			return (path);
-//			
-//			
-//	 }
-//	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}	
 	
 }

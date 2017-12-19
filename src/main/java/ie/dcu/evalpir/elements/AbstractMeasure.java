@@ -3,6 +3,7 @@ package ie.dcu.evalpir.elements;
 public abstract class AbstractMeasure {
 
 	private String name;
+	private boolean drawable;
 
 	
 	/**
@@ -11,6 +12,7 @@ public abstract class AbstractMeasure {
 	public AbstractMeasure(String name) {
 		super();
 		this.name = name;
+		this.drawable = false;
 	}
 
 	/**
@@ -26,6 +28,15 @@ public abstract class AbstractMeasure {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public boolean mustBeDrawn() {
+		return drawable;
+	}
+
+	public void setMustBeDrawn(boolean mustBeDrawn) {
+		this.drawable = mustBeDrawn;
+	}
+	
 	
 	
 }

@@ -94,16 +94,16 @@ public class InputReaderImpl /*implements InputReader*/{
 		
 		try {
 			String[] text;
-			String userKey, topicKey, queryKey, docKey, docValue1;
-			userKey = topicKey = queryKey = docKey = docValue1 = "";
+			String userKey, topicKey, queryKey, docKey;
+			int relValue = 0;
+			userKey = topicKey = queryKey = docKey = "";
 		    br = new BufferedReader(new FileReader(file.getPath()));
 		    br.readLine();//removing first row
 		    while ((line= br.readLine()) != null) {	
 		    	text = (line  != null) ? line.split(cvsSplitBy) : null;
-	    		if(!userKey.equalsIgnoreCase("")) {
-	    			doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
+	    		if(!userKey.equalsIgnoreCase("")) {	
+    				doc = new DocumentRelFile(docKey, relValue);
 		    		docs.put(doc.getId(), doc);
-		    		
 	    			if (!queryKey.equalsIgnoreCase(text[2].replaceAll("\\s+",""))){
 	    				if(!queries.containsKey(queryKey)) {
 		    				query = new QueryRelFile(userKey, topicKey, queryKey, docs);												
@@ -121,10 +121,11 @@ public class InputReaderImpl /*implements InputReader*/{
 		    	topicKey = text[1].replaceAll("\\s+","");
 		    	queryKey = text[2].replaceAll("\\s+","");
 		    	docKey = text[3].replaceAll("\\s+","");
-		    	docValue1 = text[4].replaceAll("\\s+","");
+		    	relValue = Integer.parseInt(text[4].replaceAll("\\s+",""));
 		    }
 		    
-		    doc = new DocumentRelFile(docKey, Integer.parseInt(docValue1));
+		    
+	    	doc = new DocumentRelFile(docKey, relValue);
 		    docs.put(doc.getId(), doc);
 		    query = new QueryRelFile(userKey, topicKey, queryKey, docs);
 		    queries.put(query.getId(), query);	    

@@ -69,7 +69,8 @@ public class Topic{
 	 * 
 	 * @param m
 	 */
-	public void addMeasure(AbstractMeasure m) {
+	public void addMeasure(AbstractMeasure m, boolean drawable) {
+		m.setMustBeDrawn(drawable);
 		getMeasures().put(m.getName().trim().toLowerCase(), m);
 	}
 	
@@ -86,12 +87,12 @@ public class Topic{
 	 * @param name
 	 * @return
 	 */
-	public AbstractMeasure searchAddMeasure(String name, boolean compound) {
+	public AbstractMeasure searchAddMeasure(String name, boolean compound, boolean drawable) {
 		if(searchMeasure(name) == null) {
 			if(compound) {
-				addMeasure(new MeasureCompound(name.trim()));
+				addMeasure(new MeasureCompound(name.trim()), drawable);
 			}else {
-				addMeasure(new Measure(name.trim()));
+				addMeasure(new Measure(name.trim()), drawable);
 			}
 		}
 		

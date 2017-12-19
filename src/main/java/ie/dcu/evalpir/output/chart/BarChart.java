@@ -27,7 +27,6 @@ public class BarChart {
 		initUIPerTopic(path, topic, m);
 	}
 	
-	
 	private static void initUIPerTopic(String path, ArrayList<Query> topic, Measure m) {
 		CategoryDataset dataset = createDataset(topic, m);
 		String user = topic.get(0).getUser();
@@ -36,20 +35,14 @@ public class BarChart {
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
 		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
 		ChartFactory.setChartTheme(theme);
-	
-	
-	
         try {
 			if(m.getName().contains("Precision@")) {
-				
 				ChartUtilities.saveChartAsPNG(new File(path + "/Precision@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
 
 			}else if (m.getName().contains("Recall@")) {
-				
 				ChartUtilities.saveChartAsPNG(new File(path + "/Recall@/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
 
 			}else {
-				
 				ChartUtilities.saveChartAsPNG(new File(path  + "/" + m.getName() +"/" +"User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
 
 			}
@@ -60,7 +53,6 @@ public class BarChart {
 		}
 		
 	}
-	
 	
 	 private static JFreeChart createChart(final CategoryDataset dataset, final String user, final String topicName, final String measure , ArrayList<Query> topic) {
 	        JFreeChart chart = ChartFactory.createBarChart(
@@ -73,7 +65,6 @@ public class BarChart {
 	                true, 
 	                false
 	        );
-	        
 	        
 	        chart.getCategoryPlot().getRangeAxis().setLowerBound(0.0);
 	        chart.getCategoryPlot().getRangeAxis().setUpperBound(1.0);
@@ -107,20 +98,4 @@ public class BarChart {
 		
 		return dataset;
 	}
-	
-	
-	
-//	/**
-//	 * It Creates the folder for the diagrams
-//	 * @param nameFolder
-//	 * @return
-//	 */
-//	 public static String createFolder(String path, String nameFolder){
-//	    	
-//			path = path + "/BarChart/" + nameFolder + "/";
-//			File dir = new File(path);
-//			dir.mkdirs();
-//  
-//			return (path);
-//	 }
 }

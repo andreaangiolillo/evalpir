@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -31,21 +32,6 @@ import ie.dcu.evalpir.output.table.ConsolePrinter;
  * 
  * **/
 public class CalculateMeasureImpl{
-
-	//private Map<String, String> measures;
-	private Map<String, Query> relevanceFile;
-	private Map<String, Session> logsFile;
-	
-	
-	/**
-	 * Constructor
-	 * @param 
-	 */
-	public CalculateMeasureImpl(Map<String, Query> relevanceFile) {
-		this.relevanceFile = relevanceFile;  // key = queryID, value = Query
-	}
-	
-	
 	
 	/**
 	 * Precision (P) is defined as the proportion of retrieved documents that
@@ -289,7 +275,7 @@ public class CalculateMeasureImpl{
 	 *@Complexity O(n)
 	 */
 	public static double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) {
-		return DCG(queryRel, queryOutputPIR, p) / IDCG( queryRel, p);
+		return DCG(queryRel, queryOutputPIR, p) / IDCG(queryRel, p);
 	}
 	
 	/**
@@ -369,9 +355,8 @@ public class CalculateMeasureImpl{
 		return memo;
 	    
 	}
-	  
-	  
-	
+
+
 	
 	
 	/**
@@ -392,36 +377,37 @@ public class CalculateMeasureImpl{
 	 * 
 	 * @param pirs
 	 */
-	public void calculateMeasures(ArrayList<PIR> pirs) {
+	public static void calculateMeasures() {
+		ArrayList<PIR> pirs = EvalEpir.MODELS;
 		ConsolePrinter.startTask("Calculating Measures");
 		Query queryPIR;
 		QueryRelFile queryRel;
-		/*Measures variables*/
 		double qPrecisionK = 0.0;
 		double qRecallK = 0.0;
 		double qNDCG5, qNDCG10, qNDCG15, qNDCG20 = 0.0;
-		double precision = 0.0;
-		double recall = 0.0;
+//		double qNDCG5NewInfo, qNDCG10NewInfo, qNDCG15NewInfo, qNDCG20NewInfo = 0.0;
+		double precision, precisionNewInfo = 0.0;
+		double recall, recallNewInfo = 0.0;
 		double fMeasure = 0.0;
-		double ap = 0.0;
-		String zeroToSort = "";
+		double ap, apNewInfo = 0.0;
 		int k = 0;
-		//int nQuery = getRelevanceFile().size();
-		Iterator<Entry<String, Query>> it = getRelevanceFile().entrySet().iterator();
+		Iterator<Entry<String, Query>> it = EvalEpir.QUERYREL.entrySet().iterator();
+		String zeroToSort = ""; // this variable adds 0 in case of k <= 9 (so we have 01, 02, 03, etc.. instead of 1, 2 ..) to allow to sort the measures by name
+		
 		while (it.hasNext()) {
 			queryRel = (QueryRelFile) it.next().getValue();
 			//queryRel = createMeasure(queryRel);
 			for(PIR pir : pirs) {
 				queryPIR = pir.getQuery(queryRel.getId());
 				if(queryPIR != null) {
-					queryRel.setToConsiderForChart(true);
+					queryRel.setToConsiderForChart(true); // not all the queries in the collection are used on the input models
 					k =  queryRel.getNRelevantDoc();
 					for (; k != 0; k --) {
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
 						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
 						zeroToSort = (k > 9) ? "" : "0";
-						((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort+ k, false)).addPIR(pir.getName(), qPrecisionK);
-						((Measure) queryRel.searchAddMeasure("Recall@"+ zeroToSort + k, false)).addPIR(pir.getName(), qRecallK);
+						((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort+ k, false, true)).addPIR(pir.getName(), qPrecisionK);
+						((Measure) queryRel.searchAddMeasure("Recall@"+ zeroToSort + k, false, true)).addPIR(pir.getName(), qRecallK);
 						
 					}
 					
@@ -433,16 +419,35 @@ public class CalculateMeasureImpl{
 					recall = recall(queryRel, queryPIR);
 					fMeasure = fMeasure(precision, recall, 0.5);
 					ap = calculateAP(queryRel, queryPIR);
-						
-					((Measure) queryRel.searchAddMeasure("NDCG@05", false)).addPIR(pir.getName(), qNDCG5);
-					((Measure) queryRel.searchAddMeasure("NDCG@10",false)).addPIR(pir.getName(), qNDCG10);
-					((Measure) queryRel.searchAddMeasure("NDCG@15", false)).addPIR(pir.getName(), qNDCG15);
-					((Measure) queryRel.searchAddMeasure("NDCG@20", false )).addPIR(pir.getName(), qNDCG20);
-					((Measure) queryRel.searchAddMeasure("Precision", false)).addPIR(pir.getName(), precision);
-					((Measure) queryRel.searchAddMeasure("Recall", false)).addPIR(pir.getName(), recall);
-					((Measure) queryRel.searchAddMeasure("fMeasure0.5", false)).addPIR(pir.getName(), fMeasure);
-					((Measure) queryRel.searchAddMeasure("Average Precision", false)).addPIR(pir.getName(), ap);
-					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true)).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
+					
+					apNewInfo = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR);
+					recallNewInfo = CalculateSessionMeasure.recallConsideringNewInformation(queryRel, queryPIR);
+					precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);
+//					qNDCG5NewInfo = CalculateSessionMeasure.calculateNDCGConsideringNewInformation(queryRel, queryPIR, 5);
+//					qNDCG10NewInfo = CalculateSessionMeasure.calculateNDCGConsideringNewInformation(queryRel, queryPIR, 10);
+//					qNDCG15NewInfo = CalculateSessionMeasure.calculateNDCGConsideringNewInformation(queryRel, queryPIR, 15);
+//					qNDCG20NewInfo = CalculateSessionMeasure.calculateNDCGConsideringNewInformation(queryRel, queryPIR, 15);
+					
+					((Measure) queryRel.searchAddMeasure("NDCG@05", false, true)).addPIR(pir.getName(), qNDCG5);
+					((Measure) queryRel.searchAddMeasure("NDCG@10",false, true)).addPIR(pir.getName(), qNDCG10);
+					((Measure) queryRel.searchAddMeasure("NDCG@15", false, true)).addPIR(pir.getName(), qNDCG15);
+					((Measure) queryRel.searchAddMeasure("NDCG@20", false, true )).addPIR(pir.getName(), qNDCG20);
+					((Measure) queryRel.searchAddMeasure("Precision", false, true)).addPIR(pir.getName(), precision);
+					((Measure) queryRel.searchAddMeasure("Recall", false, true)).addPIR(pir.getName(), recall);
+					((Measure) queryRel.searchAddMeasure("fMeasure0.5", false, true)).addPIR(pir.getName(), fMeasure);
+					((Measure) queryRel.searchAddMeasure("AveragePrecision", false, true)).addPIR(pir.getName(), ap);
+					
+//					//considering only the relvant docs not in the previous queries
+//					((Measure) queryRel.searchAddMeasure("NDCG@05-NewInfo", false, false)).addPIR(pir.getName(), qNDCG5);
+//					((Measure) queryRel.searchAddMeasure("NDCG@10-NewInfo",false, false)).addPIR(pir.getName(), qNDCG10);
+//					((Measure) queryRel.searchAddMeasure("NDCG@15-NewInfo", false, false)).addPIR(pir.getName(), qNDCG15);
+//					((Measure) queryRel.searchAddMeasure("NDCG@20-NewInfo", false, false )).addPIR(pir.getName(), qNDCG20);
+					((Measure) queryRel.searchAddMeasure("Recall-NewInfo ", false, false)).addPIR(pir.getName(), recallNewInfo);
+					((Measure) queryRel.searchAddMeasure("Precision-NewInfo ", false, false)).addPIR(pir.getName(), precisionNewInfo);
+					((Measure) queryRel.searchAddMeasure("AveragePrecision-NewInfo ", false, false)).addPIR(pir.getName(), apNewInfo);
+					
+					//Compound measure
+					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, true)).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
 				
 				}
 				
@@ -451,36 +456,6 @@ public class CalculateMeasureImpl{
 		
 		ConsolePrinter.endTask("Calculating Measures");
 	}
-	
-	/**
-	 * @return the relevanceDoc
-	 */
-	public Map<String, Query> getRelevanceFile() {
-		return relevanceFile;
-	}
-
-	/**
-	 * @return the logsFile
-	 */
-	public Map<String, Session> getLogsFile() {
-		return logsFile;
-	}
-	
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public Session getSession(String key){
-		return getLogsFile().get(key);
-		
-	}
-	
-	
-	
-	
-	
-	
 }
 
 

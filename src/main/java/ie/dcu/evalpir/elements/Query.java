@@ -38,7 +38,7 @@ public class Query {
 		this.id = id;
 		this.topic = topic;
 		this.user = user;
-		this.docs = docs;
+		this.docs = new HashMap<String, Document>(docs);
 	}
 	
 	

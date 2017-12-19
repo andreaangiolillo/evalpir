@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.vandermeer.asciitable.AsciiTable;
+import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Topic;
@@ -36,7 +37,7 @@ public class TableGenerator {
 		System.out.println(at.render());
 	}
 	
-	public static void printMeasures(Map<String, Query> relevantQueries, Map<String, Topic> sessionMeasures) {
+	public static void printMeasures(Map<String, Topic> sessionMeasures) {
 		ConsolePrinter.startTask("Creating output.csv");
 		PrintStream out;
 		try {
@@ -45,11 +46,11 @@ public class TableGenerator {
 			System.out.println("Example:");
 			printExample();
 	    	System.out.println("\n----------------------Print Measures----------------------------------\n");
-	    	Iterator<Entry<String, Query>> itm = relevantQueries.entrySet().iterator();
+	    	Iterator<Entry<String, Query>> itm = EvalEpir.QUERYREL.entrySet().iterator();
 	    	Query q ;
 	    	while (itm.hasNext()) {
 	    		q = itm.next().getValue();
-	    			((QueryRelFile)q).printMeasures(q.getUser(), q.getTopic());
+	    			((QueryRelFile)q).printMeasures();
 	    	}
 
 			System.out.println("\n----------------------Print Session Measures----------------------------------\n");   	

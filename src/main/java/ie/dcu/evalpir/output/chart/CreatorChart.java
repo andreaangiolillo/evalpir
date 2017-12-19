@@ -22,11 +22,11 @@ import ie.dcu.evalpir.output.table.ConsolePrinter;
 
 public class CreatorChart {
 
-	final static String[] MEASURES_LINECHART = {"Recall", "Precision", "Average Precision", "NDCG@05", "NDCG@10", 
+	final static String[] MEASURES_LINECHART = {"Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
 										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve"};
 	
 	
-	final static String[] MEASURES_BARCHART = { "Recall", "Precision", "Average Precision", "NDCG@05", "NDCG@10", 
+	final static String[] MEASURES_BARCHART = { "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
 			"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5"};
 
 	/**
@@ -74,13 +74,13 @@ public class CreatorChart {
 			topic = it.next().getValue();
 			measures = getNameMeasures(topic);
 			for (AbstractMeasure measure : measures) {
-				if(measure instanceof Measure) {
-					LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
-					BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure);
-					
-					
-				}else if(measure instanceof MeasureCompound) {
-					LineChart.CreateLineChartPerQuery(pathL, topic, measure.getName());
+				if(measure.mustBeDrawn()) {	
+					if(measure instanceof Measure) {
+						LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
+						BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure);
+					}else if(measure instanceof MeasureCompound) {
+						LineChart.CreateLineChartPerQuery(pathL, topic, measure.getName());
+					}
 				}
 			}
 		}

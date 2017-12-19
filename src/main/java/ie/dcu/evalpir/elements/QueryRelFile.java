@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
@@ -15,7 +16,7 @@ import de.vandermeer.asciitable.CWC_LongestLine;
 public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	
 	private Map<String, AbstractMeasure> measures; // key = measureName, value = Measure
-	private boolean toConsider;
+	private boolean mustBeDrawn;
 	
 	/***
 	 * 
@@ -23,7 +24,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	public QueryRelFile(String user, String topic, String id) {
 		super(user, topic, id);
 		this.measures = new HashMap<String, AbstractMeasure>();
-		this.toConsider = false;
+		this.mustBeDrawn = false;
 	}
 
 	/***
@@ -32,24 +33,35 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs) {
 		super(user, topic, id, docs);
 		this.measures = new HashMap<String, AbstractMeasure>();
-		this.toConsider = false;
+		this.mustBeDrawn = false;
+	}
+	
+	/**
+	 * 
+	 * @param query
+	 */
+	public QueryRelFile(QueryRelFile query) {
+		super(query.getUser(), query.getTopic(), query.getId(), query.getDocs());
+		this.measures = new HashMap<String, AbstractMeasure>(query.getMeasures());
+		this.mustBeDrawn = query.isToConsiderForChart();
 	}
 
 
 	/**
 	 * @param measures
 	 */
-	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs, HashMap<String, AbstractMeasure> measures) {
+	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs, Map<String, AbstractMeasure> measures) {
 		super(user, topic, id, docs);
 		this.measures = measures;
-		this.toConsider = false;
+		this.mustBeDrawn = false;
 	}
 	
 	/**
 	 * 
 	 * @param m
 	 */
-	public void addMeasure(AbstractMeasure m) {
+	public void addMeasure(AbstractMeasure m, boolean drawable) {
+		m.setMustBeDrawn(drawable);
 		getMeasures().put(m.getName().trim().toLowerCase(), m);
 	}
 	
@@ -65,13 +77,13 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 * @param name
 	 * @return
 	 */
-	public AbstractMeasure searchAddMeasure(String name, boolean compound) {
+	public AbstractMeasure searchAddMeasure(String name, boolean compound, boolean drawable) {
 		
 		if(getMeasures().get(name.trim().toLowerCase()) == null) {
 			if(compound) {
-				addMeasure(new MeasureCompound(name.trim()));
+				addMeasure(new MeasureCompound(name.trim()), drawable);
 			}else {
-				addMeasure(new Measure(name.trim()));
+				addMeasure(new Measure(name.trim()), drawable);
 			}
 		}
 		
@@ -90,17 +102,17 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	
 
 	/**
-	 * @return the toConsiderForChart
+	 * @return the mustBeDrawn
 	 */
 	public boolean isToConsiderForChart() {
-		return toConsider;
+		return mustBeDrawn;
 	}
 
 	/**
-	 * @param toConsiderForChart the toConsiderForChart to set
+	 * @param 
 	 */
 	public void setToConsiderForChart(boolean toConsiderForChart) {
-		this.toConsider = toConsiderForChart;
+		this.mustBeDrawn = toConsiderForChart;
 	}
 
 	/**
@@ -141,19 +153,34 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		
 	}
 	
+	public Map<String, Document>getRelevantDocs(){
+		Map<String, Document> docs = getDocs();
+		Map<String, Document> relDocs = new HashMap<String, Document>();
+		
+		Iterator<Entry<String, Document>> itDocs = docs.entrySet().iterator();
+		Entry<String, Document> entryDoc;
+		while(itDocs.hasNext()){
+			entryDoc = itDocs.next();
+			if(((DocumentRelFile)entryDoc.getValue()).getIsRelevance()) {
+				relDocs.put(entryDoc.getKey(), entryDoc.getValue());
+			}
+		}
+		
+		return relDocs;
+	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	public String printMeasures(String user, String topic) {
+	public String printMeasures() {
 		String stringDoc = "";
 		Iterator<?> it = sortMeasureForKey().entrySet().iterator();
 		AsciiTable tb = new AsciiTable();
 		CWC_LongestLine cwc = new CWC_LongestLine();
 		tb.getRenderer().setCWC(cwc);
 		tb.addRule();
-		tb.addRow("User: " + user, "Topic: " + topic, "Query: " + getId(), "S1 - Si", "(Si-1) - Si");
+		tb.addRow("User: " + getUser(), "Topic: " + getTopic(), "Query: " + getId(), "S1 - Si", "(Si-1) - Si");
 		tb.addRule();
 		while(it.hasNext()) {
 			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();

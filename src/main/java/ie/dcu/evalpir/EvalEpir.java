@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.antlr.v4.codegen.model.ThrowNoViableAlt;
+import org.antlr.v4.parse.BlockSetTransformer.setAlt_return;
 
 import java.util.Random;
 
@@ -46,15 +47,18 @@ import ie.dcu.evalpir.output.table.TableGenerator;
  */
 //clean package assembly:single
 public class EvalEpir {
-	static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
-	static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
+	public static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
+	public static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
+	public static  Map<String, Session> LOGS = null;
+	public static  Map<String, Query> QUERYREL = null;
+	public static  ArrayList<PIR> MODELS = null;
 	
     public static void main( String[] args ) {
     	
 //    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
 //    	File logsFile = new File(LOGS_FILE_PATH);
 //    	File outputPIR = new File("src/main/resources/ar.csv");
-    	
+//    	
     	ConsolePrinter.startEval();
     	
     	String[] args1 = {RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/model1.csv","src/main/resources/model2.csv","src/main/resources/model3.csv"};
@@ -67,92 +71,24 @@ public class EvalEpir {
     	File logsFile = new File(args1[1]);
 
     	
-    	Map<String, Query> qRel = InputReaderImpl.extractRelevanceFile(relevanceFile);
-    	Map<String, Session> logs = InputReaderImpl.extracLogFile(logsFile);
-    	//ArrayList<PIR> pirs = InputReaderImpl.extractOutputPIR(outputPIR);
+    	setQUERYREL(InputReaderImpl.extractRelevanceFile(relevanceFile));
+    	setLOGS(InputReaderImpl.extracLogFile(logsFile));
+    	setMODELS(extractingModels(args1));
+    	
+    //	setMODELS(InputReaderImpl.extractOutputPIR(outputPIR));
+   	  	
+    
+		CalculateMeasureImpl.calculateMeasures();
+    	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
+      		
+    	
+		CreatorChart.createChart(QUERYREL);
+		CreatorChart.createChartSession(measures);		
+		TableGenerator.printMeasures(measures);
     	
     	
-    	ArrayList<PIR> pirs = extractingModels(args1);
     	
     	
-//    	
-    	
-//    	
-//    	System.out.println("----------------------Print RELEVANCE File----------------------------------\n\n");    	
-//    	Iterator<Entry<String, Query>> itd = qRel.entrySet().iterator();
-//    	Query q1;
-//    	while (itd.hasNext()) {
-//    		q1 = itd.next().getValue();
-//    		
-//    		if(q1.getId().equals("122") ) {
-//    			System.out.println(q1.toString());
-//    			System.out.println(((QueryRelFile)q1).getNRelevantDoc());
-//    		}
-    		
-//    	}
-//    	
-//    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
-//        Iterator<Entry<String, Session>> it = logs.entrySet().iterator();
-//    	
-//        while(it.hasNext()) {
-//        	Entry<String, Session> a = it.next();
-//        	if(a.getValue().getSessionMeasure()) {
-//        		System.out.println(a.getValue().toString());
-//        	}
-//        
-//        }
-//    	
-//    	
- //   	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");
-    	
-//    	for (PIR p : pirs) {
-//    		//System.out.println(p.toString());
-//    	}
-    	
-    	
-    	CalculateMeasureImpl m = new CalculateMeasureImpl(qRel);
-   	
-    	m.calculateMeasures(pirs);
-		CalculateSessionMeasure m1 = new CalculateSessionMeasure(qRel, logs);
-    	Map<String, Topic> measures = m1.calculateSessionMeasure(pirs); 
-
-//    	
-// 	System.out.println("\n\n----------------------Print Measures----------------------------------\n\n");
-//    	Iterator<Entry<String, Query>> itm = qRel.entrySet().iterator();
-//    	Query q ;
-//    	while (itm.hasNext()) {
-//    		q = itm.next().getValue();
-//    		//if(q.getUser().equals("121")) {
-//    			System.out.println(((QueryRelFile)q).printMeasures());
-//    		//}
-//    		
-//    		
-//    	}
-////    	
-//    	for(Query q : qRel) {
-//    		//System.out.print(((QueryRelFile)q).printMeasures());
-//    	}
-//    	
-
-//    	Path p = new Path();
-//    	ArrayList<Path> memo = new ArrayList<Path>();
-//    	
-//    	ArrayList<Integer> input = new ArrayList<Integer>();
-//    
-//    	
-//    	ArrayList<ArrayList<Integer>> a = new ArrayList<ArrayList<Integer>>();
-//    	//CalculateMeasureImpl.partition(60,15, 5, input, a);
-    	
-//    	Path p = new Path(4);
-//    	Map <String, ArrayList<Path>> memo = new HashMap<String, ArrayList<Path>>();
-//    	CalculateMeasureImpl.findPaths(44, 11, 4, p, memo);
-    	
-    	
-		CreatorChart.createChart(qRel);
-		CreatorChart.createChartSession(measures);
-//		
-		
-		TableGenerator.printMeasures(qRel, measures);
     	
 //    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
     	
@@ -182,30 +118,7 @@ public class EvalEpir {
 //            if (pb.getCurrent() > 1) pb.maxHint(10000);
 //
 //        }
-//        pb.stop();
-//    	
-//    	InputCreator input = new InputCreatorImpl();
-//    	input.generateFilesInput(2, 2);
-//    	System.out.println("\n\n----------------------Print Session Measures----------------------------------\n\n");
-    	
-    	
-//    	Map<String, Topic> measures = m.calculateSessionMeasure(pirs);    	
-//    	
-//    	Iterator<Entry<String, Topic>> itTopic = measures.entrySet().iterator();
-//    	Iterator<Entry<String, AbstractMeasure>> itM;
-//    	while(itTopic.hasNext()) {
-//    		
-//    		System.out.println(itTopic.next().getValue().printMeasures());
-//    		
-//    	}
-    	
-    
-    	
-    	/*----------------------Print Session Measures on .txt----------------------------------*/
-    	
-    	
-		
-		
+//        pb.stop();		
     }
     
     /**
@@ -223,6 +136,84 @@ public class EvalEpir {
     	
     	return allModel;
     }
+
+	public static Map<String, Session> getLOGS() {
+		return LOGS;
+	}
+
+	public static void setLOGS(Map<String, Session> lOGS) {
+		LOGS = lOGS;
+	}
+
+	public static Map<String, Query> getQUERYREL() {
+		return QUERYREL;
+	}
+
+	public static void setQUERYREL(Map<String, Query> qUERYREL) {
+		QUERYREL = qUERYREL;
+	}
+
+	public static ArrayList<PIR> getMODELS() {
+		return MODELS;
+	}
+
+	public static void setMODELS(ArrayList<PIR> mODELS) {
+		MODELS = mODELS;
+	}
+
+	public static void printRelevantFile() {
+	
+		System.out.println("----------------------Print RELEVANT File----------------------------------\n\n");    	
+		Iterator<Entry<String, Query>> itd = QUERYREL.entrySet().iterator();
+		Query q1;
+		while (itd.hasNext()) {
+			q1 = itd.next().getValue();
+//			if(q1.getId().equals("122") ) {
+				System.out.println(q1.toString());
+				System.out.println(((QueryRelFile)q1).getNRelevantDoc());
+//			}
+			
+		}
+	}
+	
+	public static void printLogsFile() {
+    	
+    	System.out.println("\n\n----------------------Print Logs File----------------------------------\n\n");
+        Iterator<Entry<String, Session>> it = LOGS.entrySet().iterator();
+    	
+        while(it.hasNext()) {
+        	Entry<String, Session> a = it.next();
+        	if(a.getValue().getSessionMeasure()) {
+        		System.out.println(a.getValue().toString());
+        	}
+        
+        }
+	}
+    
+	public static void printModelsFile() {
+    	System.out.println("----------------------Print OUTPUT File----------------------------------\n\n");	
+    	for (PIR p : MODELS) {
+    		System.out.println(p.toString());
+    	}
+	}
+	
+	public static void printAllMeasures() {
+		CalculateMeasureImpl.calculateMeasures();
+    	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
+    	System.out.println("\n----------------------Print Measures----------------------------------\n");
+    	Iterator<Entry<String, Query>> itm = QUERYREL.entrySet().iterator();
+    	Query q ;
+    	while (itm.hasNext()) {
+    		q = itm.next().getValue();
+    			((QueryRelFile)q).printMeasures();
+    	}
+
+		System.out.println("\n----------------------Print Session Measures----------------------------------\n");   	
+    	Iterator<Entry<String, Topic>> itTopic = measures.entrySet().iterator();
+    	while(itTopic.hasNext()) {
+    		itTopic.next().getValue().printMeasures();	    		
+    	}
+	}
     
     
     

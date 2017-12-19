@@ -9,7 +9,7 @@ package ie.dcu.evalpir.elements;
  */
 public class DocumentRelFile extends Document{
 	
-	static final int  THRESHOLD = 2; //it is used to set isRelevance
+	static final int  THRESHOLD = 3; //it is used to set isRelevance
 	
 	private int relevance;
 	private boolean isRelevance;
@@ -49,6 +49,8 @@ public class DocumentRelFile extends Document{
 	 */
 	public void setRelevance(int relevance) {
 		this.relevance = relevance;
+		setIsRelevance();
+	
 	}
 
 	/**
@@ -63,7 +65,7 @@ public class DocumentRelFile extends Document{
 	 */
 	public void setIsRelevance() {
 		
-		if( getRelevance() > THRESHOLD) {
+		if( getRelevance() >= THRESHOLD) {
 			this.isRelevance = true;
 		}else {
 			this.isRelevance = false;

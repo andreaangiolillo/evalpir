@@ -1,14 +1,18 @@
 package ie.dcu.evalpir.measures;
 
 import java.io.File;
+import java.nio.channels.AsynchronousServerSocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -29,28 +33,28 @@ public class TestCaseSessionMeasure {
 	private ArrayList<PIR>  result;
 	private Map<String ,Session> logsfile;
 	private CalculateSessionMeasure m;
-	private Map<String,Query> qPIR;
-	private Map<String,Query> qRel;
+	private Map<String,Query> qPIR = new HashMap<String, Query>();
+	private Map<String,Query> qRel = new HashMap<String, Query>();
 	private Session s;
 	
-	public TestCaseSessionMeasure() {
-		super();
-
-		InputReaderImpl reader = new InputReaderImpl();  
-		File relevanceFile = new File(RELEVANCE_FILE_PATH);
-		rel = reader.extractRelevanceFile(relevanceFile);
-		
-		File outputPIR = new File(PIRS_FILE);
-	    result = reader.extractOutputPIR(outputPIR);
-	    
-	    File log = new File(LOGS_FILE_PATH);
-	    logsfile = reader.extracLogFile(log);
-	  
-	    m = new CalculateSessionMeasure(rel,logsfile);	
-	    qPIR = new HashMap<String, Query>();
-	    qRel = new HashMap<String, Query>();
-	    setInstance();
-	}
+//	public TestCaseSessionMeasure() {
+//		super();
+//
+//		InputReaderImpl reader = new InputReaderImpl();  
+//		File relevanceFile = new File(RELEVANCE_FILE_PATH);
+//		rel = reader.extractRelevanceFile(relevanceFile);
+//		
+//		File outputPIR = new File(PIRS_FILE);
+//	    result = reader.extractOutputPIR(outputPIR);
+//	    
+//	    File log = new File(LOGS_FILE_PATH);
+//	    logsfile = reader.extracLogFile(log);
+//	  
+//	    m = new CalculateMeasureUsingLogsFile(rel,logsfile);	
+//	    qPIR = new HashMap<String, Query>();
+//	    qRel = new HashMap<String, Query>();
+//	    setInstance();
+//	}
 	
 	
 	
@@ -71,12 +75,12 @@ public class TestCaseSessionMeasure {
 		Query query = new QueryRelFile("user", "topic", "query1", docs);
 		qRel.put(query.getId().toLowerCase(), query);
 		
-		dr1 = new DocumentRelFile("12", 1);
+		dr1 = new DocumentRelFile("12", 4);
 		dr2 = new DocumentRelFile("22", 3);
 		dr3 = new DocumentRelFile("32", 1);
 		dr4 = new DocumentRelFile("42", 4);
 		dr5 = new DocumentRelFile("52", 3);
-		dr6 = new DocumentRelFile("62", 1);
+		dr6 = new DocumentRelFile("62", 4);
 		docs = new HashMap<String, Document>();
 		docs.put("12", dr1);
 		docs.put("22", dr2);
@@ -93,7 +97,7 @@ public class TestCaseSessionMeasure {
 		dr3 = new DocumentRelFile("32", 3);
 		dr4 = new DocumentRelFile("42", 1);
 		dr5 = new DocumentRelFile("55", 1);
-		dr6 = new DocumentRelFile("66", 4);
+		dr6 = new DocumentRelFile("62", 4);
 		docs = new HashMap<String, Document>();
 		docs.put("122", dr1);
 		docs.put("222", dr2);
@@ -142,10 +146,10 @@ public class TestCaseSessionMeasure {
 		
 		d1 = new DocumentOutputPIR("122", 1,0);
 		d2 = new DocumentOutputPIR("222", 2,0);
-		d3 = new DocumentOutputPIR("32", 3,0);
+		d3 = new DocumentOutputPIR("3", 3,0);
 		d4 = new DocumentOutputPIR("42", 4,0);
 		d5 = new DocumentOutputPIR("52", 5,0);
-		d6 = new DocumentOutputPIR("62", 6,0);
+		d6 = new DocumentOutputPIR("6", 6,0);
 		
 		docs = new HashMap<String, Document>();
 		docs.put("122", d1);
@@ -165,7 +169,7 @@ public class TestCaseSessionMeasure {
 		Log l5 = new Log("OPEN_DOCUMENT", "2016-03-15 20:00:11.957", "6", "query3", "2");
 		Log l3 = new Log("QUERY_SUBMISSION", "2016-03-15 20:00:11.957", "6", "query2", "4");
 		Log l4 = new Log("QUERY_SUBMISSION", "2017-03-15 20:00:11.957", "6", "query1", "4");
-		Log l6 = new Log("QUERY_SUBMISSION", "2011-03-15 20:00:11.957", "6", "query3", "4");
+		Log l6 = new Log("QUERY_SUBMISSION", "2018-03-15 20:00:11.957", "6", "query3", "4");
 		
 		s.addLog(l);
 		s.addLog(l2);
@@ -177,8 +181,39 @@ public class TestCaseSessionMeasure {
 
 	}
 	
+	
+	
+	@Test
+	public void testCreatingQueryConsideringPreoviousOnes() {
+		setInstance();
+		EvalEpir.setQUERYREL(qRel);
+		Iterator<Entry<String, Query>> itq = qRel.entrySet().iterator();
+		Entry<String, Query> entryQ;
+		Query qNew = null;
+		int positionQuery  = -1;
+		while(itq.hasNext()) {
+			entryQ = itq.next();
+			if(entryQ.getKey().equalsIgnoreCase("query3")) {
+				System.out.println(entryQ.getValue().getDocs());
+				positionQuery = CalculateSessionMeasure.getPositionQuery((QueryRelFile)entryQ.getValue(), s.getQuery());
+				assertEquals(2, positionQuery);
+				qNew = CalculateSessionMeasure.creatingQueryConsideringPreoviousOnes((QueryRelFile)entryQ.getValue(), 1, s.getQuery());
+			}
+		}
+		
+		assertEquals(2, ((QueryRelFile)qNew).getNRelevantDoc());
+		System.out.println(qNew.getDocs());
+		
+		
+		
+		
+	}
+	
+//	
+	
 	@Test
 	public void TestPrecisionk() {
+		setInstance();
 		Map<String, Document> docsMergedRel = CalculateSessionMeasure.mergeRelevanceDocs(qRel);
 		/* TEST MergeReleanceDocs*/
 		assertEquals(18, docsMergedRel.size());
@@ -189,18 +224,19 @@ public class TestCaseSessionMeasure {
 		
 		/* TEST Precision**/
 		assertEquals(1.0, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 1), 0.01);
-		assertEquals(0.5, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 4), 0.01);
-		assertEquals(0.5, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 6), 0.01);
+		assertEquals(0.75, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 4), 0.01);
+		assertEquals(0.66, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 6), 0.01);
 		assertEquals(0.55, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 9), 0.01);
-		assertEquals(0.5, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 12), 0.01);
+		assertEquals(0.583, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 12), 0.01);
 	}
 
 	@Test
-	public void TestPrecisionRecallCurve(){				
+	public void TestPrecisionRecallCurve(){
+		setInstance();
 		ArrayList<Pair<Integer, Double>> curve = CalculateSessionMeasure.precisionRecallCurve(qRel, qPIR , s, s.getPath());
-		System.out.print(curve);
+		System.out.println(curve);
 		/**TEST CURVE*/
-		assertEquals(8, curve.size());
+		assertEquals(10, curve.size());
 		
 	}
 	
@@ -246,17 +282,20 @@ public class TestCaseSessionMeasure {
 	
 	@Test
 	public void TestrR() {
+		setInstance();
 		assertEquals(7,CalculateSessionMeasure.rR(qRel, qPIR, s.getPath()));
 		
 	}
 	
 	@Test
 	public void TestrRC() {
-		assertEquals(0.875,CalculateSessionMeasure.rRC(qRel, qPIR, s.getPath()), 0.01);
+		setInstance();
+		assertEquals(0.7,CalculateSessionMeasure.rRC(qRel, qPIR, s.getPath()), 0.01);
 	}
 	
 	@Test
 	public void TestrPC() {
+		setInstance();
 		assertEquals(0.46,CalculateSessionMeasure.rPC(qRel, qPIR, s.getPath()), 0.01);
 	}
 
