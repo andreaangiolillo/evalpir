@@ -434,9 +434,11 @@ public class CalculateMeasureImpl{
 					precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);
 					apNewInfo = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR);
 					if(precision != precisionNewInfo) {
-						//considering only the relevant docs not in the previous queries				
-						((Measure) queryRel.searchAddMeasure("Precision-NewInfo ", false, false, false)).addPIR(pir.getName(), precisionNewInfo);
-						((Measure) queryRel.searchAddMeasure("AveragePrecision-NewInfo ", false, false, false)).addPIR(pir.getName(), apNewInfo);
+						//considering only the relevant docs not in the previous queries	
+//						System.out.println("TopicID: " + queryRel.getTopic() + " Query: " + queryRel.getId() );
+//						System.out.println("Precision " + precision  + " PrecisionNewInfo: " + precisionNewInfo + " diff: " + (precision - precisionNewInfo));
+						((Measure) queryRel.searchAddMeasure("Precision-NewInfo", false, false, false)).addPIR(pir.getName(), precisionNewInfo);
+						((Measure) queryRel.searchAddMeasure("AveragePrecision-NewInfo", false, false, false)).addPIR(pir.getName(), apNewInfo);
 						queryRel.getMeasures().get("precision").setStackedBar(true);
 						queryRel.getMeasures().get("averageprecision").setStackedBar(true);	
 					}

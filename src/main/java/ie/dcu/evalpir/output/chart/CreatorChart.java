@@ -1,6 +1,5 @@
 package ie.dcu.evalpir.output.chart;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Log;
@@ -32,6 +30,8 @@ public class CreatorChart {
 	
 	final static String[] MEASURES_BARCHART = { "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
 			"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5"};
+	
+	final static String[] MEASURES_STACKEDBAR = {"Precision", "AveragePrecision"};
 
 	/**
 	 * It Creates the folder for the diagrams
@@ -46,7 +46,22 @@ public class CreatorChart {
 		        dir.mkdirs();
 		     
 				File subdir;
-				String[] measures = (folderName.equalsIgnoreCase("LineChart")) ? MEASURES_LINECHART : MEASURES_BARCHART;
+				String[] measures = null;
+				//String[] measures = (folderName.equalsIgnoreCase("LineChart")) ? MEASURES_LINECHART : MEASURES_BARCHART;
+				switch(folderName) {
+					case "LineChart":
+						measures = MEASURES_LINECHART;
+						break;
+					case "BarChart":
+						measures = MEASURES_BARCHART;
+						break;
+					case "StackedBar":
+						measures = MEASURES_STACKEDBAR;
+						break;
+					default:
+						throw new IllegalArgumentException("Invalid name of the folder: " + folderName);
+				}
+				
 		        for(int i = 0; i < measures.length; i++) {
 		        	subdir = new File(path + measures[i]); 
 		        	subdir.mkdir();
@@ -54,11 +69,10 @@ public class CreatorChart {
 		        
 				return (path);	
 			}catch (IOException e) {
-				
 				e.printStackTrace();
 			}
 			
-			return "";	
+			return "";
 	 }
 	
 	 /**
@@ -69,6 +83,7 @@ public class CreatorChart {
 		ConsolePrinter.startTask("Creating Charts");
 		String pathL = createFolder("LineChart");
 		String pathB = createFolder("BarChart");
+		String pathS = createFolder("StackedBar");
 
 		Map<String, ArrayList<Query>> topics = setTopic(queries);
 		Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
@@ -80,10 +95,14 @@ public class CreatorChart {
 			for (AbstractMeasure measure : measures) {
 				if(measure.mustBeDrawn()) {	
 					if(measure instanceof Measure) {
-						LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
-						BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure);
+//						LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
+//						BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure);
+						if(measure.isStackedBar()) {
+							System.out.println("Stack da creare");
+							StackedBar.CreateStackedBar(pathS, topic, (Measure)measure);
+						}
 					}else if(measure instanceof MeasureCompound) {
-						LineChart.CreateLineChartPerQuery(pathL, topic, measure.getName());
+//						LineChart.CreateLineChartPerQuery(pathL, topic, measure.getName());
 					}
 				}
 			}
@@ -100,10 +119,6 @@ public class CreatorChart {
 		 while(itTopic.hasNext()) {
 			 topic = itTopic.next().getValue();
 			 measure = (MeasureCompound)topic.searchMeasure("Session_PrecisionRecallCurve");
-//			 System.out.println("SIZE: " + topics.size());
-//			 System.out.println(topic.getUserId() + " " +topic.getTopicId());
-//			// System.out.println(topic.printMeasures());
-//			 System.out.println(measure.getPIRvalue().size());
 			 if(measure != null) {
 				 LineChart.createLineChartForSessionMeasure(path, topic.getUserId(), topic.getTopicId(), measure);
 			 }
@@ -131,8 +146,6 @@ public class CreatorChart {
 			for (int i = 0; i < querySorted.size(); i++) {
 				query = queries.get(querySorted.get(i).getQuery().toLowerCase().trim());
 				if(query == null) {
-					System.out.println("QUERY");
-					System.out.println(queries);
 					throw new QueryNotInTheLogFileException("QueryID: " + querySorted.get(i).getQuery().toLowerCase().trim());
 				}
 				

@@ -33,7 +33,7 @@ public class Measure extends AbstractMeasure{
 	}
 	
 	
-	public double  getPIR(String key) {
+	public double  getPIRValue(String key) {
 		for (Pair<String, Double> p : PIRvalue) {
 			if (p.getKey().equals(key)) {
 				return (Double) p.getValue();
@@ -44,6 +44,15 @@ public class Measure extends AbstractMeasure{
 
 	public Pair<String, Double> getPIR(int i) {
 		return PIRvalue.get(i);
+	}
+	
+	public boolean containsPIR(String key) {
+		for (Pair<String, Double> p : PIRvalue) {
+			if (p.getKey().equals(key)) {
+				return true;
+			}
+		}
+		return false;
 	}
 		
 	/**

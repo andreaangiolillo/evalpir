@@ -79,8 +79,8 @@ public class LineChart{
 				}
 	
 				measure = (Measure)((QueryRelFile)topic.get(i)).searchMeasure(m.getName());
-				measure.sortbyKey();
 				if(measure != null) {
+					measure.sortbyKey();
 					value = (Double)measure.getPIR(j).getValue();
 					
 				}
@@ -243,8 +243,7 @@ public class LineChart{
 		int i = 0;
 		while(it.hasNext()) {
 			Entry<String, ArrayList<Pair<Integer, Double>>> measurePerPir = it.next();
-			series[i] = new XYSeries(measurePerPir.getKey());
-			
+			series[i] = new XYSeries(measurePerPir.getKey());		
 			value = measurePerPir.getValue();
 			if (value != null) {
 				for(int j = 0; j < value.size(); j++) {

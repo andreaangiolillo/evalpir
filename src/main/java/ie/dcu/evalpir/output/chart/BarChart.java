@@ -83,10 +83,9 @@ public class BarChart {
 		for (int i = 0; i < nQuery; i++) {			
 			for (int j = 0; j < nPIR; j++) { 
 				measure = (Measure)((QueryRelFile)topic.get(i)).searchMeasure(m.getName());
-				measure.sortbyKey();
 				if(measure != null) {
-					value = (Double)measure.getPIR(j).getValue();
-					
+					measure.sortbyKey();
+					value = (Double)measure.getPIR(j).getValue();	
 				}
 				
 				//System.out.println("Number of PIR: " + nPIR +"\n j: " + j);
