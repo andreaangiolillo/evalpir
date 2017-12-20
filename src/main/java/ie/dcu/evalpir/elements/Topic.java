@@ -4,6 +4,7 @@ package ie.dcu.evalpir.elements;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import de.vandermeer.asciitable.AsciiTable;
@@ -69,7 +70,8 @@ public class Topic{
 	 * 
 	 * @param m
 	 */
-	public void addMeasure(AbstractMeasure m, boolean drawable) {
+	public void addMeasure(AbstractMeasure m, boolean printOutput, boolean drawable) {
+		m.setPrintOutput(printOutput);
 		m.setMustBeDrawn(drawable);
 		getMeasures().put(m.getName().trim().toLowerCase(), m);
 	}
@@ -87,12 +89,12 @@ public class Topic{
 	 * @param name
 	 * @return
 	 */
-	public AbstractMeasure searchAddMeasure(String name, boolean compound, boolean drawable) {
+	public AbstractMeasure searchAddMeasure(String name, boolean compound, boolean printOutput, boolean drawable) {
 		if(searchMeasure(name) == null) {
 			if(compound) {
-				addMeasure(new MeasureCompound(name.trim()), drawable);
+				addMeasure(new MeasureCompound(name.trim()), printOutput, drawable);
 			}else {
-				addMeasure(new Measure(name.trim()), drawable);
+				addMeasure(new Measure(name.trim()), printOutput, drawable);
 			}
 		}
 		
@@ -123,22 +125,22 @@ public class Topic{
 	public String printMeasures() {
 		
 		String stringDoc = "";
-		Iterator<?> it = sortMeasureForKey().entrySet().iterator();
+		Iterator<Entry<String, AbstractMeasure>> it = sortMeasureForKey().entrySet().iterator();
 		AsciiTable tb = new AsciiTable();
 		CWC_LongestLine cwc = new CWC_LongestLine();
 		tb.getRenderer().setCWC(cwc);
 		tb.addRule();
 		tb.addRow("User: " + getUserId(), "Topic: " + getTopicId(), "", "S1 - Si", "(Si-1) - Si");
 		tb.addRule();
+		Map.Entry<String, AbstractMeasure> pair;
 		while(it.hasNext()) {
-			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
-			if(pair.getValue() instanceof Measure) {
+			pair = it.next();
+			if(pair.getValue().isPrintOutput()) {
 				stringDoc = ((Measure)pair.getValue()).printMeasure(tb) + "\n";
 			}
 			
 		}
 		
-		System.out.println(stringDoc);
 		return stringDoc;
 	}
 	

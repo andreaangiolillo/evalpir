@@ -10,12 +10,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.AbstractMeasure;
+import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
+import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.elements.Topic;
+import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
 import ie.dcu.evalpir.output.table.ConsolePrinter;
 
 
@@ -105,55 +109,63 @@ public class CreatorChart {
 			 }
 			 
 		 }
-		 
-		 
-		 
-//			ConsolePrinter.startTask("Creating Charts");
-//			String path = createFolder("Charts");
-//			Map<String, ArrayList<Query>> topics = setTopic(queries);
-//			Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
-//			AbstractMeasure[] measures;
-//			ArrayList<Query> topic;
-//			while(it.hasNext()) {
-//				topic = it.next().getValue();
-//				measures = getNameMeasures(topic);
-//				for (AbstractMeasure measure : measures) {
-//					if(measure instanceof Measure) {
-//						LineChart.CreateLineChartPerTopic(path, topic, (Measure)measure);
-//					}else if(measure instanceof MeasureCompound) {
-//						LineChart.CreateLineChartPerQuery(path, topic, measure.getName());
-//					}
-//				}
-//			}
-//			ConsolePrinter.endTask("Creating Charts");
-//			
-		 }
+		
+	 }
+	 
 	 /**
 	  * 
 	  * @param queries
 	  * @return
 	  */
 	public static Map<String, ArrayList<Query>> setTopic(final Map<String,Query> queries){
-		Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
-		Query q;
-		String key ="";
-		Map<String, ArrayList<Query>> topicUser = new HashMap<String, ArrayList<Query>>();
-		while(it.hasNext()) {
-			q = it.next().getValue();	
-			if(((QueryRelFile)q).isToConsiderForChart()) {
-				key = q.getTopic() +  "," + q.getUser();
-				if(!topicUser.containsKey(key)) {
-					ArrayList<Query> topic = new ArrayList<Query>();
-					topic.add(q);
-					topicUser.put(key, topic);
-				}else {
-					topicUser.get(key).add(q);
+		Map<String, ArrayList<Query>> topicUser = new HashMap<String, ArrayList<Query>>(); 
+		Map<String, Session> logs = EvalEpir.getLOGS();
+		Iterator<Entry<String, Session>> itLogs = logs.entrySet().iterator();
+		Entry<String, Session> entryLog;
+		ArrayList<Log> querySorted ;
+		Query query;
+		while(itLogs.hasNext()) {
+			entryLog = itLogs.next();
+			querySorted = entryLog.getValue().getQuery();
+			ArrayList<Query> topic = new ArrayList<Query>();
+			for (int i = 0; i < querySorted.size(); i++) {
+				query = queries.get(querySorted.get(i).getQuery().toLowerCase().trim());
+				if(query == null) {
+					System.out.println("QUERY");
+					System.out.println(queries);
+					throw new QueryNotInTheLogFileException("QueryID: " + querySorted.get(i).getQuery().toLowerCase().trim());
 				}
+				
+				topic.add(query);
 			}
 			
+			topicUser.put(entryLog.getKey(), topic);
 		}
 		
 		return topicUser;
+		
+//		Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
+//		Query q;
+//		String key ="";
+//		Map<String, ArrayList<Query>> topicUser = new HashMap<String, ArrayList<Query>>();
+//		ArrayList<Log> queryOrder;
+//		while(it.hasNext()) {
+//			q = it.next().getValue();	
+//			if(((QueryRelFile)q).isToConsiderForChart()) {
+//				key = q.getUser().toLowerCase() +  "," + q.getTopic().toLowerCase();
+//				queryOrder = EvalEpir.LOGS.get(key).getQuery();
+//				if(!topicUser.containsKey(key)) {
+//					ArrayList<Query> topic = new ArrayList<Query>();
+//					topic.add(q);
+//					topicUser.put(key, topic);
+//				}else {
+//					topicUser.get(key).add(q);
+//				}
+//			}
+//			
+//		}
+//		
+//		return topicUser;
 	}
 	
 	/**

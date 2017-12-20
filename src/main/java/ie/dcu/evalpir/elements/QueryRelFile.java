@@ -60,7 +60,8 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 * 
 	 * @param m
 	 */
-	public void addMeasure(AbstractMeasure m, boolean drawable) {
+	public void addMeasure(AbstractMeasure m, boolean printOutput, boolean drawable) {
+		m.setPrintOutput(printOutput);
 		m.setMustBeDrawn(drawable);
 		getMeasures().put(m.getName().trim().toLowerCase(), m);
 	}
@@ -77,13 +78,13 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 * @param name
 	 * @return
 	 */
-	public AbstractMeasure searchAddMeasure(String name, boolean compound, boolean drawable) {
+	public AbstractMeasure searchAddMeasure(String name, boolean compound, boolean printOutput, boolean drawable) {
 		
 		if(getMeasures().get(name.trim().toLowerCase()) == null) {
 			if(compound) {
-				addMeasure(new MeasureCompound(name.trim()), drawable);
+				addMeasure(new MeasureCompound(name.trim()), printOutput, drawable);
 			}else {
-				addMeasure(new Measure(name.trim()), drawable);
+				addMeasure(new Measure(name.trim()), printOutput, drawable);
 			}
 		}
 		
@@ -175,22 +176,22 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	 */
 	public String printMeasures() {
 		String stringDoc = "";
-		Iterator<?> it = sortMeasureForKey().entrySet().iterator();
+		Iterator<Entry<String, AbstractMeasure>> it = sortMeasureForKey().entrySet().iterator();
 		AsciiTable tb = new AsciiTable();
 		CWC_LongestLine cwc = new CWC_LongestLine();
 		tb.getRenderer().setCWC(cwc);
 		tb.addRule();
 		tb.addRow("User: " + getUser(), "Topic: " + getTopic(), "Query: " + getId(), "S1 - Si", "(Si-1) - Si");
 		tb.addRule();
+		Map.Entry<String, AbstractMeasure> pair;
 		while(it.hasNext()) {
-			Map.Entry<?,?> pair = (Map.Entry<?,?>)it.next();
-			if(pair.getValue() instanceof Measure) {
+			pair = (Map.Entry<String, AbstractMeasure>)it.next();
+			if(pair.getValue().isPrintOutput()) {
 				stringDoc = ((Measure)pair.getValue()).printMeasure(tb) + "\n";
 			}
 			
 		}
 		
-		System.out.print(stringDoc);
 		return stringDoc;
 	}
 	

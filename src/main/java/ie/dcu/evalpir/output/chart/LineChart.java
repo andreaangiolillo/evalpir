@@ -34,13 +34,7 @@ import ie.dcu.evalpir.elements.QueryRelFile;
 
 public class LineChart{
 	
-	Map<String, Color> pirColor;
-
 	
-	public LineChart() {
-		super();
-		this.pirColor = new HashMap<String, Color>();
-	}
 	
 	public static void CreateLineChartPerTopic(String path, ArrayList<Query> topic, Measure m) {
 			initUIPerTopic(path, topic, m);

@@ -50,13 +50,13 @@ public class TableGenerator {
 	    	Query q ;
 	    	while (itm.hasNext()) {
 	    		q = itm.next().getValue();
-	    			((QueryRelFile)q).printMeasures();
+	    			System.out.println(((QueryRelFile)q).printMeasures());
 	    	}
 
 			System.out.println("\n----------------------Print Session Measures----------------------------------\n");   	
 	    	Iterator<Entry<String, Topic>> itTopic = sessionMeasures.entrySet().iterator();
 	    	while(itTopic.hasNext()) {
-	    		itTopic.next().getValue().printMeasures();	    		
+	    		System.out.println(itTopic.next().getValue().printMeasures());	    		
 	    	}
 	    	
 	    	System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));

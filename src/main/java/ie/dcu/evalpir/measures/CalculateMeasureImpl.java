@@ -387,7 +387,7 @@ public class CalculateMeasureImpl{
 		double qNDCG5, qNDCG10, qNDCG15, qNDCG20 = 0.0;
 //		double qNDCG5NewInfo, qNDCG10NewInfo, qNDCG15NewInfo, qNDCG20NewInfo = 0.0;
 		double precision, precisionNewInfo = 0.0;
-		double recall, recallNewInfo = 0.0;
+		double recall = 0.0;
 		double fMeasure = 0.0;
 		double ap, apNewInfo = 0.0;
 		int k = 0;
@@ -406,8 +406,8 @@ public class CalculateMeasureImpl{
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
 						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
 						zeroToSort = (k > 9) ? "" : "0";
-						((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort+ k, false, true)).addPIR(pir.getName(), qPrecisionK);
-						((Measure) queryRel.searchAddMeasure("Recall@"+ zeroToSort + k, false, true)).addPIR(pir.getName(), qRecallK);
+						((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort+ k, false, true, true)).addPIR(pir.getName(), qPrecisionK);
+						((Measure) queryRel.searchAddMeasure("Recall@"+ zeroToSort + k, false, true, true)).addPIR(pir.getName(), qRecallK);
 						
 					}
 					
@@ -419,35 +419,31 @@ public class CalculateMeasureImpl{
 					recall = recall(queryRel, queryPIR);
 					fMeasure = fMeasure(precision, recall, 0.5);
 					ap = calculateAP(queryRel, queryPIR);
+	
 					
-					apNewInfo = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR);
-					recallNewInfo = CalculateSessionMeasure.recallConsideringNewInformation(queryRel, queryPIR);
+					((Measure) queryRel.searchAddMeasure("NDCG@05", false, true, true)).addPIR(pir.getName(), qNDCG5);
+					((Measure) queryRel.searchAddMeasure("NDCG@10",false, true, true)).addPIR(pir.getName(), qNDCG10);
+					((Measure) queryRel.searchAddMeasure("NDCG@15", false, true, true)).addPIR(pir.getName(), qNDCG15);
+					((Measure) queryRel.searchAddMeasure("NDCG@20", false, true, true )).addPIR(pir.getName(), qNDCG20);
+					((Measure) queryRel.searchAddMeasure("Precision", false, true, true)).addPIR(pir.getName(), precision);
+					((Measure) queryRel.searchAddMeasure("Recall", false, true, true)).addPIR(pir.getName(), recall);
+					((Measure) queryRel.searchAddMeasure("fMeasure0.5", false, true, true)).addPIR(pir.getName(), fMeasure);
+					((Measure) queryRel.searchAddMeasure("AveragePrecision", false, true, true)).addPIR(pir.getName(), ap);
+					
+					
 					precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);
-//					qNDCG5NewInfo = CalculateSessionMeasure.calculateNDCGConsideringNewInformation(queryRel, queryPIR, 5);
-//					qNDCG10NewInfo = CalculateSessionMeasure.calculateNDCGConsideringNewInformation(queryRel, queryPIR, 10);
-//					qNDCG15NewInfo = CalculateSessionMeasure.calculateNDCGConsideringNewInformation(queryRel, queryPIR, 15);
-//					qNDCG20NewInfo = CalculateSessionMeasure.calculateNDCGConsideringNewInformation(queryRel, queryPIR, 15);
+					apNewInfo = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR);
+					if(precision != precisionNewInfo) {
+						//considering only the relevant docs not in the previous queries				
+						((Measure) queryRel.searchAddMeasure("Precision-NewInfo ", false, false, false)).addPIR(pir.getName(), precisionNewInfo);
+						((Measure) queryRel.searchAddMeasure("AveragePrecision-NewInfo ", false, false, false)).addPIR(pir.getName(), apNewInfo);
+						queryRel.getMeasures().get("precision").setStackedBar(true);
+						queryRel.getMeasures().get("averageprecision").setStackedBar(true);	
+					}
 					
-					((Measure) queryRel.searchAddMeasure("NDCG@05", false, true)).addPIR(pir.getName(), qNDCG5);
-					((Measure) queryRel.searchAddMeasure("NDCG@10",false, true)).addPIR(pir.getName(), qNDCG10);
-					((Measure) queryRel.searchAddMeasure("NDCG@15", false, true)).addPIR(pir.getName(), qNDCG15);
-					((Measure) queryRel.searchAddMeasure("NDCG@20", false, true )).addPIR(pir.getName(), qNDCG20);
-					((Measure) queryRel.searchAddMeasure("Precision", false, true)).addPIR(pir.getName(), precision);
-					((Measure) queryRel.searchAddMeasure("Recall", false, true)).addPIR(pir.getName(), recall);
-					((Measure) queryRel.searchAddMeasure("fMeasure0.5", false, true)).addPIR(pir.getName(), fMeasure);
-					((Measure) queryRel.searchAddMeasure("AveragePrecision", false, true)).addPIR(pir.getName(), ap);
-					
-//					//considering only the relvant docs not in the previous queries
-//					((Measure) queryRel.searchAddMeasure("NDCG@05-NewInfo", false, false)).addPIR(pir.getName(), qNDCG5);
-//					((Measure) queryRel.searchAddMeasure("NDCG@10-NewInfo",false, false)).addPIR(pir.getName(), qNDCG10);
-//					((Measure) queryRel.searchAddMeasure("NDCG@15-NewInfo", false, false)).addPIR(pir.getName(), qNDCG15);
-//					((Measure) queryRel.searchAddMeasure("NDCG@20-NewInfo", false, false )).addPIR(pir.getName(), qNDCG20);
-					((Measure) queryRel.searchAddMeasure("Recall-NewInfo ", false, false)).addPIR(pir.getName(), recallNewInfo);
-					((Measure) queryRel.searchAddMeasure("Precision-NewInfo ", false, false)).addPIR(pir.getName(), precisionNewInfo);
-					((Measure) queryRel.searchAddMeasure("AveragePrecision-NewInfo ", false, false)).addPIR(pir.getName(), apNewInfo);
-					
+//					
 					//Compound measure
-					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, true)).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
+					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, false, true)).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
 				
 				}
 				
