@@ -23,6 +23,15 @@ public class DocumentRelFile extends Document{
 		super(id);
 	}	
 	
+	/**
+	 * 
+	 * @param doc
+	 */
+	public DocumentRelFile(DocumentRelFile doc) {
+		super(doc.getId());
+		this.relevance = doc.relevance;
+		this.isRelevance = doc.isRelevance;
+	}
 	
 	/**
 	 * @param id

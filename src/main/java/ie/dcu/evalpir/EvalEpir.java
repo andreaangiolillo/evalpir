@@ -49,6 +49,9 @@ import ie.dcu.evalpir.output.table.TableGenerator;
 public class EvalEpir {
 	public static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
 	public static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
+	
+	public static  String[] DEFAULT_MEASURES_FOR_CHART = {"Recall", "Precision", "AveragePrecision","Session_PrecisionRecallCurve", "NDCG@10", "Session_PrecisionRecallCurve"};
+	
 	public static  Map<String, Session> LOGS = null;
 	public static  Map<String, Query> QUERYREL = null;
 	public static  ArrayList<PIR> MODELS = null;

@@ -23,6 +23,7 @@ import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.exceptions.DifferentQueryException;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
+import ie.dcu.evalpir.utilities.Utilities;
 
 public class CalculateSessionMeasure {
 
@@ -52,8 +53,8 @@ public class CalculateSessionMeasure {
 			
 			for (int i = 0; i < queryRel.size(); i++) {
 				if(queryRel.get(i).getId().equalsIgnoreCase(queryOutputPIR.get(i).getId())) {
-					sDCG += !ideal ? Math.pow(1 + CalculateMeasureImpl.log(i + 1, logbase), -1) * CalculateMeasureImpl.DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
-							  :	Math.pow(1 + CalculateMeasureImpl.log(i + 1, logbase), -1) * CalculateMeasureImpl.IDCG(queryRel.get(i), k);
+					sDCG += !ideal ? Math.pow(1 + Utilities.log(i + 1, logbase), -1) * CalculateMeasureImpl.DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
+							  :	Math.pow(1 + Utilities.log(i + 1, logbase), -1) * CalculateMeasureImpl.IDCG(queryRel.get(i), k);
 				}else {
 					throw new DifferentQueryException("Different queries: \nQueryRelID: " + queryRel.get(i).getId() + ", QueryOutputPIR: " + queryOutputPIR.get(i).getId());
 				}
@@ -124,14 +125,11 @@ public class CalculateSessionMeasure {
 				throw new DifferentSizeException();
 			}
 			
-			Iterator <Entry<String, Query>> itRel = queryRel.entrySet().iterator();
-			Query qRel;
-			while(itRel.hasNext()) {
-				qRel = itRel.next().getValue();
-				if(!queryOutputPIR.containsKey(qRel.getId())) {
+			for(Map.Entry<String, Query> entryQueryRel: queryRel.entrySet()) {
+				if(!queryOutputPIR.containsKey(entryQueryRel.getValue().getId())) {
 					throw new DifferentQueryException();
 				}
-				map += CalculateMeasureImpl.calculateAP(qRel, queryOutputPIR.get(qRel.getId()));	
+				map += CalculateMeasureImpl.calculateAP(entryQueryRel.getValue(), queryOutputPIR.get(entryQueryRel.getValue().getId()));	
 			}
 
 			return map/size;		
@@ -143,27 +141,22 @@ public class CalculateSessionMeasure {
 		  * @return
 		  */
 		public static Map<String, Topic> setTopic(final Map<String,Query> queries){
-			Iterator<Entry<String, Query>> itQueries = queries.entrySet().iterator();
-			Query query;
 			String key ="";
 			Map<String, Topic> topicUser = new HashMap<String, Topic>();
-			while(itQueries.hasNext()) {
-				query = itQueries.next().getValue();	
-				key = query.getUser().toLowerCase() +  "," +  query.getTopic().toLowerCase() ;
+			for(Map.Entry<String, Query> EntryQuery : queries.entrySet()) {
+				key = EntryQuery.getValue().getUser().toLowerCase() +  "," +  EntryQuery.getValue().getTopic().toLowerCase() ;
 				if(!topicUser.containsKey(key)) {
-					Map<String, Query> quertTopic = new HashMap<String, Query>();
-					quertTopic.put(query.getId(), query);
-					Topic topic = new Topic(query.getUser(), query.getTopic(), quertTopic);
+					Map<String, Query> queryTopic = new HashMap<String, Query>();
+					queryTopic.put(EntryQuery.getValue().getId(), EntryQuery.getValue());
+					Topic topic = new Topic(EntryQuery.getValue().getUser(), EntryQuery.getValue().getTopic(), queryTopic);
 					topicUser.put(key, topic);
 				}else {
-					topicUser.get(key).addQuery(query);
+					topicUser.get(key).addQuery(EntryQuery.getValue());
 				}	
 			}
 			
 			return topicUser;
 		}
-
-
 
 		/**
 		 * @param measures must be normalized
@@ -548,7 +541,7 @@ public class CalculateSessionMeasure {
 		 * @param queriesSortedByTime
 		 * @return
 		 */
-		 public static Query creatingQueryConsideringPreoviousOnes(QueryRelFile query, int positionQueryInTopic, ArrayList<Log>  queriesSortedByTime ){
+		 public static Query creatingQueryConsideringPreoviousOnes(final QueryRelFile query, int positionQueryInTopic, ArrayList<Log>  queriesSortedByTime ){
 			 Map<String, Document> docsInPreviousQuery = new HashMap<String, Document>();
 			 QueryRelFile previousQueryRel;	 
 			 for (int i = 0; i < queriesSortedByTime.size(); i++) {
@@ -562,7 +555,7 @@ public class CalculateSessionMeasure {
 				 }
 			 }
 		
-			 Map<String, Document> docsQuery = new HashMap<String, Document>(query.getDocs());
+			 Map<String, Document> docsQuery = Utilities.copyMap(query.getDocs());
 			 Iterator<Entry <String, Document>> itDocs = docsQuery.entrySet().iterator();
 			 Entry<String, Document> entryDocs;
 			 while(itDocs.hasNext()) {
@@ -617,5 +610,8 @@ public class CalculateSessionMeasure {
 			
 			return topicsRel;
 		}
+		
+		
+		
 		
 }

@@ -25,6 +25,7 @@ import ie.dcu.evalpir.exceptions.DifferentQueryException;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
 import ie.dcu.evalpir.output.table.ConsolePrinter;
+import ie.dcu.evalpir.utilities.Utilities;
 
 /**
  * @author Andrea Angiolillo
@@ -188,7 +189,7 @@ public class CalculateMeasureImpl{
 			if(docOut.getRank() <= p) {	
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
-				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (log(docOut.getRank() + 1, 2));	
+				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (Utilities.log(docOut.getRank() + 1, 2));	
 			}
 			
 		}
@@ -226,7 +227,7 @@ public class CalculateMeasureImpl{
 		int rank = 2;
 		p = (p < idcg.size()) ? p : idcg.size(); // if p > idcg.size the value of the documents after size is 0 
 		for (int i = 1; i < p; i++){	
-			idcgValue += idcg.get(i) / (log(rank + 1, 2));
+			idcgValue += idcg.get(i) / (Utilities.log(rank + 1, 2));
 			rank ++;	
 		}
 		
@@ -276,17 +277,7 @@ public class CalculateMeasureImpl{
 	 */
 	public static double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) {
 		return DCG(queryRel, queryOutputPIR, p) / IDCG(queryRel, p);
-	}
-	
-	/**
-	 * Changing of base
-	 * 
-	 * @input value
-	 * @input base
-	 * */
-	public static double log(int value, int base) {
-		return Math.log(value) / Math.log(base);
-	}
+	}	
 
 	/**
 	 * Precision at k (P@k) measures the fraction of retrieved relevant
@@ -329,36 +320,6 @@ public class CalculateMeasureImpl{
 		return 0;
 	}	
 	
-	public static ArrayList<ArrayList<Integer>>  partition(int n, int k, int j, ArrayList<Integer> prefix, ArrayList<ArrayList<Integer>> memo) {
-		if(prefix.size()> j || (n == 0 && prefix.size() < j)) {
-	        	return memo;
-		} 
-		  
-		if (n == 0) {
-			System.out.println(prefix);
-	        memo.add(prefix);
-	        return memo;
-		}
-	        
-		for (int i = n; i >= 1; i--) {
-			
-			if (i <=k) {
-				ArrayList<Integer> prefix_ = new ArrayList<Integer>(prefix);
-				prefix_.add(i);
-				//System.out.println(i);
-				
-				partition(n-i, k, j, prefix_, memo);
-			}
-			
-		}
-		
-		return memo;
-	    
-	}
-
-
-	
-	
 	/**
 	 * @param userID
 	 * @param topicId
@@ -400,7 +361,7 @@ public class CalculateMeasureImpl{
 			for(PIR pir : pirs) {
 				queryPIR = pir.getQuery(queryRel.getId());
 				if(queryPIR != null) {
-					queryRel.setToConsiderForChart(true); // not all the queries in the collection are used on the input models
+					queryRel.setToConsiderForChart(true); // not all the queries in the collection are used to create charts
 					k =  queryRel.getNRelevantDoc();
 					for (; k != 0; k --) {
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
@@ -435,11 +396,14 @@ public class CalculateMeasureImpl{
 					apNewInfo = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR);
 					if(precision != precisionNewInfo) {
 						//considering only the relevant docs not in the previous queries	
-//						System.out.println("TopicID: " + queryRel.getTopic() + " Query: " + queryRel.getId() );
-//						System.out.println("Precision " + precision  + " PrecisionNewInfo: " + precisionNewInfo + " diff: " + (precision - precisionNewInfo));
+						//System.out.println("TopicID: " + queryRel.getTopic() + " Query: " + queryRel.getId() );
+						//System.out.println("Precision " + precision  + " PrecisionNewInfo: " + precisionNewInfo + " diff: " + (precision - precisionNewInfo));
 						((Measure) queryRel.searchAddMeasure("Precision-NewInfo", false, false, false)).addPIR(pir.getName(), precisionNewInfo);
 						((Measure) queryRel.searchAddMeasure("AveragePrecision-NewInfo", false, false, false)).addPIR(pir.getName(), apNewInfo);
+						//System.out.println("QUII LA SETTIAMO:" + queryRel.getMeasures().get("precision").getName() + " PRIMA: " + queryRel.getMeasures().get("precision").isStackedBar());
 						queryRel.getMeasures().get("precision").setStackedBar(true);
+						//System.out.println("QUII LA SETTIAMO:" + queryRel.getMeasures().get("precision").getName() + " PRIMA: " + queryRel.getMeasures().get("precision").isStackedBar());
+						
 						queryRel.getMeasures().get("averageprecision").setStackedBar(true);	
 					}
 					

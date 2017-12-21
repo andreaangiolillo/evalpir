@@ -86,45 +86,46 @@ public class CreatorChart {
 		String pathS = createFolder("StackedBar");
 
 		Map<String, ArrayList<Query>> topics = setTopic(queries);
-		Iterator<Entry<String, ArrayList<Query>>> it = topics.entrySet().iterator();
 		AbstractMeasure[] measures;
 		ArrayList<Query> topic;
-		while(it.hasNext()) {
-			topic = it.next().getValue();
+		for(Map.Entry<String, ArrayList<Query>> entry : topics.entrySet()) {
+			topic = entry.getValue();
 			measures = getNameMeasures(topic);
 			for (AbstractMeasure measure : measures) {
 				if(measure.mustBeDrawn()) {	
+					//System.out.println("MEASURE: " + measure.getName());
 					if(measure instanceof Measure) {
-//						LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
-//						BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure);
+						LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
 						if(measure.isStackedBar()) {
-							System.out.println("Stack da creare");
+							//System.out.println("Stack da creare");
+
 							StackedBar.CreateStackedBar(pathS, topic, (Measure)measure);
+							BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure, true);						
+						}else {
+							BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure, false);
+
 						}
+						
 					}else if(measure instanceof MeasureCompound) {
-//						LineChart.CreateLineChartPerQuery(pathL, topic, measure.getName());
+						LineChart.CreateLineChartPerQuery(pathL, topic, measure.getName());
 					}
 				}
 			}
 		}
+		
 		ConsolePrinter.endTask("Creating Charts");
 		
 	 }
 	 
 	 public static void createChartSession(final Map<String, Topic> topics) {
 		 String path = createFolder("LineChart");
-		 Iterator<Entry<String, Topic>> itTopic = topics.entrySet().iterator();
-		 Topic topic;
 		 MeasureCompound measure;
-		 while(itTopic.hasNext()) {
-			 topic = itTopic.next().getValue();
-			 measure = (MeasureCompound)topic.searchMeasure("Session_PrecisionRecallCurve");
+		 for(Map.Entry<String, Topic> topic: topics.entrySet()) {
+			 measure = (MeasureCompound)topic.getValue().searchMeasure("Session_PrecisionRecallCurve");
 			 if(measure != null) {
-				 LineChart.createLineChartForSessionMeasure(path, topic.getUserId(), topic.getTopicId(), measure);
+				 LineChart.createLineChartForSessionMeasure(path, topic.getValue().getUserId(), topic.getValue().getTopicId(), measure);
 			 }
-			 
 		 }
-		
 	 }
 	 
 	 /**
@@ -135,50 +136,24 @@ public class CreatorChart {
 	public static Map<String, ArrayList<Query>> setTopic(final Map<String,Query> queries){
 		Map<String, ArrayList<Query>> topicUser = new HashMap<String, ArrayList<Query>>(); 
 		Map<String, Session> logs = EvalEpir.getLOGS();
-		Iterator<Entry<String, Session>> itLogs = logs.entrySet().iterator();
-		Entry<String, Session> entryLog;
 		ArrayList<Log> querySorted ;
 		Query query;
-		while(itLogs.hasNext()) {
-			entryLog = itLogs.next();
+		for(Map.Entry<String, Session> entryLog: logs.entrySet()) {
 			querySorted = entryLog.getValue().getQuery();
-			ArrayList<Query> topic = new ArrayList<Query>();
+			ArrayList<Query> topicQueries = new ArrayList<Query>();
 			for (int i = 0; i < querySorted.size(); i++) {
 				query = queries.get(querySorted.get(i).getQuery().toLowerCase().trim());
 				if(query == null) {
 					throw new QueryNotInTheLogFileException("QueryID: " + querySorted.get(i).getQuery().toLowerCase().trim());
 				}
 				
-				topic.add(query);
+				topicQueries.add(query);
 			}
 			
-			topicUser.put(entryLog.getKey(), topic);
+			topicUser.put(entryLog.getKey(), topicQueries);
 		}
 		
 		return topicUser;
-		
-//		Iterator<Entry<String, Query>> it = queries.entrySet().iterator();
-//		Query q;
-//		String key ="";
-//		Map<String, ArrayList<Query>> topicUser = new HashMap<String, ArrayList<Query>>();
-//		ArrayList<Log> queryOrder;
-//		while(it.hasNext()) {
-//			q = it.next().getValue();	
-//			if(((QueryRelFile)q).isToConsiderForChart()) {
-//				key = q.getUser().toLowerCase() +  "," + q.getTopic().toLowerCase();
-//				queryOrder = EvalEpir.LOGS.get(key).getQuery();
-//				if(!topicUser.containsKey(key)) {
-//					ArrayList<Query> topic = new ArrayList<Query>();
-//					topic.add(q);
-//					topicUser.put(key, topic);
-//				}else {
-//					topicUser.get(key).add(q);
-//				}
-//			}
-//			
-//		}
-//		
-//		return topicUser;
 	}
 	
 	/**
@@ -206,6 +181,41 @@ public class CreatorChart {
 		nameMeasures = value.toArray(new AbstractMeasure[value.size()]);
 		}
 		
-		return nameMeasures;
+		return setStackedBar(nameMeasures, topic);
+	}
+	
+	
+	/***
+	 * It searches measures with isStackedBar == true in the topic, and, in that case, set the measures used to create charts to true
+	 * @param measures
+	 * @param topic
+	 * @return
+	 */
+	public static AbstractMeasure[] setStackedBar(AbstractMeasure[] measures, final ArrayList<Query> topic) {
+		Map<String, Boolean> dictionaryMeasure = new HashMap<String, Boolean>();
+		for(String measureStackedBar : MEASURES_STACKEDBAR) {
+			dictionaryMeasure.put(measureStackedBar.trim().toLowerCase(), false);
+		}
+		
+		Map<String, AbstractMeasure> measuresTopic;
+		AbstractMeasure measureTopic;
+		for (Query query : topic) {
+			measuresTopic = ((QueryRelFile)query).getMeasures();
+			for(String measureStackedBar : MEASURES_STACKEDBAR) {
+				measureTopic = measuresTopic.get(measureStackedBar.trim().toLowerCase());
+				if(measureTopic != null && measureTopic.isStackedBar()) {
+					dictionaryMeasure.put(measureStackedBar.trim().toLowerCase(), true);
+				}
+			}
+		}
+		
+		for (AbstractMeasure measure : measures) {
+			if(dictionaryMeasure.containsKey(measure.getName().trim().toLowerCase())
+					&&  dictionaryMeasure.get(measure.getName().trim().toLowerCase())){
+					measure.setStackedBar(true);
+			}
+		}
+		
+		return measures;
 	}
 }

@@ -46,18 +46,14 @@ public class TableGenerator {
 			System.out.println("Example:");
 			printExample();
 	    	System.out.println("\n----------------------Print Measures----------------------------------\n");
-	    	Iterator<Entry<String, Query>> itm = EvalEpir.QUERYREL.entrySet().iterator();
-	    	Query q ;
-	    	while (itm.hasNext()) {
-	    		q = itm.next().getValue();
-	    			System.out.println(((QueryRelFile)q).printMeasures());
+	    	for(Map.Entry<String, Query> entry : EvalEpir.QUERYREL.entrySet()) {
+	    		System.out.println(((QueryRelFile)entry.getValue()).printMeasures());
 	    	}
 
-			System.out.println("\n----------------------Print Session Measures----------------------------------\n");   	
-	    	Iterator<Entry<String, Topic>> itTopic = sessionMeasures.entrySet().iterator();
-	    	while(itTopic.hasNext()) {
-	    		System.out.println(itTopic.next().getValue().printMeasures());	    		
-	    	}
+			System.out.println("\n----------------------Print Session Measures----------------------------------\n");   
+			for(Map.Entry<String, Topic> entry : sessionMeasures.entrySet()) {
+				System.out.println(entry.getValue().printMeasures());
+			}
 	    	
 	    	System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
 	    	ConsolePrinter.endTask("Creating output.csv");
