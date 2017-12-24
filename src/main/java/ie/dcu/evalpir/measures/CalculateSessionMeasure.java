@@ -568,6 +568,7 @@ public class CalculateSessionMeasure {
 			 return new QueryRelFile(query.getUser(), query.getTopic(), query.getId(), docsQuery, query.getMeasures());
 		 }
 		
+		 
 		
 		/**
 		 * 
@@ -598,12 +599,12 @@ public class CalculateSessionMeasure {
 						man = calculateMAP(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries());
 						rPC = rPC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath());
 						rRC = rRC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath());
-						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_AverageK@" + session.getAverageK(), false, true, true)).addPIR(pir.getName(), nsDCGAverage);
-						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_MaxK@" +  session.getMaxK(), false, true, true)).addPIR(pir.getName(), nsDCGMax);	
-						((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false, true, true)).addPIR(pir.getName(), man);
-						((Measure)topicRel.getValue().searchAddMeasure("Session_Precision", false, true, true)).addPIR(pir.getName(), rPC);
-						((Measure)topicRel.getValue().searchAddMeasure("Session_Recall", false, true, true)).addPIR(pir.getName(), rRC);
-						((MeasureCompound)topicRel.getValue().searchAddMeasure("Session_PrecisionRecallCurve", true, false, true)).addPIR(pir.getName(), precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath()));
+						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_AverageK@" + session.getAverageK(), false, true, false)).addPIR(pir.getName(), nsDCGAverage);
+						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_MaxK@" +  session.getMaxK(), false, true, false)).addPIR(pir.getName(), nsDCGMax);	
+						((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false, true, false)).addPIR(pir.getName(), man);
+						((Measure)topicRel.getValue().searchAddMeasure("Session_Precision", false, true, false)).addPIR(pir.getName(), rPC);
+						((Measure)topicRel.getValue().searchAddMeasure("Session_Recall", false, true, false)).addPIR(pir.getName(), rRC);
+						((MeasureCompound)topicRel.getValue().searchAddMeasure("Session_PrecisionRecallCurve", true, false, EvalEpir.MEASURES_FOR_CHART.contains("Session_PrecisionRecallCurve"))).addPIR(pir.getName(), precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath()));
 					}	
 				}
 			}

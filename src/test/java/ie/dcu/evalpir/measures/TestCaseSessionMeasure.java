@@ -37,24 +37,9 @@ public class TestCaseSessionMeasure {
 	private Map<String,Query> qRel = new HashMap<String, Query>();
 	private Session s;
 	
-//	public TestCaseSessionMeasure() {
-//		super();
-//
-//		InputReaderImpl reader = new InputReaderImpl();  
-//		File relevanceFile = new File(RELEVANCE_FILE_PATH);
-//		rel = reader.extractRelevanceFile(relevanceFile);
-//		
-//		File outputPIR = new File(PIRS_FILE);
-//	    result = reader.extractOutputPIR(outputPIR);
-//	    
-//	    File log = new File(LOGS_FILE_PATH);
-//	    logsfile = reader.extracLogFile(log);
-//	  
-//	    m = new CalculateMeasureUsingLogsFile(rel,logsfile);	
-//	    qPIR = new HashMap<String, Query>();
-//	    qRel = new HashMap<String, Query>();
-//	    setInstance();
-//	}
+	public TestCaseSessionMeasure() {
+	    setInstance();
+	}
 	
 	
 	
@@ -185,7 +170,6 @@ public class TestCaseSessionMeasure {
 	
 	@Test
 	public void testCreatingQueryConsideringPreoviousOnes() {
-		setInstance();
 		EvalEpir.setQUERYREL(qRel);
 		Iterator<Entry<String, Query>> itq = qRel.entrySet().iterator();
 		Entry<String, Query> entryQ;
@@ -212,8 +196,17 @@ public class TestCaseSessionMeasure {
 //	
 	
 	@Test
+	public void TestGetPath() {
+		Map<String, Integer> path1 = s.getPath();
+		Map<String, Integer> path = s.getPath(qPIR);
+		System.out.println("PATH1: " + path1);
+		System.out.println("PATH: " + path);
+		
+	}
+	
+	@Test
 	public void TestPrecisionk() {
-		setInstance();
+	
 		Map<String, Document> docsMergedRel = CalculateSessionMeasure.mergeRelevanceDocs(qRel);
 		/* TEST MergeReleanceDocs*/
 		assertEquals(18, docsMergedRel.size());
@@ -232,7 +225,7 @@ public class TestCaseSessionMeasure {
 
 	@Test
 	public void TestPrecisionRecallCurve(){
-		setInstance();
+
 		ArrayList<Pair<Integer, Double>> curve = CalculateSessionMeasure.precisionRecallCurve(qRel, qPIR , s, s.getPath());
 		System.out.println(curve);
 		/**TEST CURVE*/
@@ -282,20 +275,17 @@ public class TestCaseSessionMeasure {
 	
 	@Test
 	public void TestrR() {
-		setInstance();
 		assertEquals(7,CalculateSessionMeasure.rR(qRel, qPIR, s.getPath()));
 		
 	}
 	
 	@Test
 	public void TestrRC() {
-		setInstance();
 		assertEquals(0.7,CalculateSessionMeasure.rRC(qRel, qPIR, s.getPath()), 0.01);
 	}
 	
 	@Test
 	public void TestrPC() {
-		setInstance();
 		assertEquals(0.46,CalculateSessionMeasure.rPC(qRel, qPIR, s.getPath()), 0.01);
 	}
 

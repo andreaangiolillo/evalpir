@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.antlr.v4.codegen.model.ThrowNoViableAlt;
 import org.antlr.v4.parse.BlockSetTransformer.setAlt_return;
 
 import java.util.Random;
+import java.util.Set;
 
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Document;
@@ -49,14 +51,22 @@ import ie.dcu.evalpir.output.table.TableGenerator;
 public class EvalEpir {
 	public static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
 	public static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
+	public static final String COMMANDS_FILE_PATH = "src/main/resources/commands.txt";
 	
-	public static  String[] DEFAULT_MEASURES_FOR_CHART = {"Recall", "Precision", "AveragePrecision","Session_PrecisionRecallCurve", "NDCG@10", "Session_PrecisionRecallCurve"};
+	public static Set<String> MEASURES_FOR_CHART;
+	
+	/**Commands**/
+	public static String CHART = "default";
+	public static boolean SESSION_METHOD_1 = false;
+	public static boolean SESSION_METHOD_2 = false;
+	public static boolean ALL_SESSION_METHODS = false;
+	/**/
 	
 	public static  Map<String, Session> LOGS = null;
 	public static  Map<String, Query> QUERYREL = null;
 	public static  ArrayList<PIR> MODELS = null;
 	
-    public static void main( String[] args ) {
+    public static void main(String[] args ) {
     	
 //    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
 //    	File logsFile = new File(LOGS_FILE_PATH);
@@ -64,16 +74,17 @@ public class EvalEpir {
 //    	
     	ConsolePrinter.startEval();
     	
-    	String[] args1 = {RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/model1.csv","src/main/resources/model2.csv","src/main/resources/model3.csv"};
+    	String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/model1.csv","src/main/resources/model2.csv","src/main/resources/model3.csv"};
     	
-//    	if(args.length < 3) {
-//    		throw new InvalidInputException("The input file must be 3 at least: \n1) Relevance Documents \n2) LogsFile \n3) System to be evaluated ");
+//    	if(args.length < 4) {
+//    		throw new InvalidInputException("The input file must be 4 at least: \n1)Commands \n2) Relevance Documents \n3) LogsFile \n4) System to be evaluated ");
 //    	}
 //    	
-    	File relevanceFile = new File(args1[0]);
-    	File logsFile = new File(args1[1]);
+    	File commandsFile = new File(args1[0]);
+    	File relevanceFile = new File(args1[1]);
+    	File logsFile = new File(args1[2]);
 
-    	
+    	InputReaderImpl.extractCommands(commandsFile);
     	setQUERYREL(InputReaderImpl.extractRelevanceFile(relevanceFile));
     	setLOGS(InputReaderImpl.extracLogFile(logsFile));
     	setMODELS(extractingModels(args1));
@@ -84,9 +95,12 @@ public class EvalEpir {
 		CalculateMeasureImpl.calculateMeasures();
     	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
       		
+    	if(!CHART.equalsIgnoreCase("no_charts")) {
+    		CreatorChart.createChart(QUERYREL);
+    		CreatorChart.createChartSession(measures);		
     	
-		CreatorChart.createChart(QUERYREL);
-		CreatorChart.createChartSession(measures);		
+    	}
+			
 		TableGenerator.printMeasures(measures);
     	
     	

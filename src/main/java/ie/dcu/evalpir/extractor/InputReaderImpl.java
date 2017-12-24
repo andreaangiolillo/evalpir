@@ -6,9 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
+import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
@@ -26,6 +29,74 @@ import ie.dcu.evalpir.output.table.ConsolePrinter;
  * **/
 public class InputReaderImpl /*implements InputReader*/{
 
+	/**
+	 * 
+	 * @param commandsFile
+	 */
+	public static void extractCommands(File commandsFile) {
+		ConsolePrinter.startTask("Extracting " + commandsFile.getName());
+		BufferedReader 	br = null;
+		try {
+			 br = new BufferedReader(new FileReader(commandsFile.getPath()));
+			 for(int i = 0; i <= 16; i++) { //removing comments
+				 br.readLine();
+			 }
+			 
+			 String line = "";
+			 do {
+				 line = br.readLine();
+			 }while(line.equalsIgnoreCase(""));
+			 String[] row;
+			 row = line.split(",");
+			 EvalEpir.CHART = row[0].trim().toLowerCase();
+			 switch(EvalEpir.CHART) {
+				case "all":
+					EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
+						"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve"));
+					break;
+				case "default":
+					EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision","Session_PrecisionRecallCurve", "NDCG@10", "Session_PrecisionRecallCurve"));
+						break;
+				case "no_charts":
+					EvalEpir.MEASURES_FOR_CHART = new HashSet<>();
+						break;
+				default:
+					throw new IllegalArgumentException("Invalid command: " + EvalEpir.CHART);
+			} 
+			 
+			 for(int j = 1; j < row.length; j++) {
+				 switch(row[j]) {
+					case "method2":
+						EvalEpir.SESSION_METHOD_2 = true;
+						break;
+					case "default":
+						EvalEpir.SESSION_METHOD_1 = true;
+						break;
+					case "all":
+						EvalEpir.ALL_SESSION_METHODS = true;
+						break;
+					default:
+						throw new IllegalArgumentException("Invalid command: " + row[j]);
+				}
+			 }
+		}catch (NumberFormatException e) {
+			e.printStackTrace();
+		}catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				}catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		ConsolePrinter.endTask("Extracting " + commandsFile.getName());
+	}
 	
 	/**
 	 * @input logsfile

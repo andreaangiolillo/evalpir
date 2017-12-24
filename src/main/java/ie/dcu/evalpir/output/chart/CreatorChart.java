@@ -63,8 +63,10 @@ public class CreatorChart {
 				}
 				
 		        for(int i = 0; i < measures.length; i++) {
-		        	subdir = new File(path + measures[i]); 
-		        	subdir.mkdir();
+		        	if(EvalEpir.MEASURES_FOR_CHART.contains(measures[i])) {
+			        	subdir = new File(path + measures[i]); 
+			        	subdir.mkdir();
+		        	}
 		        }
 		        
 				return (path);	

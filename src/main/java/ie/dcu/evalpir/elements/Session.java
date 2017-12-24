@@ -9,6 +9,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ie.dcu.evalpir.EvalEpir;
+import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
+
 public class Session{
 	
 	private static final String QUERY_SUBMISSION = "QUERY_SUBMISSION";
@@ -177,6 +180,54 @@ public class Session{
 				path.put(docOpened.getQuery().trim().toLowerCase(), rank);
 			}
 		}	
+		
+		return path;
+	}
+	
+	/**This method return the last document opened in each ranked list across the session. 
+	 * We define the last document opened as the first not relevant document found after the last
+	 * document opened by the user in that ranked list
+	 * 
+	 * @param pirQueries
+	 * @return
+	 */
+	public Map<String, Integer> getPath(Map<String, Query> pirQueries){
+		Map<String, Integer> path = getPath();
+		Map<String, Query> relQueries = EvalEpir.QUERYREL;
+		Map<String, Document> relDocs; 
+		Map<String, Document> pirDocs;
+		int lastDocOpenedInLog = 0;
+		int lastDocOpened = 0;
+		for (Map.Entry<String, Integer> entryPath : path.entrySet()){
+			relDocs = relQueries.get(entryPath.getKey().trim().toLowerCase()).getDocs();
+			pirDocs = pirQueries.get(entryPath.getKey().trim().toLowerCase()).getDocs();
+			if(relDocs == null || pirDocs == null) {
+				throw new QueryNotInTheLogFileException("QueryID: " + entryPath.getKey());
+			}
+			
+			lastDocOpenedInLog = entryPath.getValue() - 1; // the doc opened starts to 0
+			lastDocOpened = 100000; //
+			for (Map.Entry<String, Document> entryDocPir : pirDocs.entrySet()) {
+				if(((DocumentOutputPIR)entryDocPir.getValue()).getRank()> lastDocOpenedInLog) {
+//					System.out.println("1)QueryID: " + entryDocPir.getKey());
+					if(relDocs.containsKey(entryDocPir.getKey().trim().toLowerCase())){
+//						System.out.println("2)QueryID: " + entryDocPir.getKey());
+						if(!((DocumentRelFile)relDocs.get(entryDocPir.getKey().trim().toLowerCase())).getIsRelevance()) {
+//							System.out.println("3)QueryID: " + entryDocPir.getKey());
+//							System.out.println("3)lastDocOpened : " + lastDocOpened + " value: " + ((DocumentOutputPIR)entryDocPir.getValue()).getRank());
+							if(((DocumentOutputPIR)entryDocPir.getValue()).getRank() < lastDocOpened) {
+//								System.out.println("4)QueryID: " + entryDocPir.getKey() + " Value: " + ((DocumentOutputPIR)entryDocPir.getValue()).getRank());
+								lastDocOpened = ((DocumentOutputPIR)entryDocPir.getValue()).getRank();
+							}
+						}
+						
+					}
+				}
+			}
+			
+			lastDocOpened = (lastDocOpened == 100000) ? entryPath.getValue() : lastDocOpened + 1;
+			entryPath.setValue(lastDocOpened); // the doc opened starts to 0
+		}
 		
 		return path;
 	}
