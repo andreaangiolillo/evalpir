@@ -31,8 +31,8 @@ import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.exceptions.InvalidInputException;
-import ie.dcu.evalpir.extractor.InputReaderImpl;
-import ie.dcu.evalpir.measures.CalculateMeasureImpl;
+import ie.dcu.evalpir.extractor.InputReader;
+import ie.dcu.evalpir.measures.CalculateMeasure;
 import ie.dcu.evalpir.measures.CalculateSessionMeasure;
 import ie.dcu.evalpir.output.chart.CreatorChart;
 import ie.dcu.evalpir.output.table.ConsolePrinter;
@@ -83,9 +83,9 @@ public class EvalEpir {
     	File relevanceFile = new File(args1[1]);
     	File logsFile = new File(args1[2]);
 
-    	InputReaderImpl.extractCommands(commandsFile);
-    	setQUERYREL(InputReaderImpl.extractRelevanceFile(relevanceFile));
-    	setLOGS(InputReaderImpl.extracLogFile(logsFile));
+    	InputReader.extractCommands(commandsFile);
+    	setQUERYREL(InputReader.extractRelevanceFile(relevanceFile));
+    	setLOGS(InputReader.extracLogFile(logsFile));
     	setMODELS(extractingModels(args1));
     	
     //	setMODELS(InputReaderImpl.extractOutputPIR(outputPIR));
@@ -94,7 +94,7 @@ public class EvalEpir {
     	System.out.println("Method1: "  + SESSION_METHOD_1);
     	System.out.println("Method2: "  + SESSION_METHOD_2);
     	
-		CalculateMeasureImpl.calculateMeasures();
+		CalculateMeasure.calculateMeasures();
     	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
       		
     	if(!CHART.equalsIgnoreCase("no_charts")) {
@@ -103,41 +103,7 @@ public class EvalEpir {
     	
     	}
 			
-		TableGenerator.printMeasures(measures);
-    	
-    	
-    	
-    	
-    	
-//    	ProgressBar pb = new ProgressBar("Test", 100).start(); 
-    	
-    	
-//    	for (int i = 1; i<=10; i++) {
-//    		pb.stepBy(10);
-//    		pb.maxHint(100);
-//    	}
-//    	pb.stop();
-//    	
-    	
-    	
-//        double x = 1.0;
-//        double y = x * x;
-//
-//        ArrayList<Integer> l = new ArrayList<Integer>();
-//
-//        System.out.println("\n\n\n\n\n");
-//
-//        for (int i = 0; i < 10000; i++) {
-//            int sum = 0;
-//            for (int j = 0; j < i * 2000; j++)
-//                sum += j;
-//            l.add(sum);
-//
-//            pb.step();
-//            if (pb.getCurrent() > 1) pb.maxHint(10000);
-//
-//        }
-//        pb.stop();		
+		TableGenerator.printMeasures(measures);		
     }
     
     /**
@@ -150,35 +116,11 @@ public class EvalEpir {
     	ArrayList<PIR> allModel = new ArrayList<PIR>();
     	for (int i = 3; i < args.length; i++) {
     		outputPIR = new File(args[i]);
-    		allModel.addAll(InputReaderImpl.extractOutputPIR(outputPIR));	
+    		allModel.addAll(InputReader.extractOutputPIR(outputPIR));	
     	}
     	
     	return allModel;
     }
-
-	public static Map<String, Session> getLOGS() {
-		return LOGS;
-	}
-
-	public static void setLOGS(Map<String, Session> lOGS) {
-		LOGS = lOGS;
-	}
-
-	public static Map<String, Query> getQUERYREL() {
-		return QUERYREL;
-	}
-
-	public static void setQUERYREL(Map<String, Query> qUERYREL) {
-		QUERYREL = qUERYREL;
-	}
-
-	public static ArrayList<PIR> getMODELS() {
-		return MODELS;
-	}
-
-	public static void setMODELS(ArrayList<PIR> mODELS) {
-		MODELS = mODELS;
-	}
 
 	public static void printRelevantFile() {
 	
@@ -216,7 +158,7 @@ public class EvalEpir {
 	}
 	
 	public static void printAllMeasures() {
-		CalculateMeasureImpl.calculateMeasures();
+		CalculateMeasure.calculateMeasures();
     	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
     	System.out.println("\n----------------------Print Measures----------------------------------\n");
     	Iterator<Entry<String, Query>> itm = QUERYREL.entrySet().iterator();
@@ -233,8 +175,29 @@ public class EvalEpir {
     	}
 	}
     
-    
-    
+	public static Map<String, Session> getLOGS() {
+		return LOGS;
+	}
+
+	public static void setLOGS(Map<String, Session> lOGS) {
+		LOGS = lOGS;
+	}
+
+	public static Map<String, Query> getQUERYREL() {
+		return QUERYREL;
+	}
+
+	public static void setQUERYREL(Map<String, Query> qUERYREL) {
+		QUERYREL = qUERYREL;
+	}
+
+	public static ArrayList<PIR> getMODELS() {
+		return MODELS;
+	}
+
+	public static void setMODELS(ArrayList<PIR> mODELS) {
+		MODELS = mODELS;
+	}
 }
 
 

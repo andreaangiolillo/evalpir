@@ -37,6 +37,9 @@ public class TableGenerator {
 		System.out.println(at.render());
 	}
 	
+	/**
+	 * @param sessionMeasures
+	 */
 	public static void printMeasures(Map<String, Topic> sessionMeasures) {
 		ConsolePrinter.startTask("Creating output.csv");
 		PrintStream out;
@@ -66,6 +69,39 @@ public class TableGenerator {
 
 	}
 	
+	
+	
+	
+	
+//	ProgressBar pb = new ProgressBar("Test", 100).start(); 
+	
+	
+//	for (int i = 1; i<=10; i++) {
+//		pb.stepBy(10);
+//		pb.maxHint(100);
+//	}
+//	pb.stop();
+//	
+	
+	
+//    double x = 1.0;
+//    double y = x * x;
+//
+//    ArrayList<Integer> l = new ArrayList<Integer>();
+//
+//    System.out.println("\n\n\n\n\n");
+//
+//    for (int i = 0; i < 10000; i++) {
+//        int sum = 0;
+//        for (int j = 0; j < i * 2000; j++)
+//            sum += j;
+//        l.add(sum);
+//
+//        pb.step();
+//        if (pb.getCurrent() > 1) pb.maxHint(10000);
+//
+//    }
+//    pb.stop();
 	
 
 

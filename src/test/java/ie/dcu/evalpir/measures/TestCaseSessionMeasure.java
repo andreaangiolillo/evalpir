@@ -21,7 +21,7 @@ import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
-import ie.dcu.evalpir.extractor.InputReaderImpl;
+import ie.dcu.evalpir.extractor.InputReader;
 import ie.dcu.evalpir.utilities.Pair;
 
 public class TestCaseSessionMeasure {

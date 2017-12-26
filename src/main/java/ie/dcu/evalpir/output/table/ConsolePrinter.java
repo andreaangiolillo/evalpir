@@ -15,8 +15,7 @@ public class ConsolePrinter {
 	public static final String BOLD ="\033[0;1m";
 
 	private static int n = 1;
-	
-	
+
 	public static void startEval() {
 		System.out.println();
 		System.out.println("Step: " + n + "\t"  + "Starting Evaluation ... ");
