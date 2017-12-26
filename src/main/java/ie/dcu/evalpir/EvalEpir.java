@@ -202,9 +202,8 @@ public class EvalEpir {
     	
         while(it.hasNext()) {
         	Entry<String, Session> a = it.next();
-        	if(a.getValue().getSessionMeasure()) {
-        		System.out.println(a.getValue().toString());
-        	}
+        	System.out.println(a.getValue().toString());
+        	
         
         }
 	}

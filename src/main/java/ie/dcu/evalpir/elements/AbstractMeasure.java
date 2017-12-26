@@ -1,5 +1,10 @@
 package ie.dcu.evalpir.elements;
-
+/**
+ * @author Andrea Angiolillo
+ * 
+ * This class defines the common properties of the measures
+ *
+ */
 public abstract class AbstractMeasure {
 
 	private String name;
@@ -7,7 +12,6 @@ public abstract class AbstractMeasure {
 	private boolean stackedBar; // if it is true the measure is used to create a stack bar 
 	private boolean printOutput; // if it is true the measure is printed in the output.txt
 
-	
 	/**
 	 * @param name
 	 */
@@ -19,20 +23,14 @@ public abstract class AbstractMeasure {
 		this.printOutput = false;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
 	public boolean mustBeDrawn() {
 		return drawable;
 	}
@@ -64,7 +62,4 @@ public abstract class AbstractMeasure {
 	public void setPrintOutput(boolean printOutput) {
 		this.printOutput = printOutput;
 	}
-	
-	
-	
 }

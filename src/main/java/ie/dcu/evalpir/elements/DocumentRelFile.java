@@ -6,6 +6,7 @@ package ie.dcu.evalpir.elements;
 /**
  * @author Andrea Angiolillo
  *
+ *It represents the documents in the relevantFile
  */
 public class DocumentRelFile extends Document{
 	
@@ -14,8 +15,6 @@ public class DocumentRelFile extends Document{
 	private int relevance;
 	private boolean isRelevance;
 	
-	
-
 	/**
 	 * @param id
 	 */
@@ -43,28 +42,16 @@ public class DocumentRelFile extends Document{
 		setIsRelevance();
 	}
 	
-	
-
-
-	/**
-	 * @return the relevance
-	 */
 	public int getRelevance() {
 		return relevance;
 	}
 
-	/**
-	 * @param relevance the relevance to set
-	 */
 	public void setRelevance(int relevance) {
 		this.relevance = relevance;
 		setIsRelevance();
 	
 	}
 
-	/**
-	 * @return the isRelevance
-	 */
 	public boolean getIsRelevance() {
 		return isRelevance;
 	}
@@ -73,19 +60,13 @@ public class DocumentRelFile extends Document{
 	 * set the IsRelevance according to THRESHOLD
 	 */
 	public void setIsRelevance() {
-		
 		if( getRelevance() >= THRESHOLD) {
 			this.isRelevance = true;
 		}else {
 			this.isRelevance = false;
 		}
-		
-		
 	}
 	
-	
-	
-	@Override
 	public String toString() {
 		return "Document [id=" + this.getId() + ", relevance=" + relevance + ", isRelevance=" + isRelevance +"]";
 	}

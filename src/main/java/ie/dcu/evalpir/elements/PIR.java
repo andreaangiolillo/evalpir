@@ -12,10 +12,10 @@ import java.util.Map.Entry;
 /**
  * @author Andrea Angiolillo	
  *
+ *It represents a system that must be evaluated
  */
 public class PIR {
 
-	
 	Map<String, Query> queries;
 	String name;
 	
@@ -28,15 +28,15 @@ public class PIR {
 		this.name = name;
 	}
 	
-	/*@param PIR
+	/**
 	 * 
+	 * @param p
 	 */
 	public PIR(PIR p) {
 		super();
 		this.queries = new HashMap<String, Query>(p.getQueries());
 		this.name = p.getName();
 	}
-	
 	
 	/**
 	 * @param users
@@ -48,18 +48,10 @@ public class PIR {
 		this.name = name;
 	}
 	
-	/**
-	 * @return the users
-	 */
 	public Map<String, Query> getQueries() {
 		return queries;
 	}
 	
-	/**
-	 * 
-	 * @param i
-	 * @return
-	 */
 	public Query getQuery(String i) {
 		return getQueries().get(i);
 	}
@@ -71,13 +63,12 @@ public class PIR {
 		return name;
 	}
 
-	@Override
 	public String toString() {
 		String stringDoc = "";
-		Iterator<Entry<String, Query>> it = getQueries().entrySet().iterator();
-		while (it.hasNext()) {
-			stringDoc += it.next().getValue().toString();
+		for(Map.Entry<String, Query> entry: getQueries().entrySet()) {
+			stringDoc += entry.getValue().toString();
 		}
+		
 		stringDoc += "\nNumber of queries: " + queries.size() + " ]";
 		return "PIR [id=" + getName()  + ", queries=" + stringDoc;
 	}

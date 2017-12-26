@@ -15,7 +15,6 @@ import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.PIR;
-import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
@@ -23,6 +22,7 @@ import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.exceptions.DifferentQueryException;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
+import ie.dcu.evalpir.utilities.Pair;
 import ie.dcu.evalpir.utilities.Utilities;
 
 public class CalculateSessionMeasure {
@@ -586,7 +586,6 @@ public class CalculateSessionMeasure {
 			double manMet2, manDf = 0.0;
 			double rPCMet2, rPCDf = 0.0;
 			double rRCMet2, rRCDf = 0.0;
-			
 			
 			for(PIR pir : pirs) {
 				topicsPir = setTopic(pir.getQueries());

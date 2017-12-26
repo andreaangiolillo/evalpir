@@ -1,12 +1,16 @@
 package ie.dcu.evalpir.elements;
 
+/**
+ * @author Andrea Angiolillo
+ * 
+ * It represents the queries in the same user-topic contained in the relevant file. 
+ * It contains a Map with all the measures computed for the query.
+ * 
+ */
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
-
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestLine;
 
@@ -16,7 +20,13 @@ public class Topic{
 	private Map<String, AbstractMeasure> measures;
 	private Map<String, Query> queries;
 	
-	
+	/**
+	 * 
+	 * @param userId
+	 * @param id
+	 * @param measures
+	 * @param queries
+	 */
 	public Topic(String userId, String id, Map<String, AbstractMeasure> measures, Map<String, Query> queries) {
 		this.userId = userId;
 		this.topicId = id;
@@ -24,6 +34,11 @@ public class Topic{
 		this.queries = queries;
 	}
 	
+	/**
+	 * 
+	 * @param userId
+	 * @param id
+	 */
 	public Topic(String userId, String id) {
 		this.userId = userId;
 		this.topicId = id;
@@ -31,6 +46,12 @@ public class Topic{
 		this.queries = new HashMap<String, Query>();
 	}
 	
+	/**
+	 * 
+	 * @param userId
+	 * @param id
+	 * @param queries
+	 */
 	public Topic(String userId, String id, Map<String, Query> queries) {
 		this.userId = userId;
 		this.topicId = id;
@@ -67,7 +88,7 @@ public class Topic{
 	}
 	
 	/**
-	 * 
+	 * It add a new measure
 	 * @param m
 	 */
 	public void addMeasure(AbstractMeasure m, boolean printOutput, boolean drawable) {
@@ -75,17 +96,16 @@ public class Topic{
 		m.setMustBeDrawn(drawable);
 		getMeasures().put(m.getName().trim().toLowerCase(), m);
 	}
-	
 
 	/**
-	 * 
+	 * It remove a measure
 	 */
 	public void removeMeasure(String name) {
 		getMeasures().remove(name.trim().toLowerCase());
 	}
 	
 	/**
-	 * 
+	 * It search a measure. In case of it doesn't find the measure, it create a new measure.
 	 * @param name
 	 * @return
 	 */
@@ -98,10 +118,8 @@ public class Topic{
 			}
 		}
 		
-		
 		return searchMeasure(name);
 	}
-	
 	
 	/***
 	 * 
@@ -113,7 +131,7 @@ public class Topic{
 	}
 	
 	/**
-	 * 
+	 * It computes the sorting of the measures by key (Measures' names)
 	 */
 	public TreeMap<String, AbstractMeasure>  sortMeasureForKey() {
 		TreeMap<String, AbstractMeasure> measureSorted = new TreeMap<String, AbstractMeasure>(getMeasures());
@@ -122,29 +140,6 @@ public class Topic{
 		
 	}
 	
-	public String printMeasures() {
-		
-		String stringDoc = "";
-		Iterator<Entry<String, AbstractMeasure>> it = sortMeasureForKey().entrySet().iterator();
-		AsciiTable tb = new AsciiTable();
-		CWC_LongestLine cwc = new CWC_LongestLine();
-		tb.getRenderer().setCWC(cwc);
-		tb.addRule();
-		tb.addRow("User: " + getUserId(), "Topic: " + getTopicId(), "", "S1 - Si", "(Si-1) - Si");
-		tb.addRule();
-		Map.Entry<String, AbstractMeasure> pair;
-		while(it.hasNext()) {
-			pair = it.next();
-			if(pair.getValue().isPrintOutput()) {
-				stringDoc = ((Measure)pair.getValue()).printMeasure(tb) + "\n";
-			}
-			
-		}
-		
-		return stringDoc;
-	}
-	
-
 	public String getUserId() {
 		return userId;
 	}
@@ -153,6 +148,26 @@ public class Topic{
 		return topicId;
 	}
 	
-	
-	
+	/**
+	 * It prints the measures using the library AsciiTable
+	 * 
+	 * @see AsciiTable
+	 * @return
+	 */
+	public String printMeasures() {
+		String stringDoc = "";
+		AsciiTable tb = new AsciiTable();
+		CWC_LongestLine cwc = new CWC_LongestLine();
+		tb.getRenderer().setCWC(cwc);
+		tb.addRule();
+		tb.addRow("User: " + getUserId(), "Topic: " + getTopicId(), "", "S1 - Si", "(Si-1) - Si");
+		tb.addRule();
+		for(Map.Entry<String, AbstractMeasure> entryMeasure: sortMeasureForKey().entrySet()) {
+			if(entryMeasure.getValue().isPrintOutput()) {
+				stringDoc = ((Measure)entryMeasure.getValue()).printMeasure(tb) + "\n";
+			}
+		}
+		
+		return stringDoc;
+	}	
 }

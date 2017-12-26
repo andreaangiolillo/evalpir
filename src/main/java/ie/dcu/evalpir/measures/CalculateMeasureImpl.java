@@ -16,7 +16,6 @@ import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.PIR;
-import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
@@ -25,6 +24,7 @@ import ie.dcu.evalpir.exceptions.DifferentQueryException;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
 import ie.dcu.evalpir.output.table.ConsolePrinter;
+import ie.dcu.evalpir.utilities.Pair;
 import ie.dcu.evalpir.utilities.Utilities;
 
 /**

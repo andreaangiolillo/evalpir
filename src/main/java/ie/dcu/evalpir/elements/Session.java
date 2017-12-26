@@ -1,14 +1,18 @@
 package ie.dcu.evalpir.elements;
 
+/**
+ * @author Andrea Angiolillo
+ * 
+ * It represents a session performed by the user as a set of LOG contained in the logFile
+ */
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
 
@@ -17,16 +21,12 @@ public class Session{
 	private static final String QUERY_SUBMISSION = "QUERY_SUBMISSION";
 	private static final String OPEN_DOCUMENT = "OPEN_DOCUMENT";
 	
-
-
-	private String id;
+	private String id; //The id is made up of a set of session_id 
 	private String user;
 	private String topic;
 	private ArrayList<Log> logs;
 	private ArrayList<Log> query;
 	private ArrayList<Log> docOpened;
-	private boolean sessionMeasure;
-	
 	
 	/**
 	 * @param id
@@ -40,7 +40,6 @@ public class Session{
 		this.logs = new ArrayList<Log>();
 		this.query = new ArrayList<Log>();
 		this.docOpened = new ArrayList<Log>();
-		this.sessionMeasure = false;
 	}
 	
 	/**
@@ -56,13 +55,20 @@ public class Session{
 		this.logs = logs;
 		this.query = new ArrayList<Log>();
 		this.docOpened = new ArrayList<Log>();
-		this.sessionMeasure = false;
 	}
 	
+	/**
+	 * 
+	 * @param id
+	 */
 	public void addId(String id) {
 		this.id += ", " + id; 
 	}
 	
+	/**
+	 * It adds a new log
+	 * @param l
+	 */
 	public void addLog(Log l) {
 		if(l.getType().equalsIgnoreCase(QUERY_SUBMISSION)) {
 			query.add(l); 
@@ -71,34 +77,7 @@ public class Session{
 		}
 		
 		getLogs().add(l);
-		setSessionMeasure();
 	}
-	
-	public void removeLog(int i) {
-		getLogs().remove(i);
-	}
-
-	
-	/**
-	 * @return the sessionMeasure
-	 */
-	public boolean getSessionMeasure() {
-		return sessionMeasure;
-	}
-
-	/**
-	 * @param sessionMeasure the sessionMeasure to set
-	 */
-	private void setSessionMeasure() {
-		if(docOpened.size() == 0 || query.size() == 0 || query.size() == 1) {
-			sessionMeasure = false;
-		}else if(docOpened.size() >= query.size() || docOpened.size() >= query.size()/2) {
-			sessionMeasure = true;
-		}else {
-			sessionMeasure = false;
-		}
-	}
-
 	
 	/**
 	 * This method return the deepest document opened in a ranked list into the session
@@ -118,7 +97,7 @@ public class Session{
 				}
 			}
 			
-			return k + 1;  // sum + 1 because in the logsfile tha rank starts to 0 
+			return k + 1;  // sum + 1 because in the logsfile the ranklists start to 0 
 		}
 		
 		return 10;
@@ -135,7 +114,7 @@ public class Session{
 			int k = 0;
 			Iterator<Entry<String, Integer>> it = getPath().entrySet().iterator();
 			while(it.hasNext()) { 
-				k += it.next().getValue() + 1; // sum + 1 because in the logsfile tha rank starts to 0 
+				k += it.next().getValue() + 1; // sum + 1 because in the logsfile the ranklists start to 0 
 			}
 			
 			return k/getDocOpened().size();	
@@ -145,7 +124,7 @@ public class Session{
 	}
 	
 	/**
-	 * 
+	 * It computes the sorting of the log by time
 	 * @param myList
 	 */
 	public void sortLog(ArrayList<Log> myList) {
@@ -156,13 +135,12 @@ public class Session{
 			});
 	}
 	
-	
-	
 	/**
 	 * This method returns the last document opened in each ranked list across the session
 	 * If a query has not documents opened is set to 1
-	 * In the logsfile the rank starts to 0 so the rank is incremented by 1
-	 * @return
+	 * In the logsfile the ranklists start to 0 so the rank is incremented by 1
+	 * 
+	 * @return path
 	 */
 	public Map<String, Integer> getPath() {
 		ArrayList<Log> queries = getQuery();
@@ -230,75 +208,46 @@ public class Session{
 		}
 		
 		return path;
-	}
+	}	
 	
-	
-	/**
-	 * @return the nQuery
-	 */
 	public ArrayList<Log> getQuery() {
 		sortLog(query);
 		return query;
 	}
 
-	/**
-	 * @return the nDocOpened
-	 */
 	public ArrayList<Log> getDocOpened() {
 		sortLog(docOpened);
 		return docOpened;
 	}
 
-	/**
-	 * @return the user
-	 */
 	public String getUser() {
 		return user;
 	}
 
-	/**
-	 * @return the topic
-	 */
 	public String getTopic() {
 		return topic;
 	}
 
-	/**
-	 * @return the logs
-	 */
 	public ArrayList<Log> getLogs() {
 		sortLog(logs);
 		return logs;
 	}
 
-	/**
-	 * @return the id
-	 */
 	public String getId() {
 		return id;
 	}
-	
-	
 
-	/**
-	 * @param id the id to set
-	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
 	public String toString() {
 		String logs = "";
-		
 		for (Log l : getLogs()) {
 			logs += l.toString() + "\n";
 		}
 		
-		return "Session [id=" + id + ", user=" + getUser() + ", topic=" + getTopic() + ", nQuery=" + query.size() + ", sessionMeasure=" + sessionMeasure + ", logs=\n" + logs + "]";
+		return "Session [id=" + id + ", user=" + getUser() + ", topic=" + getTopic() + ", nQuery=" + query.size()  + ", logs=\n" + logs + "]";
 	}
 
 	

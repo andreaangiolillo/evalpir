@@ -5,18 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import ie.dcu.evalpir.utilities.Pair;
+
 /**
- * 
  * @author Andrea Angiolillo
  *
  *This class represents a measure made up of a set of values.
- * @param <K>
- * @param <T>
  *
  */
 public class MeasureCompound extends AbstractMeasure {
 	 
-
 	private Map<String, ArrayList<Pair<Integer,Double>>> PIRvalue;
 	
 	public MeasureCompound(String name) {
@@ -43,40 +41,34 @@ public class MeasureCompound extends AbstractMeasure {
 		this.PIRvalue = value;
 	}
 
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 */
 	public void  addPIR(String key, ArrayList<Pair<Integer, Double>> value) {
 		this.PIRvalue.put(key, value);
 	}
-	
 	
 	public ArrayList<Pair<Integer, Double>> getPIR(String key) {
 		return PIRvalue.get(key);
 	}
 	
+	/**
+	 * it sorted the pirValue by key creating a TreeMap
+	 * @return
+	 */
 	public Map<String, ArrayList<Pair<Integer,Double>>> getPIRvalueSortedByKey() {
 		Map<String, ArrayList<Pair<Integer,Double>>> map = new TreeMap<String, ArrayList<Pair<Integer,Double>>>(PIRvalue);
 		return map;
 	}
 	
-	
-	/**
-	 * @return the pIRvalue
-	 */
 	public Map<String, ArrayList<Pair<Integer, Double>>> getPIRvalue() {
 		return PIRvalue;
 	}
 
-	/**
-	 * @param pIRvalue the pIRvalue to set
-	 */
-	public void setPIRvalue(Map<String, ArrayList<Pair<Integer, Double>>> pIRvalue) {
-		PIRvalue = pIRvalue;
+	public void setPIRvalue(Map<String, ArrayList<Pair<Integer, Double>>> value) {
+		PIRvalue = value;
 	}
-
-	public int compareTo(Pair<Integer, Double> o) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	
 	
 }

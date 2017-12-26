@@ -1,5 +1,11 @@
 package ie.dcu.evalpir.elements;
 
+/**
+ * @author Andrea Angiolillo
+ * 
+ * It represents a row in the logFile
+ */
+
 import java.sql.Timestamp;
 
 public class Log {
@@ -25,55 +31,29 @@ public class Log {
 		this.query = query;
 	}
 
-	/**
-	 * @return the document
-	 */
 	public String getDocument() {
 		return document;
 	}
 
-
-	/**
-	 * @return the type
-	 */
 	public String getType() {
 		return type;
 	}
 
-	/**
-	 * @return the timestamp
-	 */
 	public Timestamp getTimestamp() {
 		return timestamp;
 	}
 
-	/**
-	 * @return the query
-	 */
 	public String getQuery() {
 		return query;
 	}
 
-
-	/**
-	 * @return the rank
-	 */
 	public String getRank() {
 		return rank;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
 	public String toString() {
 		return "Log [document=" + document + ", type=" + type + ", timestamp=" + timestamp + ", query=" + query
 				+ ", rank=" + rank + "]";
 	}
-
-
-	
-	
-	
 	
 }
