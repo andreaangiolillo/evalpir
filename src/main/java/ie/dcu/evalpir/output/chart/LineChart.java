@@ -141,7 +141,7 @@ public class LineChart{
 		
 		//Setting the yAxis
 		boolean isNormaliseMeasure = false;
-		String[] normaliseMeasure = new String[] {"precision@", "recall@", "ndcg", "precision", "recall", "fmeasure", "average precision"};
+		String[] normaliseMeasure = new String[] {"precision@", "recall@", "ndcg", "recall", "fmeasure", "average precision"};
 		int i = 0;
 		while(i < normaliseMeasure.length && !isNormaliseMeasure) {
 			if(measure.toLowerCase().contains(normaliseMeasure[i])){
@@ -169,6 +169,13 @@ public class LineChart{
 		ChartFactory.setChartTheme(theme);
 		XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
 		JFreeChart chart = createChart(dataset, user, topic, "", measure.getName());
+		XYPlot plot = (XYPlot) chart.getPlot();
+        ValueAxis xAxis = plot.getDomainAxis();
+        xAxis.setRange(0, 100);
+        xAxis.setLowerMargin(0);
+        ValueAxis yAxis = plot.getRangeAxis();
+		yAxis.setRange(0, 1.05);
+	
 		try {
         	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 1366, 768);
         } catch (IOException e) {
@@ -188,11 +195,17 @@ public class LineChart{
 		AbstractMeasure measure;
 		for(int i = 0; i < topic.size(); i++) {
 			measure = ((QueryRelFile) topic.get(i)).searchMeasure(measureName);
-			if(((MeasureCompound)measure).getPIRvalue() != null && ((QueryRelFile)topic.get(i)).getNRelevantDoc() > 0 ) {
+			if(((MeasureCompound)measure).getPIRvalue() != null && ((QueryRelFile)topic.get(i)).getNRelevantDoc() > 0 ) {	
 				XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
 				String user = topic.get(i).getUser();
 				String nameTopic = topic.get(i).getTopic();
 				JFreeChart chart = createChart(dataset, user, nameTopic,topic.get(i).getId(), measureName);
+				XYPlot plot = (XYPlot) chart.getPlot();
+		        ValueAxis xAxis = plot.getDomainAxis();
+		        xAxis.setRange(0, 105);
+		        xAxis.setLowerMargin(0);
+		        ValueAxis yAxis = plot.getRangeAxis();
+				yAxis.setRange(0, 1.05);
 				try {
 				
 		        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measureName + "/" + "Query" + topic.get(i).getId() + "_" + measureName +".png"), chart, 1366, 768);
@@ -206,6 +219,7 @@ public class LineChart{
 		
 	}
 	
+	@SuppressWarnings("deprecation")
 	private static JFreeChart createChart(final XYSeriesCollection dataset, final String user, final String topicName, final String query, final String measure) {
 		 JFreeChart chart = ChartFactory.createXYLineChart(
 	                "User: " + user + " Topic: " + topicName + " Query: " + query, 
@@ -219,20 +233,9 @@ public class LineChart{
 	        );
 	        
 	        XYPlot plot = (XYPlot) chart.getPlot();
-	        ValueAxis xAxis = plot.getDomainAxis();
-	        xAxis.setRange(0, 100);
-	        xAxis.setRangeWithMargins(0, 100);
-	        xAxis.setLowerMargin(0);
-	        ValueAxis yAxis = plot.getRangeAxis();
-			yAxis.setRange(0, 1);
-			yAxis.setRangeWithMargins(0,1);
 	        XYLineAndShapeRenderer r = (XYLineAndShapeRenderer) plot.getRenderer();
 			r.setAutoPopulateSeriesShape(true);
-			for (int i = 0; i < dataset.getSeries().size(); i++){			
-				r.setSeriesShapesVisible (i, true);
-				r.setSeriesStroke(i, new BasicStroke(3));
-			}
-			
+			r.setStroke(new BasicStroke(3));
 	        return chart;
 	}
 	
@@ -256,6 +259,7 @@ public class LineChart{
 		
 		XYSeriesCollection dataset = new XYSeriesCollection();	
 		for (XYSeries s : series) {
+		//	System.out.println("LIST" + s.getItems());
 			dataset.addSeries(s);
 		}
 		

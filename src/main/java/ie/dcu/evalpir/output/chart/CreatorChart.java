@@ -25,7 +25,7 @@ import ie.dcu.evalpir.output.table.ConsolePrinter;
 public class CreatorChart {
 
 	final static String[] MEASURES_LINECHART = {"Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
-										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve"};
+										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve", "Session_PrecisionRecallCurve_2"};
 	
 	
 	final static String[] MEASURES_BARCHART = { "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
@@ -121,12 +121,23 @@ public class CreatorChart {
 	 
 	 public static void createChartSession(final Map<String, Topic> topics) {
 		 String path = createFolder("LineChart");
-		 MeasureCompound measure;
+		 MeasureCompound measureDf;
+		 MeasureCompound measureNewInfo;
 		 for(Map.Entry<String, Topic> topic: topics.entrySet()) {
-			 measure = (MeasureCompound)topic.getValue().searchMeasure("Session_PrecisionRecallCurve");
-			 if(measure != null) {
-				 LineChart.createLineChartForSessionMeasure(path, topic.getValue().getUserId(), topic.getValue().getTopicId(), measure);
+			 if(EvalEpir.SESSION_METHOD_1) {
+				 measureDf = (MeasureCompound)topic.getValue().searchMeasure("Session_PrecisionRecallCurve");
+				 if(measureDf != null) {
+					 LineChart.createLineChartForSessionMeasure(path, topic.getValue().getUserId(), topic.getValue().getTopicId(), measureDf);
+				 }
 			 }
+			 
+			 if(EvalEpir.SESSION_METHOD_2) {
+				 measureNewInfo = (MeasureCompound)topic.getValue().searchMeasure("Session_PrecisionRecallCurve_2");
+				 if(measureNewInfo != null) {
+					 LineChart.createLineChartForSessionMeasure(path, topic.getValue().getUserId(), topic.getValue().getTopicId(), measureNewInfo);
+				 }
+			 }
+			 
 		 }
 	 }
 	 

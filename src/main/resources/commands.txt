@@ -1,0 +1,18 @@
+/**
+INFO COMMANDS
+
+Charts: 
+
+1) no_charts
+2) default
+3) all
+
+Session Measures:
+
+1) default
+2) method2
+3) all
+
+**/
+
+all, all

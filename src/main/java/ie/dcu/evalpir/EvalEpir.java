@@ -59,7 +59,6 @@ public class EvalEpir {
 	public static String CHART = "default";
 	public static boolean SESSION_METHOD_1 = false;
 	public static boolean SESSION_METHOD_2 = false;
-	public static boolean ALL_SESSION_METHODS = false;
 	/**/
 	
 	public static  Map<String, Session> LOGS = null;
@@ -91,7 +90,10 @@ public class EvalEpir {
     	
     //	setMODELS(InputReaderImpl.extractOutputPIR(outputPIR));
    	  	
-    
+    	System.out.println("CHART: "  + CHART);
+    	System.out.println("Method1: "  + SESSION_METHOD_1);
+    	System.out.println("Method2: "  + SESSION_METHOD_2);
+    	
 		CalculateMeasureImpl.calculateMeasures();
     	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
       		
@@ -146,7 +148,7 @@ public class EvalEpir {
     public static ArrayList<PIR> extractingModels(String[] args) {
     	File outputPIR; 
     	ArrayList<PIR> allModel = new ArrayList<PIR>();
-    	for (int i = 2; i < args.length; i++) {
+    	for (int i = 3; i < args.length; i++) {
     		outputPIR = new File(args[i]);
     		allModel.addAll(InputReaderImpl.extractOutputPIR(outputPIR));	
     	}

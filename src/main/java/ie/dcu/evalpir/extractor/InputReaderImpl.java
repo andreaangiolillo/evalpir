@@ -48,14 +48,32 @@ public class InputReaderImpl /*implements InputReader*/{
 			 }while(line.equalsIgnoreCase(""));
 			 String[] row;
 			 row = line.split(",");
+			
+			 for(int j = 1; j < row.length; j++) {
+				 switch(row[j].trim().toLowerCase()) {
+					case "method2":
+						EvalEpir.SESSION_METHOD_2 = true;
+						break;
+					case "default":
+						EvalEpir.SESSION_METHOD_1 = true;
+						break;
+					case "all":
+						EvalEpir.SESSION_METHOD_1 = true;
+						EvalEpir.SESSION_METHOD_2 = true;
+						break;
+					default:
+						throw new IllegalArgumentException("Invalid command: " + row[j]);
+				}
+			 }
+
 			 EvalEpir.CHART = row[0].trim().toLowerCase();
 			 switch(EvalEpir.CHART) {
 				case "all":
 					EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
-						"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve"));
+						"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve"));
 					break;
 				case "default":
-					EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision","Session_PrecisionRecallCurve", "NDCG@10", "Session_PrecisionRecallCurve"));
+					EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision","PrecisionRecallCurve", "NDCG@10"));
 						break;
 				case "no_charts":
 					EvalEpir.MEASURES_FOR_CHART = new HashSet<>();
@@ -64,21 +82,15 @@ public class InputReaderImpl /*implements InputReader*/{
 					throw new IllegalArgumentException("Invalid command: " + EvalEpir.CHART);
 			} 
 			 
-			 for(int j = 1; j < row.length; j++) {
-				 switch(row[j]) {
-					case "method2":
-						EvalEpir.SESSION_METHOD_2 = true;
-						break;
-					case "default":
-						EvalEpir.SESSION_METHOD_1 = true;
-						break;
-					case "all":
-						EvalEpir.ALL_SESSION_METHODS = true;
-						break;
-					default:
-						throw new IllegalArgumentException("Invalid command: " + row[j]);
-				}
-			 }
+			if(EvalEpir.SESSION_METHOD_1) {
+				EvalEpir.MEASURES_FOR_CHART.add("Session_PrecisionRecallCurve");
+			}
+			if(EvalEpir.SESSION_METHOD_2) {
+				EvalEpir.MEASURES_FOR_CHART.add("Session_PrecisionRecallCurve_2");
+			}
+			
+			 
+		
 		}catch (NumberFormatException e) {
 			e.printStackTrace();
 		}catch (FileNotFoundException e) {

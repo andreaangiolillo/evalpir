@@ -115,7 +115,7 @@ public class CalculateMeasureImpl{
 				}
 			}
 			
-			return listPair;	
+			return computeInterpolation(listPair);	
 		}
 	
 		return null;	
@@ -153,17 +153,31 @@ public class CalculateMeasureImpl{
 	 * @input listPair
 	 * @return interpolated precision
 	 * **/
-	
 	public static double interpolation(int r, ArrayList<Pair<Integer, Double>> listPair) {
 		double max = 0.0;
 		for (Pair<Integer, Double> p : listPair) {
 			if(p.getKey() >= r) {
 				max = (max >= p.getValue()) ? max : p.getValue();	
-			}
-			
+			}	
 		}
 		
 		return max;
+	}
+	
+	/**
+	 * 
+	 * @param listPair
+	 * @return
+	 */
+	public static ArrayList<Pair<Integer, Double>> computeInterpolation(ArrayList<Pair<Integer, Double>> listPair) {
+		int i = 0;
+		ArrayList<Pair<Integer, Double>> listPairInterpolated = new ArrayList<Pair<Integer, Double>>();
+		while(i<=100) {
+			listPairInterpolated.add(new Pair<Integer, Double>(i, interpolation(i, listPair)));
+			i+=10;
+		}
+		
+		return listPairInterpolated;
 	}
 	
 	/**
@@ -383,14 +397,17 @@ public class CalculateMeasureImpl{
 	
 					
 					((Measure) queryRel.searchAddMeasure("NDCG@05", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@05"))).addPIR(pir.getName(), qNDCG5);
-					((Measure) queryRel.searchAddMeasure("NDCG@10",false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@010"))).addPIR(pir.getName(), qNDCG10);
-					((Measure) queryRel.searchAddMeasure("NDCG@15", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@015"))).addPIR(pir.getName(), qNDCG15);
-					((Measure) queryRel.searchAddMeasure("NDCG@20", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@020") )).addPIR(pir.getName(), qNDCG20);
+					((Measure) queryRel.searchAddMeasure("NDCG@10",false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@10"))).addPIR(pir.getName(), qNDCG10);
+					((Measure) queryRel.searchAddMeasure("NDCG@15", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@15"))).addPIR(pir.getName(), qNDCG15);
+					((Measure) queryRel.searchAddMeasure("NDCG@20", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@20") )).addPIR(pir.getName(), qNDCG20);
 					((Measure) queryRel.searchAddMeasure("Precision", false, true, EvalEpir.MEASURES_FOR_CHART.contains("Precision"))).addPIR(pir.getName(), precision);
 					((Measure) queryRel.searchAddMeasure("Recall", false, true, EvalEpir.MEASURES_FOR_CHART.contains("Recall"))).addPIR(pir.getName(), recall);
 					((Measure) queryRel.searchAddMeasure("fMeasure0.5", false, true, EvalEpir.MEASURES_FOR_CHART.contains("fMeasure0.5"))).addPIR(pir.getName(), fMeasure);
 					((Measure) queryRel.searchAddMeasure("AveragePrecision", false, true, EvalEpir.MEASURES_FOR_CHART.contains("AveragePrecision"))).addPIR(pir.getName(), ap);
 					
+					//Compound measure
+					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, false, EvalEpir.MEASURES_FOR_CHART.contains("PrecisionRecallCurve"))).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
+				
 					
 					precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);
 					apNewInfo = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR);
@@ -406,10 +423,6 @@ public class CalculateMeasureImpl{
 						
 						queryRel.getMeasures().get("averageprecision").setStackedBar(true);	
 					}
-					
-//					
-					//Compound measure
-					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, false, true)).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
 				
 				}
 				
