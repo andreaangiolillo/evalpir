@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Log;
@@ -34,7 +32,7 @@ public class CreatorChart {
 	final static String[] MEASURES_STACKEDBAR = {"Precision", "AveragePrecision"};
 
 	/**
-	 * It Creates the folder for the diagrams
+	 * It creates the folder for the diagrams
 	 * @param nameFolder
 	 * @return
 	 */
@@ -78,7 +76,7 @@ public class CreatorChart {
 	 }
 	
 	 /**
-	  * 
+	  * It computes the charts for the measures
 	  * @param queries
 	  */
 	 public static void createChart(final Map<String,Query> queries) {
@@ -119,6 +117,10 @@ public class CreatorChart {
 		
 	 }
 	 
+	 /**
+	  * In computes the charts for the sessions measures
+	  * @param topics
+	  */
 	 public static void createChartSession(final Map<String, Topic> topics) {
 		 String path = createFolder("LineChart");
 		 MeasureCompound measureDf;
@@ -142,7 +144,7 @@ public class CreatorChart {
 	 }
 	 
 	 /**
-	  * 
+	  * Ii creates a map of <TopicId, queries in the topic>
 	  * @param queries
 	  * @return
 	  */

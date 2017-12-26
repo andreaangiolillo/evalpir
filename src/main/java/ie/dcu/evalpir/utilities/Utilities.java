@@ -1,8 +1,10 @@
 package ie.dcu.evalpir.utilities;
 
+/**
+ * @author Andrea Angiolillo
+ */
 import java.util.HashMap;
 import java.util.Map;
-
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentRelFile;
 
@@ -30,4 +32,6 @@ public class Utilities {
 		}
 		return newMap;
 	}
+	
+
 }

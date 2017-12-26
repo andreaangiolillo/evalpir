@@ -3,26 +3,16 @@ package ie.dcu.evalpir.measures;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
-import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
-import ie.dcu.evalpir.elements.Session;
-import ie.dcu.evalpir.elements.Topic;
-import ie.dcu.evalpir.exceptions.DifferentQueryException;
-import ie.dcu.evalpir.exceptions.DifferentSizeException;
-import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
 import ie.dcu.evalpir.output.table.ConsolePrinter;
 import ie.dcu.evalpir.utilities.Pair;
 import ie.dcu.evalpir.utilities.Utilities;
@@ -31,6 +21,7 @@ import ie.dcu.evalpir.utilities.Utilities;
  * @author Andrea Angiolillo
  * @version 1.0
  * 
+ * It computes the measures 
  * **/
 public class CalculateMeasure{
 	
@@ -163,7 +154,7 @@ public class CalculateMeasure{
 	}
 	
 	/**
-	 * 
+	 * In computes the interpolation
 	 * @param listPair
 	 * @return
 	 */
@@ -324,20 +315,6 @@ public class CalculateMeasure{
 		
 		return 0;
 	}	
-	
-	/**
-	 * @param userID
-	 * @param topicId
-	 * @param queryId
-	 * @param k
-	 * @param measure
-	 * @return the text with the measure's info
-	 */
-	public static String printMeasure(String userID, String topicId, String queryId, int k, Double measure) {
-		return "UserID: " + userID + (topicId.equalsIgnoreCase("") ? "" : " TopicID: " + topicId)
-				+ (queryId.equalsIgnoreCase("") ? "" : " QueryID: " + queryId) + " Precision@" + k + ": " + String.valueOf(measure) + "\n";  
-		
-	}
 		
 	/***
 	 * 

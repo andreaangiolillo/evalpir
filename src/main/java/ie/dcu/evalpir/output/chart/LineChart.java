@@ -1,13 +1,17 @@
 package ie.dcu.evalpir.output.chart;
 
+/**
+ * @author Andrea Angiolillo
+ * 
+ * It creates the lineCharts
+ */
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -18,12 +22,9 @@ import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
@@ -34,15 +35,18 @@ import ie.dcu.evalpir.utilities.Pair;
 
 public class LineChart{
 	
-	
-	
 	public static void CreateLineChartPerTopic(String path, ArrayList<Query> topic, Measure m) {
 			initUIPerTopic(path, topic, m);
 	}
 
-	
+	/**
+	 * It creates the linechart 
+	 * @param path
+	 * @param topic
+	 * @param m
+	 */
 	private static void initUIPerTopic(String path, ArrayList<Query> topic, Measure m) {
-		XYSeriesCollection dataset = createDataset(topic, m);
+		XYSeriesCollection dataset = createDatasetPerTopic(topic, m);
 		String user = topic.get(0).getUser();
 		String nameTopic = topic.get(0).getTopic();
 		JFreeChart chart = createChart(dataset, user, nameTopic, m.getName(), topic);
@@ -64,12 +68,18 @@ public class LineChart{
 		
 	}
 	
-	private static XYSeriesCollection createDataset(ArrayList<Query> topic, Measure m) {
+	/**
+	 * It creates the dataset that contains all the points to show on the lineChart
+	 * @param topic
+	 * @param m
+	 * @return
+	 */
+	private static XYSeriesCollection createDatasetPerTopic(ArrayList<Query> topic, Measure m) {
 		int nQuery = topic.size();
 		int nPIR = m.getPIRvalue().size();
 		m.sortbyKey();
 		XYSeries[] series = new XYSeries[nPIR];
-		Measure measure;
+		Measure measure; 
 		Double value = 0.0;
 		for (int i = 0; i < nQuery; i++) {			
 			for (int j = 0; j < nPIR; j++) { 
@@ -84,8 +94,7 @@ public class LineChart{
 					value = (Double)measure.getPIR(j).getValue();
 					
 				}
-				//System.out.println("Number of PIR: " + nPIR +"\n j: " + j);
-				//System.out.println("PIR Name: " + measure.getPIR(j).getKey() );
+	
 				series[j].add(i, value);
 				value = 0.0;
 			}
@@ -101,7 +110,17 @@ public class LineChart{
 		
 	}
 	
-	 private static JFreeChart createChart(final XYSeriesCollection dataset, final String user, final String topicName, final String measure , ArrayList<Query> topic) {
+	/**
+	 * It creates the chart
+	 * @param dataset
+	 * @param user
+	 * @param topicName
+	 * @param measure
+	 * @param topic
+	 * @return
+	 */
+	 @SuppressWarnings("deprecation")
+	private static JFreeChart createChart(final XYSeriesCollection dataset, final String user, final String topicName, final String measure , ArrayList<Query> topic) {
 	        JFreeChart chart = ChartFactory.createXYLineChart(
 	                "User: " + user + " Topic: " + topicName, 
 	                "Query", 
@@ -112,19 +131,22 @@ public class LineChart{
 	                true, 
 	                false
 	        );
+	        
 	        setXYAxis(chart, measure, topic);
 	        XYPlot plot = (XYPlot) chart.getPlot();
 	        XYLineAndShapeRenderer r = (XYLineAndShapeRenderer) plot.getRenderer();
 			r.setAutoPopulateSeriesShape(true);
-			for (int i = 0; i < dataset.getSeries().size(); i++){			
-				r.setSeriesShapesVisible (i, true);
-				r.setSeriesStroke(i, new BasicStroke(3));
-			}
-		
+			r.setStroke(new BasicStroke(3));
 	        return chart;
 	        
 	 }
 	 
+	 /**
+	  * 
+	  * @param chart
+	  * @param measure
+	  * @param topic
+	  */
 	 private static void setXYAxis(JFreeChart chart, String measure, ArrayList<Query> topic) {
 		//Setting the xAxis
 		String[]name = new String[topic.size()];
@@ -163,6 +185,13 @@ public class LineChart{
 		
 	 }
 	 
+	/**
+	 * It creates the lineChart for the session measure
+	 * @param path
+	 * @param user
+	 * @param topic
+	 * @param measure
+	 */
 	public static void createLineChartForSessionMeasure(String path, String user, String topic, MeasureCompound measure) {
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
 		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
@@ -184,10 +213,22 @@ public class LineChart{
 		}
 	}
 	 
+	/**
+	 * 
+	 * @param path
+	 * @param topic
+	 * @param measureName
+	 */
 	public static void CreateLineChartPerQuery(String path, ArrayList<Query> topic, String measureName) {
 		initUIPerQuery(path, topic, measureName);
 	}
-	 
+	
+	/**
+	 * It creates the lineChart for the PrecisionRecallCurve
+	 * @param path
+	 * @param topic
+	 * @param measureName
+	 */
 	private static void initUIPerQuery(String path, ArrayList<Query> topic, String measureName) {
 		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
 		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
@@ -219,6 +260,15 @@ public class LineChart{
 		
 	}
 	
+	/**
+	 * It creates the chart object for PrecisionRecallCurve
+	 * @param dataset
+	 * @param user
+	 * @param topicName
+	 * @param query
+	 * @param measure
+	 * @return
+	 */
 	@SuppressWarnings("deprecation")
 	private static JFreeChart createChart(final XYSeriesCollection dataset, final String user, final String topicName, final String query, final String measure) {
 		 JFreeChart chart = ChartFactory.createXYLineChart(
@@ -239,6 +289,11 @@ public class LineChart{
 	        return chart;
 	}
 	
+	/**
+	 * It creates the Dataset
+	 * @param m
+	 * @return
+	 */
 	private static XYSeriesCollection createDataset(final MeasureCompound m) {
 		Iterator<Entry<String, ArrayList<Pair<Integer, Double>>>> it = m.getPIRvalueSortedByKey().entrySet().iterator();
 		XYSeries[] series = new XYSeries[m.getPIRvalue().size()];
