@@ -69,14 +69,15 @@ public class CalculateMeasure{
 	
 	
 	/**
-	 * This function is used to calculate the Precision/Recall Curve
+	 * This function is used to calculate the Precision/Recall Curve interpolated
 	 * @input queryRel
 	 * @input queryOutputPIR
 	 * @assumption If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc is 0 
 	 * @return listPair
 	 * @Complexity O(n^2)
+	 * @see https://www.youtube.com/watch?v=yjCMEjoc_ZI
 	 * **/
-	public static ArrayList<Pair<Integer, Double>> precisionRecallCurve(Query queryRel, Query queryOutputPIR) {		
+	public static ArrayList<Pair<Integer, Double>> precisionRecallCurve(Query queryRel, Query queryOutputPIR, boolean interpolation) {		
 		int nRelevantDoc = ((QueryRelFile) queryRel).getNRelevantDoc();
 		if(nRelevantDoc != 0) {
 			int nRelDocFind = 0;
@@ -104,7 +105,12 @@ public class CalculateMeasure{
 				}
 			}
 			
-			return computeInterpolation(listPair);	
+			if(interpolation) {
+				return computeInterpolation(listPair);
+			}else {
+				return listPair;
+			}
+				
 		}
 	
 		return null;	
@@ -120,7 +126,7 @@ public class CalculateMeasure{
 	 * @return
 	 */
 	public static double calculateAP(Query queryRel, Query queryOutputPIR) {
-		ArrayList<Pair<Integer, Double>> ap = precisionRecallCurve(queryRel, queryOutputPIR);
+		ArrayList<Pair<Integer, Double>> ap = precisionRecallCurve(queryRel, queryOutputPIR, false);
 		if(ap != null) {
 			double averagePrecision = 0.0;
 			int size = ap.size();
@@ -141,6 +147,7 @@ public class CalculateMeasure{
 	 * @input r
 	 * @input listPair
 	 * @return interpolated precision
+	 * @see https://www.youtube.com/watch?v=yjCMEjoc_ZI
 	 * **/
 	public static double interpolation(int r, ArrayList<Pair<Integer, Double>> listPair) {
 		double max = 0.0;
@@ -189,10 +196,7 @@ public class CalculateMeasure{
 			if(docOut.getRank() <= p) {	
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				value_relevance = (docRel == null) ? 1 : docRel.getRelevance();
-				System.out.println("1)dcd: " + dcg);
-				System.out.println("DOC ID: " + docOut.getId() + " RANK: " +docOut.getRank()+  " VALUE REL: " + value_relevance + " LOG: " + Utilities.log(docOut.getRank(), 2));
 				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (Utilities.log(docOut.getRank(), 2));	
-				System.out.println("2)dcd: " + dcg);
 			}
 		}
 		
@@ -213,7 +217,6 @@ public class CalculateMeasure{
 		DocumentRelFile docRel;
 		for(Map.Entry<String, Document> entry: queryRel.getDocs().entrySet()) {
 			docRel = (DocumentRelFile)entry.getValue();
-			System.out.println("DOCID: " + docRel.getId() + " Rel: " +docRel.getRelevance());
 			idcg.add(docRel.getRelevance());
 		}
 		
@@ -350,7 +353,7 @@ public class CalculateMeasure{
 					((Measure) queryRel.searchAddMeasure("AveragePrecision", false, true, EvalEpir.MEASURES_FOR_CHART.contains("AveragePrecision"))).addPIR(pir.getName(), ap);
 					
 					//Compound measure
-					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, false, EvalEpir.MEASURES_FOR_CHART.contains("PrecisionRecallCurve"))).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR));
+					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, false, EvalEpir.MEASURES_FOR_CHART.contains("PrecisionRecallCurve"))).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR, true));
 				
 					
 					precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);

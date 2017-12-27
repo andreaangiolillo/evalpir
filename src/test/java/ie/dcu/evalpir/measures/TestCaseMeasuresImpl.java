@@ -1,12 +1,14 @@
 package ie.dcu.evalpir.measures;
 
+/**
+ * @author Andrea Angiolillo
+ */
 import static org.junit.Assert.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
-
 import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
@@ -14,13 +16,11 @@ import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
-import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.extractor.InputReader;
+import ie.dcu.evalpir.utilities.Pair;
 
 
 public class TestCaseMeasuresImpl {
-	
-
 	
 	private Map<String, Query>  rel;
 	private ArrayList<PIR>  result;
@@ -102,9 +102,7 @@ public class TestCaseMeasuresImpl {
 		 assertNotNull(pirQuery);
 		 assertNotNull(relQuery);
 		 assertEquals(0.0,  CalculateMeasure.precision(relQuery, pirQuery), 0.000000001);
-		
-	
-		
+
 	}
 	
 	@Test
@@ -180,8 +178,6 @@ public class TestCaseMeasuresImpl {
 		assertEquals(0.0,  CalculateMeasure.recall(relQuery, pirQuery), 0.000000001);	
 	}
 	
-	
-	
 	@Test
 	public void testFMeasure() {
 		assertEquals(0.0,  CalculateMeasure.fMeasure(1.0, 0.0), 0.000000001);
@@ -189,7 +185,6 @@ public class TestCaseMeasuresImpl {
 		assertEquals(0.5,  CalculateMeasure.fMeasure(0.5, 0.5), 0.000000001);
 		assertEquals(0.01980198,  CalculateMeasure.fMeasure(0.01, 1.0), 0.000000001);
 	}
-	
 	
 	@Test
 	public void testCalculatePKRK() {
@@ -391,11 +386,8 @@ public class TestCaseMeasuresImpl {
 		assertEquals(0.0,  CalculateMeasure.calculatePKRK(relQuery, pirQuery, 6, true), 0.000000001);
 		assertEquals(0.0,  CalculateMeasure.calculatePKRK(relQuery, pirQuery, 15, false), 0.000000001);
 		assertEquals(0.0,  CalculateMeasure.calculatePKRK(relQuery, pirQuery, 15, true), 0.000000001);
-			
-	
 	
 	}
-
 
 	@Test
 	public void testCalculateNDCG() {
@@ -420,71 +412,124 @@ public class TestCaseMeasuresImpl {
 		assertEquals(0.833576718,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 20), 0.000000001);	
 	}
 
-	
+	@Test
+	public void testPrecisionRecallCurve() {
+		Map<String, Query> pirQueries;
+		Query pirQuery;
+		Query relQuery;
+		ArrayList<Pair<Integer, Double>> curve;
+		//Model 1
+		pirQueries = result.get(0).getQueries();
+		pirQuery = pirQueries.get("204");
+		relQuery = rel.get("204");
+		assertNotNull(pirQuery);
+		assertNotNull(relQuery);
+		curve = CalculateMeasure.precisionRecallCurve(relQuery, pirQuery,true);
+		assertEquals(11, curve.size());
+		assertEquals(0.333333333, curve.get(0).getValue(), 0.0001);
+		assertEquals(0.333333333, curve.get(10).getValue(), 0.0001);
+		
+		pirQuery = pirQueries.get("108");
+		relQuery = rel.get("108");
+		curve = CalculateMeasure.precisionRecallCurve(relQuery, pirQuery, true);
+		assertEquals(11, curve.size());
+		assertEquals(1, curve.get(0).getValue(), 0.0001);
+		assertEquals(1, curve.get(2).getValue(), 0.0001);
+		assertEquals(1, curve.get(5).getValue(), 0.0001);
+		assertEquals(0.6666666666666666, curve.get(7).getValue(), 0.0001);
+		assertEquals(0.34782608695652173, curve.get(10).getValue(), 0.0001);
+		
+		pirQuery = pirQueries.get("267");
+		relQuery = rel.get("267");
+		curve = CalculateMeasure.precisionRecallCurve(relQuery, pirQuery,true);
+		assertNotNull(pirQuery);
+		assertNotNull(relQuery);
+		assertEquals(11, curve.size());
+		assertEquals(1, curve.get(0).getValue(), 0.0001);
+		assertEquals(1, curve.get(2).getValue(), 0.0001);
+		assertEquals(0.2, curve.get(5).getValue(), 0.0001);
+		assertEquals(0.11904761904761904, curve.get(7).getValue(), 0.0001);
+		assertEquals(0.075, curve.get(10).getValue(), 0.0001);
+		
+		pirQuery = pirQueries.get("197");
+		relQuery = rel.get("197");
+		curve = CalculateMeasure.precisionRecallCurve(relQuery, pirQuery, true);
+		assertNotNull(pirQuery);
+		assertNotNull(relQuery);
+		assertNull(curve);
+		
+	}
 
-	
-//	
-//	@Test
-//	public void TestCaseAp() {
-//		DocumentRelFile d1 = new DocumentRelFile("1", 3);
-//		DocumentRelFile d2 = new DocumentRelFile("2", 3);
-//		DocumentRelFile d3 = new DocumentRelFile("3", 3);
-//		DocumentRelFile d4 = new DocumentRelFile("4", 3);
-//		DocumentRelFile d5 = new DocumentRelFile("5", 3);
-//		DocumentRelFile d6 = new DocumentRelFile("6", 1);
-//		DocumentRelFile d7 = new DocumentRelFile("7", 1);
-//		DocumentRelFile d8 = new DocumentRelFile("8", 1);
-//		DocumentRelFile d9 = new DocumentRelFile("9", 1);
-//		DocumentRelFile d10 = new DocumentRelFile("10", 1);
-//		Map<String,Document> docs = new HashMap<String, Document>();
-//		docs.put("1", d1);
-//		docs.put("2", d2);
-//		docs.put("3", d3);
-//		docs.put("4", d4);
-//		docs.put("5", d5);
-//		docs.put("6", d6);
-//		docs.put("7", d7);
-//		docs.put("8", d8);
-//		docs.put("9", d9);
-//		docs.put("10", d10);
-//		Query qRel = new QueryRelFile("user", "topic", "queryRel", docs);
-//		
-//		
-//		DocumentOutputPIR o1 = new DocumentOutputPIR("1", 1, 0.95);
-//		DocumentOutputPIR o2 = new DocumentOutputPIR("5", 2, 0.95);
-//		DocumentOutputPIR o3 = new DocumentOutputPIR("10", 3, 0.95);
-//		DocumentOutputPIR o4 = new DocumentOutputPIR("4", 4, 0.95);
-//		DocumentOutputPIR o5 = new DocumentOutputPIR("9", 5, 0.95);
-//		DocumentOutputPIR o6 = new DocumentOutputPIR("3", 6, 0.95);
-//		DocumentOutputPIR o7 = new DocumentOutputPIR("8", 7, 0.95);
-//		DocumentOutputPIR o8 = new DocumentOutputPIR("7", 8, 0.95);
-//		DocumentOutputPIR o9 = new DocumentOutputPIR("6", 9, 0.95);
-//		DocumentOutputPIR o10 = new DocumentOutputPIR("2", 10, 0.95);
-//		Map<String,Document> docs1 = new HashMap<String, Document>();
-//		docs1.put("1", o1);
-//		docs1.put("5", o2);
-//		docs1.put("10", o3);
-//		docs1.put("4", o4);
-//		docs1.put("9", o5);
-//		docs1.put("3", o6);
-//		docs1.put("8", o7);
-//		docs1.put("7", o8);
-//		docs1.put("6", o9);
-//		docs1.put("2", o10);
-//		Query qOut = new Query("user", "topic", "queryOut", docs1);
-//		
-//		
-//		assertEquals(0.783, CalculateMeasure.calculateAP(qRel, qOut), 0.001);
-//		
-//	}
-	
-	
-//	
-//	
-//	
-//
-//		
+	@Test
+	public void TestCaseAp() {
+		DocumentRelFile d1 = new DocumentRelFile("1", 3);
+		DocumentRelFile d2 = new DocumentRelFile("2", 3);
+		DocumentRelFile d3 = new DocumentRelFile("3", 3);
+		DocumentRelFile d4 = new DocumentRelFile("4", 3);
+		DocumentRelFile d5 = new DocumentRelFile("5", 3);
+		DocumentRelFile d6 = new DocumentRelFile("6", 1);
+		DocumentRelFile d7 = new DocumentRelFile("7", 1);
+		DocumentRelFile d8 = new DocumentRelFile("8", 1);
+		DocumentRelFile d9 = new DocumentRelFile("9", 1);
+		DocumentRelFile d10 = new DocumentRelFile("10", 1);
+		Map<String,Document> docs = new HashMap<String, Document>();
+		docs.put("1", d1);
+		docs.put("2", d2);
+		docs.put("3", d3);
+		docs.put("4", d4);
+		docs.put("5", d5);
+		docs.put("6", d6);
+		docs.put("7", d7);
+		docs.put("8", d8);
+		docs.put("9", d9);
+		docs.put("10", d10);
+		Query qRel = new QueryRelFile("user", "topic", "queryRel", docs);
+		
+		
+		DocumentOutputPIR o1 = new DocumentOutputPIR("1", 1, 0.95);
+		DocumentOutputPIR o2 = new DocumentOutputPIR("5", 2, 0.95);
+		DocumentOutputPIR o3 = new DocumentOutputPIR("10", 3, 0.95);
+		DocumentOutputPIR o4 = new DocumentOutputPIR("4", 4, 0.95);
+		DocumentOutputPIR o5 = new DocumentOutputPIR("9", 5, 0.95);
+		DocumentOutputPIR o6 = new DocumentOutputPIR("3", 6, 0.95);
+		DocumentOutputPIR o7 = new DocumentOutputPIR("8", 7, 0.95);
+		DocumentOutputPIR o8 = new DocumentOutputPIR("7", 8, 0.95);
+		DocumentOutputPIR o9 = new DocumentOutputPIR("6", 9, 0.95);
+		DocumentOutputPIR o10 = new DocumentOutputPIR("2", 10, 0.95);
+		Map<String,Document> docs1 = new HashMap<String, Document>();
+		docs1.put("1", o1);
+		docs1.put("5", o2);
+		docs1.put("10", o3);
+		docs1.put("4", o4);
+		docs1.put("9", o5);
+		docs1.put("3", o6);
+		docs1.put("8", o7);
+		docs1.put("7", o8);
+		docs1.put("6", o9);
+		docs1.put("2", o10);
+		Query qOut = new Query("user", "topic", "queryOut", docs1);
 
-
+		assertEquals(0.783, CalculateMeasure.calculateAP(qRel, qOut), 0.001);
+		
+		Map<String, Query> pirQueries;
+		Query pirQuery;
+		Query relQuery;
+		//Model 1
+		pirQueries = result.get(0).getQueries();
+		pirQuery = pirQueries.get("204");
+		relQuery = rel.get("204");
+		assertNotNull(pirQuery);
+		assertNotNull(relQuery);
+		assertEquals(0.266666667, CalculateMeasure.calculateAP(relQuery, pirQuery), 0.001);
+		
+		pirQueries = result.get(0).getQueries();
+		pirQuery = pirQueries.get("108");
+		relQuery = rel.get("108");
+		assertNotNull(pirQuery);
+		assertNotNull(relQuery);
+		assertEquals(0.8268, CalculateMeasure.calculateAP(relQuery, pirQuery), 0.001);
+		
+		
+	}
 
 }
