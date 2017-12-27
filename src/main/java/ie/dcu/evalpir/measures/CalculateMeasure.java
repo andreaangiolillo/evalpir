@@ -186,11 +186,13 @@ public class CalculateMeasure{
 		for(Map.Entry<String, Document> entryDocPIR : queryOutputPIR.getDocs().entrySet() ) {
 			docOut = (DocumentOutputPIR)entryDocPIR.getValue();
 			docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
-			value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
 			if(docOut.getRank() <= p) {	
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
-				value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
-				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (Utilities.log(docOut.getRank() + 1, 2));	
+				value_relevance = (docRel == null) ? 1 : docRel.getRelevance();
+				System.out.println("1)dcd: " + dcg);
+				System.out.println("DOC ID: " + docOut.getId() + " RANK: " +docOut.getRank()+  " VALUE REL: " + value_relevance + " LOG: " + Utilities.log(docOut.getRank(), 2));
+				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (Utilities.log(docOut.getRank(), 2));	
+				System.out.println("2)dcd: " + dcg);
 			}
 		}
 		
@@ -211,6 +213,7 @@ public class CalculateMeasure{
 		DocumentRelFile docRel;
 		for(Map.Entry<String, Document> entry: queryRel.getDocs().entrySet()) {
 			docRel = (DocumentRelFile)entry.getValue();
+			System.out.println("DOCID: " + docRel.getId() + " Rel: " +docRel.getRelevance());
 			idcg.add(docRel.getRelevance());
 		}
 		
@@ -221,44 +224,20 @@ public class CalculateMeasure{
 		});
 
 		double idcgValue = idcg.get(0);
+		int lenght = (p <= idcg.size()) ? p : idcg.size();
 		int rank = 2;
-		p = (p < idcg.size()) ? p : idcg.size(); // if p > idcg.size the value of the documents after size is 0 
-		for (int i = 1; i < p; i++){	
-			idcgValue += idcg.get(i) / (Utilities.log(rank + 1, 2));
+		for (int i = 1; i < lenght; i++){	
+			idcgValue += idcg.get(i) / (Utilities.log(rank, 2));
 			rank ++;	
+		}
+		
+		for(int j = idcg.size(); j < p; j++) {// if p > idcg.size the value of the documents after size is 1 
+			idcgValue += 1 / (Utilities.log(rank, 2));
+			rank++;
 		}
 		
 		return idcgValue;
 	}
-//	public static double IDCG(Query queryRel, Query queryOutputPIR, int p) {
-//		ArrayList<Integer> idcg = new ArrayList<Integer>();
-//		int value_relevance = 0;
-//		Iterator<Entry<String, Document>> itDocOutputPIR = queryOutputPIR.getDocs().entrySet().iterator();
-//		DocumentRelFile docRel;
-//		DocumentOutputPIR docOut;
-//		while (itDocOutputPIR.hasNext()) {
-//			Map.Entry<?,?> pairDocOUT = (Map.Entry<?,?>)itDocOutputPIR.next();
-//			docOut = (DocumentOutputPIR)pairDocOUT.getValue();
-//			docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
-//			value_relevance = (docRel == null) ? 0 : docRel.getRelevance();
-//			idcg.add(value_relevance);	
-//		}
-//		
-//		Collections.sort(idcg, new Comparator<Integer>() {
-//		    public int compare(Integer o1, Integer o2) {
-//		        return o2.compareTo(o1);
-//		    }
-//		});
-//		
-//		double idcgValue = idcg.get(0);
-//		int rank = 2;
-//		for (int i = 1; i < p; i++){	
-//			idcgValue += idcg.get(i) / (log(rank + 1, 2));
-//			rank ++;	
-//		}
-//		
-//		return idcgValue;
-//	}
 	
 	/**
 	 * Normalized Discounted Cumulative Gain (NDCG) is a precision

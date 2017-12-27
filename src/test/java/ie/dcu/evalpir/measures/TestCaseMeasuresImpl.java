@@ -397,6 +397,28 @@ public class TestCaseMeasuresImpl {
 	}
 
 
+	@Test
+	public void testCalculateNDCG() {
+		
+		Map<String, Query> pirQueries;
+		Query pirQuery;
+		Query relQuery;
+		//Model 1
+		pirQueries = result.get(0).getQueries();
+		pirQuery = pirQueries.get("204");
+		relQuery = rel.get("204");
+		assertNotNull(pirQuery);
+		assertNotNull(relQuery);
+		assertEquals(6.553889181363094,  CalculateMeasure.DCG(relQuery, pirQuery, 5), 0.000000001);
+		assertEquals(9.123212623289701,  CalculateMeasure.IDCG(relQuery, 5), 0.000000001);
+		assertEquals(0.718375144,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 5), 0.000000001);
+		assertEquals(10.011053512063121,  CalculateMeasure.DCG(relQuery, pirQuery, 10), 0.000000001);
+		assertEquals(12.508989023,  CalculateMeasure.IDCG(relQuery, 10), 0.000000001);
+		assertEquals(0.800308761,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 10), 0.000000001);
+		assertEquals(12.80053534667898,  CalculateMeasure.DCG(relQuery, pirQuery, 20), 0.000000001);
+		assertEquals(15.356157471,  CalculateMeasure.IDCG(relQuery, 20), 0.000000001);
+		assertEquals(0.833576718,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 20), 0.000000001);	
+	}
 
 	
 
@@ -459,44 +481,7 @@ public class TestCaseMeasuresImpl {
 	
 //	
 //	
-//	@Test
-//	public void testCalculateNDCG() {
-//		Double delta = 0.000001;
-//		Query query_result;
-//		Query query_rel;
-//		
-//		//user0 
-//		query_result = result.get(0).getQuery("1");
-//		query_rel = rel.get("1");
-//		assertEquals(0.441060599, CalculateMeasure.calculateNDCG(query_rel, query_result, 3), delta);
 //	
-//		query_result = result.get(0).getQuery("2");
-//		query_rel = rel.get("2");
-//		assertEquals(0.809953117, CalculateMeasure.calculateNDCG(query_rel, query_result, 3), delta);
-//		
-//		query_result = result.get(0).getQuery("3");
-//		query_rel = rel.get("3");
-//		assertEquals(0.904976558, CalculateMeasure.calculateNDCG(query_rel, query_result, 3), delta);
-//		
-//				
-//		//user1 - PK
-//		
-//		query_result = result.get(0).getQuery("10");
-//		query_rel = rel.get("10");
-//		assertEquals(0.55353405, CalculateMeasure.calculateNDCG(query_rel, query_result, 3), delta);
-//		
-//		query_result = result.get(0).getQuery("11");
-//		query_rel = rel.get("11");
-//		assertEquals(0.61830695, CalculateMeasure.calculateNDCG(query_rel, query_result, 3), delta);
-//		
-//		query_result = result.get(0).getQuery("12");
-//		query_rel = rel.get("12");
-//		assertEquals(0.544276169, CalculateMeasure.calculateNDCG(query_rel, query_result, 3), delta);
-//				
-//		
-//		
-//	}
-//
 //
 //		
 
