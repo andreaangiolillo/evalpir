@@ -63,8 +63,8 @@ public class CalculateMeasure{
 	 * @return f_meausure
 	 * @Complexity O(1) 
 	 * **/
-	public static double fMeasure(double precision, double recall, double alpha) {
-		return (alpha > 0.0 && alpha <= 1.0 ) ? (1/((alpha * 1/precision) + (1 - alpha) * 1/recall)) : 0;
+	public static double fMeasure(double precision, double recall) {
+		return  2*((precision * recall)/(precision + recall));
 	}
 	
 	
@@ -358,7 +358,7 @@ public class CalculateMeasure{
 					qNDCG20 = calculateNDCG(queryRel, queryPIR, 20);
 					precision = precision(queryRel, queryPIR);
 					recall = recall(queryRel, queryPIR);
-					fMeasure = fMeasure(precision, recall, 0.5);
+					fMeasure = fMeasure(precision, recall);
 					ap = calculateAP(queryRel, queryPIR);
 	
 					((Measure) queryRel.searchAddMeasure("NDCG@05", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@05"))).addPIR(pir.getName(), qNDCG5);

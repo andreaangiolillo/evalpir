@@ -90,9 +90,9 @@ public class EvalEpir {
     	
     //	setMODELS(InputReaderImpl.extractOutputPIR(outputPIR));
    	  	
-    	System.out.println("CHART: "  + CHART);
-    	System.out.println("Method1: "  + SESSION_METHOD_1);
-    	System.out.println("Method2: "  + SESSION_METHOD_2);
+//    	System.out.println("CHART: "  + CHART);
+//    	System.out.println("Method1: "  + SESSION_METHOD_1);
+//    	System.out.println("Method2: "  + SESSION_METHOD_2);
     	
 		CalculateMeasure.calculateMeasures();
     	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
