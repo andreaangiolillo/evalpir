@@ -528,8 +528,6 @@ public class TestCaseMeasuresImpl {
 		assertNotNull(pirQuery);
 		assertNotNull(relQuery);
 		assertEquals(0.8268, CalculateMeasure.calculateAP(relQuery, pirQuery), 0.001);
-		
-		
 	}
 
 }

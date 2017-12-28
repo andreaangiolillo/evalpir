@@ -92,6 +92,7 @@ public class LineChart{
 				if(measure != null) {
 					measure.sortbyKey();
 					value = (Double)measure.getPIR(j).getValue();
+				
 					
 				}
 	
@@ -101,7 +102,7 @@ public class LineChart{
 		}
 		
 		XYSeriesCollection dataset = new XYSeriesCollection();	
-		for (XYSeries s : series) {
+		for (XYSeries s : series) {		
 			dataset.addSeries(s);
 			
 		}
@@ -137,8 +138,8 @@ public class LineChart{
 	        XYLineAndShapeRenderer r = (XYLineAndShapeRenderer) plot.getRenderer();
 			r.setAutoPopulateSeriesShape(true);
 			r.setStroke(new BasicStroke(3));
-	        return chart;
-	        
+			r.setBaseShapesVisible(true);
+	        return chart;        
 	 }
 	 
 	 /**
@@ -156,32 +157,16 @@ public class LineChart{
 		
 		SymbolAxis rangeAxis = new SymbolAxis("Query", name);
 		rangeAxis.setTickUnit(new NumberTickUnit(1));
-		rangeAxis.setRange(0,topic.size());
 		rangeAxis.setGridBandsVisible(false);
 		XYPlot plot = (XYPlot) chart.getPlot();
 		plot.setDomainAxis(rangeAxis);
-		
-		//Setting the yAxis
-		boolean isNormaliseMeasure = false;
-		String[] normaliseMeasure = new String[] {"precision@", "recall@", "ndcg", "recall", "fmeasure", "average precision"};
-		int i = 0;
-		while(i < normaliseMeasure.length && !isNormaliseMeasure) {
-			if(measure.toLowerCase().contains(normaliseMeasure[i])){
-				isNormaliseMeasure = true;
-			}
-			
-			i++;
-		}
-		if (isNormaliseMeasure) {
+		if(!measure.equalsIgnoreCase("Precision")) {
 			ValueAxis yAxis = plot.getRangeAxis();
-			
 			yAxis.setRange(0, 1);
 			yAxis.setRangeWithMargins(0,1);
-			yAxis.setLowerBound(0);
-			rangeAxis.setRangeWithMargins(0,rangeAxis.getUpperBound());
-			
-			
 		}	
+			
+			
 		
 	 }
 	 

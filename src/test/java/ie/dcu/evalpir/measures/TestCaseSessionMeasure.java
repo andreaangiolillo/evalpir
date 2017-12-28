@@ -29,20 +29,23 @@ public class TestCaseSessionMeasure {
 	static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
 	static final String PIRS_FILE = "src/main/resources/ar.csv";
 	
-	private Map<String, Query>  rel; 
+	
+	private Map<String, Query>  rel;
 	private ArrayList<PIR>  result;
 	private Map<String ,Session> logsfile;
-	private CalculateSessionMeasure m;
+	/** example variables**/
 	private Map<String,Query> qPIR = new HashMap<String, Query>();
 	private Map<String,Query> qRel = new HashMap<String, Query>();
 	private Session s;
 	
 	public TestCaseSessionMeasure() {
-	    setInstance();
+		String[] args = {"", "src/main/resources/relFile.csv", "src/main/resources/logSFile.csv", "src/main/resources/model1.csv","src/main/resources/model2.csv","src/main/resources/model3.csv"};
+		rel = InputReader.extractRelevanceFile(new File(args[1]));
+		result = EvalEpir.extractingModels(args);
+		logsfile = InputReader.extracLogFile(new File(args[2]));
+		setInstance();
 	}
-	
-	
-	
+
 	public void setInstance() {
 		DocumentRelFile dr1 = new DocumentRelFile("1", 1);
 		DocumentRelFile dr2 = new DocumentRelFile("2", 1);
@@ -166,8 +169,6 @@ public class TestCaseSessionMeasure {
 
 	}
 	
-	
-	
 	@Test
 	public void testCreatingQueryConsideringPreoviousOnes() {
 		EvalEpir.setQUERYREL(qRel);
@@ -187,13 +188,7 @@ public class TestCaseSessionMeasure {
 		
 		assertEquals(2, ((QueryRelFile)qNew).getNRelevantDoc());
 		System.out.println(qNew.getDocs());
-		
-		
-		
-		
 	}
-	
-//	
 	
 	@Test
 	public void TestGetPath() {
@@ -206,7 +201,6 @@ public class TestCaseSessionMeasure {
 	
 	@Test
 	public void TestPrecisionk() {
-	
 		Map<String, Document> docsMergedRel = CalculateSessionMeasure.mergeRelevanceDocs(qRel);
 		/* TEST MergeReleanceDocs*/
 		assertEquals(18, docsMergedRel.size());
@@ -216,11 +210,11 @@ public class TestCaseSessionMeasure {
 		assertEquals(14, docsMergedPIR.size());
 		
 //		/* TEST Precision**/
-//		assertEquals(1.0, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 1), 0.01);
-//		assertEquals(0.75, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 4), 0.01);
-//		assertEquals(0.66, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 6), 0.01);
-//		assertEquals(0.55, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 9), 0.01);
-//		assertEquals(0.583, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 12), 0.01);
+		assertEquals(1.0, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 1), 0.01);
+		assertEquals(0.75, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 4), 0.01);
+		assertEquals(0.66, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 6), 0.01);
+		assertEquals(0.55, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 9), 0.01);
+		assertEquals(0.583, CalculateSessionMeasure.precisionK(docsMergedRel, docsMergedPIR, 12), 0.01);
 	}
 
 	@Test
