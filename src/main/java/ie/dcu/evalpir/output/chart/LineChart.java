@@ -17,6 +17,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.axis.AxisSpace;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.axis.ValueAxis;
@@ -25,6 +26,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleInsets;
+
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
@@ -91,9 +94,7 @@ public class LineChart{
 				measure = (Measure)((QueryRelFile)topic.get(i)).searchMeasure(m.getName());
 				if(measure != null) {
 					measure.sortbyKey();
-					value = (Double)measure.getPIR(j).getValue();
-				
-					
+					value = (Double)measure.getPIR(j).getValue();	
 				}
 	
 				series[j].add(i, value);
@@ -160,43 +161,17 @@ public class LineChart{
 		rangeAxis.setGridBandsVisible(false);
 		XYPlot plot = (XYPlot) chart.getPlot();
 		plot.setDomainAxis(rangeAxis);
-		if(!measure.equalsIgnoreCase("Precision")) {
-			ValueAxis yAxis = plot.getRangeAxis();
+		ValueAxis yAxis = plot.getRangeAxis();
+		if(!measure.equalsIgnoreCase("Precision") && !measure.equalsIgnoreCase("F-Measure") ) {	
 			yAxis.setRange(0, 1);
-			yAxis.setRangeWithMargins(0,1);
-		}	
-			
+		}else {
+			yAxis.setLowerBound(0);
+		}
+		yAxis.setLowerMargin(5);
+		
 			
 		
 	 }
-	 
-	/**
-	 * It creates the lineChart for the session measure
-	 * @param path
-	 * @param user
-	 * @param topic
-	 * @param measure
-	 */
-	public static void createLineChartForSessionMeasure(String path, String user, String topic, MeasureCompound measure) {
-		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
-		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
-		ChartFactory.setChartTheme(theme);
-		XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
-		JFreeChart chart = createChart(dataset, user, topic, "", measure.getName());
-		XYPlot plot = (XYPlot) chart.getPlot();
-        ValueAxis xAxis = plot.getDomainAxis();
-        xAxis.setRange(0, 100);
-        xAxis.setLowerMargin(0);
-        ValueAxis yAxis = plot.getRangeAxis();
-		yAxis.setRange(0, 1.05);
-	
-		try {
-        	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 1366, 768);
-        } catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	 
 	/**
 	 * 
@@ -207,7 +182,6 @@ public class LineChart{
 	public static void CreateLineChartPerQuery(String path, ArrayList<Query> topic, String measureName) {
 		initUIPerQuery(path, topic, measureName);
 	}
-	
 	/**
 	 * It creates the lineChart for the PrecisionRecallCurve
 	 * @param path
@@ -305,5 +279,34 @@ public class LineChart{
 		
 		return dataset;
 	}	
+	
+	/**
+	 * It creates the lineChart for the session measure
+	 * @param path
+	 * @param user
+	 * @param topic
+	 * @param measure
+	 */
+	public static void createLineChartForSessionMeasure(String path, String user, String topic, MeasureCompound measure) {
+		StandardChartTheme theme = new StandardChartTheme("JFree/Shadow");
+		theme.setPlotBackgroundPaint(Color.LIGHT_GRAY);
+		ChartFactory.setChartTheme(theme);
+		XYSeriesCollection dataset = createDataset((MeasureCompound)measure);
+		JFreeChart chart = createChart(dataset, user, topic, "", measure.getName());
+		XYPlot plot = (XYPlot) chart.getPlot();
+        ValueAxis xAxis = plot.getDomainAxis();
+        xAxis.setRange(0, 100);
+        xAxis.setLowerMargin(0);
+        ValueAxis yAxis = plot.getRangeAxis();
+		yAxis.setRange(0, 1.05);
+	
+		try {
+        	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 1366, 768);
+        } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	
 }

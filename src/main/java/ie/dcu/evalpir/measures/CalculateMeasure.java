@@ -64,7 +64,11 @@ public class CalculateMeasure{
 	 * @Complexity O(1) 
 	 * **/
 	public static double fMeasure(double precision, double recall) {
-		return  2*((precision * recall)/(precision + recall));
+		if(precision == 0 && recall == 0) {
+			return 0;
+		}
+		
+		return 2*((precision * recall)/(precision + recall));
 	}
 	
 	
@@ -354,7 +358,10 @@ public class CalculateMeasure{
 					
 					//Compound measure
 					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, false, EvalEpir.MEASURES_FOR_CHART.contains("PrecisionRecallCurve"))).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR, true));
-					
+//					if(queryRel.getId().equalsIgnoreCase("110")) {
+//						System.out.println("F-Measure: " + fMeasure);
+//					}
+						
 					precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);
 					apNewInfo = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR);
 					if(precision != precisionNewInfo) {
