@@ -3,16 +3,17 @@ INFO COMMANDS
 
 Charts: 
 
-1) no_charts
+1) noCharts
 2) default (Recall", "Precision", "AveragePrecision","PrecisionRecallCurve", "NDCG@10")
-3) all	("Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", "NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve"
+3) allCharts	("Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", "NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve"
 
-Session Measures:
+Session Approaches:
 
-1) default
-2) method2
-3) all
+1) logsFile: using only the information in the logsFile
+2) untilNotRelDocFound: set the last doc seen in a ranked list as the first not relevant doc found after the last doc opened by the user (information provide by logsfile)
+3) Moffat&ZobelDistribution: the user behaviour is simulated by the probabilistic distribution defined by Moffat and Zobel
+4) allApproaches
 
 **/
 
-all, all
+allCharts, allApproaches

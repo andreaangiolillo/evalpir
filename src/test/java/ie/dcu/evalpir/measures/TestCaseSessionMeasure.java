@@ -268,6 +268,11 @@ public class TestCaseSessionMeasure {
 	}
 	
 	@Test
+	public void getPathbyProb() {
+		System.out.println("Path by prob: " + s.getPathbyMoffatZobelDistribution(0.85));
+	}
+	
+	@Test
 	public void TestrR() {
 		assertEquals(7,CalculateSessionMeasure.rR(qRel, qPIR, s.getPath()));
 		

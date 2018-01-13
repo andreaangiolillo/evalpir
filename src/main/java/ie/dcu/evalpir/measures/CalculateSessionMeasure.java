@@ -583,6 +583,14 @@ public class CalculateSessionMeasure {
 							((Measure)topicRel.getValue().searchAddMeasure("Session_Recall_UntilNotRelDocFound", false, true, false)).addPIR(pir.getName(), rRCMet2);
 							((MeasureCompound)topicRel.getValue().searchAddMeasure("Session_PrecisionRecallCurve_UntilNotRelDocFound", true, false, EvalEpir.MEASURES_FOR_CHART.contains("Session_PrecisionRecallCurve_UntilNotRelDocFound"))).addPIR(pir.getName(), precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath(topicsPir.get(topicRel.getKey()).getQueries())));	
 						}
+						
+						if(EvalEpir.SESSION_METHOD_3) {
+							rPCMet2 = rPC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPathbyMoffatZobelDistribution(0.85));
+							rRCMet2 = rRC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPathbyMoffatZobelDistribution(0.85));
+							((Measure)topicRel.getValue().searchAddMeasure("Session_Precision_Moffat&ZobelDistribution", false, true, false)).addPIR(pir.getName(), rPCMet2);
+							((Measure)topicRel.getValue().searchAddMeasure("Session_Recall_Moffat&ZobelDistribution", false, true, false)).addPIR(pir.getName(), rRCMet2);
+							((MeasureCompound)topicRel.getValue().searchAddMeasure("Session_PrecisionRecallCurve_Moffat&ZobelDistribution", true, false, EvalEpir.MEASURES_FOR_CHART.contains("Session_PrecisionRecallCurve_Moffat&ZobelDistribution"))).addPIR(pir.getName(), precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPathbyMoffatZobelDistribution(0.85)));	
+						}
 					}	
 				}
 			}

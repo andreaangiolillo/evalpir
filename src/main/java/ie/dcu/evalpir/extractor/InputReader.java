@@ -49,44 +49,43 @@ public class InputReader{
 			 String[] row;
 			 row = line.split(",");
 			
-			 for(int j = 1; j < row.length; j++) {
+			 for(int j = 0; j < row.length; j++) {
 				 switch(row[j].trim().toLowerCase()) {
-					case "method2":
+					case "untilnotreldocfound":
 						EvalEpir.SESSION_METHOD_2 = true;
+						break;
+					case "logsFile":
+						EvalEpir.SESSION_METHOD_1 = true;
+						break;
+					case "moffat&mobeldistribution":
+						EvalEpir.SESSION_METHOD_3 = true;
+					case "allapproaches":
+						EvalEpir.SESSION_METHOD_1 = true;
+						EvalEpir.SESSION_METHOD_2 = true;
+						EvalEpir.SESSION_METHOD_3 = true;
+						break;
+					case "allcharts":
+						EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
+							"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve"));
 						break;
 					case "default":
-						EvalEpir.SESSION_METHOD_1 = true;
-						break;
-					case "all":
-						EvalEpir.SESSION_METHOD_1 = true;
-						EvalEpir.SESSION_METHOD_2 = true;
-						break;
+						EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision","PrecisionRecallCurve", "NDCG@10"));
+							break;
+					case "nocharts":
+						EvalEpir.MEASURES_FOR_CHART = new HashSet<>();
 					default:
 						throw new IllegalArgumentException("Invalid command: " + row[j]);
 				}
 			 }
-
-			 EvalEpir.CHART = row[0].trim().toLowerCase();
-			 switch(EvalEpir.CHART) {
-				case "all":
-					EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
-						"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve"));
-					break;
-				case "default":
-					EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision","PrecisionRecallCurve", "NDCG@10"));
-						break;
-				case "no_charts":
-					EvalEpir.MEASURES_FOR_CHART = new HashSet<>();
-						break;
-				default:
-					throw new IllegalArgumentException("Invalid command: " + EvalEpir.CHART);
-			} 
 			 
 			if(EvalEpir.SESSION_METHOD_1) {
 				EvalEpir.MEASURES_FOR_CHART.add("Session_PrecisionRecallCurve");
 			}
 			if(EvalEpir.SESSION_METHOD_2) {
 				EvalEpir.MEASURES_FOR_CHART.add("Session_PrecisionRecallCurve_UntilNotRelDocFound");
+			}
+			if(EvalEpir.SESSION_METHOD_3) {
+				EvalEpir.MEASURES_FOR_CHART.add("Session_PrecisionRecallCurve_Moffat&ZobelDistribution");
 			}
 
 		}catch (NumberFormatException e) {

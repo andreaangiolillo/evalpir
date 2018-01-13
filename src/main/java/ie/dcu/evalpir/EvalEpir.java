@@ -59,6 +59,7 @@ public class EvalEpir {
 	public static String CHART = "default";
 	public static boolean SESSION_METHOD_1 = false;
 	public static boolean SESSION_METHOD_2 = false;
+	public static boolean SESSION_METHOD_3 = false;
 	/**/
 	
 	public static  Map<String, Session> LOGS = null;

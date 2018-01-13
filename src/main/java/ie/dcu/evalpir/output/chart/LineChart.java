@@ -294,7 +294,7 @@ public class LineChart{
         xAxis.setRange(0, 100);
         xAxis.setLowerMargin(0);
         ValueAxis yAxis = plot.getRangeAxis();
-		yAxis.setRange(0, 1.05);
+		yAxis.setRange(0, 1.0);
 	
 		try {
         	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, BarChart.getWidthScreen(), BarChart.getHeightScreen(), null, false, 9);

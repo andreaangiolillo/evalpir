@@ -212,7 +212,7 @@ public class Session{
 	 * @param p
 	 * @return
 	 */
-	public Map<String, Integer> getPathbyProb(int p){
+	public Map<String, Integer> getPathbyMoffatZobelDistribution(double p){
 		Map<String, Integer> path = getPath();
 		for(Map.Entry<String, Integer> entryPath: path.entrySet()) {
 			entryPath.setValue(getLastDocOpenedByDistribution(p));
@@ -226,7 +226,7 @@ public class Session{
 	 * @param p
 	 * @return
 	 */
-	public int getLastDocOpenedByDistribution(int p) {
+	public int getLastDocOpenedByDistribution(double p) {
 		boolean changeQuery = false;
 		Random random = new Random();
 		int i = 1;
@@ -235,8 +235,7 @@ public class Session{
 		
 		while(!changeQuery) {
 			randNumber = random.nextFloat();//which returns the random float number between 0.0f (inclusive) and 1.0f(exclusive).
-			probChangeQuery = 1 - moffatZobelDistribution(p, i + 1);
-			
+			probChangeQuery = 1 - moffatZobelDistribution(p, i + 1);	
 			if(randNumber > probChangeQuery ) {
 				i++;
 			}else {
@@ -254,7 +253,7 @@ public class Session{
 	 * @return
 	 * @see https://pdfs.semanticscholar.org/471c/b4c2e5039bdaacb0274fee70c7fe2e93493e.pdf
 	 */
-	public static double  moffatZobelDistribution(int p, int i) {
+	public static double  moffatZobelDistribution(double p, int i) {
 		if(i == 1) {
 			return 1;
 		}else {
