@@ -14,10 +14,10 @@ import ie.dcu.evalpir.elements.Document;
 import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.PIR;
+import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.extractor.InputReader;
-import ie.dcu.evalpir.utilities.Pair;
 
 
 public class TestCaseMeasuresImpl {

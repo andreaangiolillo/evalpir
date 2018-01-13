@@ -23,13 +23,13 @@ import ie.dcu.evalpir.output.table.ConsolePrinter;
 public class CreatorChart {
 
 	final static String[] MEASURES_LINECHART = {"Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
-										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve", "Session_PrecisionRecallCurve_2"};
+										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve", "Session_PrecisionRecallCurve_UntilNotRelDocFound"};
 	
 	
 	final static String[] MEASURES_BARCHART = { "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
 			"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5"};
 	
-	final static String[] MEASURES_STACKEDBAR = {"Precision", "AveragePrecision"};
+	final static String[] MEASURES_INDEPTH = {"AveragePrecision"};
 
 	/**
 	 * It creates the folder for the diagrams
@@ -53,8 +53,8 @@ public class CreatorChart {
 					case "BarChart":
 						measures = MEASURES_BARCHART;
 						break;
-					case "StackedBar":
-						measures = MEASURES_STACKEDBAR;
+					case "In-depth analysis":
+						measures = MEASURES_INDEPTH;
 						break;
 					default:
 						throw new IllegalArgumentException("Invalid name of the folder: " + folderName);
@@ -77,13 +77,14 @@ public class CreatorChart {
 	
 	 /**
 	  * It computes the charts for the measures
+	  *
 	  * @param queries
 	  */
 	 public static void createChart(final Map<String,Query> queries) {
 		ConsolePrinter.startTask("Creating Charts");
 		String pathL = createFolder("LineChart");
 		String pathB = createFolder("BarChart");
-		String pathS = createFolder("StackedBar");
+		String pathS = createFolder("In-depth analysis");
 
 		Map<String, ArrayList<Query>> topics = setTopic(queries);
 		AbstractMeasure[] measures;
@@ -96,16 +97,10 @@ public class CreatorChart {
 					//System.out.println("MEASURE: " + measure.getName());
 					if(measure instanceof Measure) {
 						LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
+						BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure, false);
 						if(measure.isStackedBar()) {
-							//System.out.println("Stack da creare");
-
-							StackedBar.CreateStackedBar(pathS, topic, (Measure)measure);
-							BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure, true);						
-						}else {
-							BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure, false);
-
+							BarChart.CreateBarChartPerTopic(pathS, topic, (Measure)measure, true);
 						}
-						
 					}else if(measure instanceof MeasureCompound) {
 						LineChart.CreateLineChartPerQuery(pathL, topic, measure.getName());
 					}
@@ -134,7 +129,7 @@ public class CreatorChart {
 			 }
 			 
 			 if(EvalEpir.SESSION_METHOD_2) {
-				 measureNewInfo = (MeasureCompound)topic.getValue().searchMeasure("Session_PrecisionRecallCurve_2");
+				 measureNewInfo = (MeasureCompound)topic.getValue().searchMeasure("Session_PrecisionRecallCurve_UntilNotRelDocFound");
 				 if(measureNewInfo != null) {
 					 LineChart.createLineChartForSessionMeasure(path, topic.getValue().getUserId(), topic.getValue().getTopicId(), measureNewInfo);
 				 }
@@ -201,14 +196,14 @@ public class CreatorChart {
 	
 	
 	/***
-	 * It searches measures with isStackedBar == true in the topic, and, in that case, set the measures used to create charts to true
+	 * It searches measures with isStackedBar == true in the topic, and, in that case, set the measures  true
 	 * @param measures
 	 * @param topic
 	 * @return
 	 */
 	public static AbstractMeasure[] setStackedBar(AbstractMeasure[] measures, final ArrayList<Query> topic) {
 		Map<String, Boolean> dictionaryMeasure = new HashMap<String, Boolean>();
-		for(String measureStackedBar : MEASURES_STACKEDBAR) {
+		for(String measureStackedBar : MEASURES_INDEPTH) {
 			dictionaryMeasure.put(measureStackedBar.trim().toLowerCase(), false);
 		}
 		
@@ -216,7 +211,7 @@ public class CreatorChart {
 		AbstractMeasure measureTopic;
 		for (Query query : topic) {
 			measuresTopic = ((QueryRelFile)query).getMeasures();
-			for(String measureStackedBar : MEASURES_STACKEDBAR) {
+			for(String measureStackedBar : MEASURES_INDEPTH) {
 				measureTopic = measuresTopic.get(measureStackedBar.trim().toLowerCase());
 				if(measureTopic != null && measureTopic.isStackedBar()) {
 					dictionaryMeasure.put(measureStackedBar.trim().toLowerCase(), true);

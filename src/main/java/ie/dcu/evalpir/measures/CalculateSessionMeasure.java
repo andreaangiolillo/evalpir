@@ -19,6 +19,7 @@ import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.PIR;
+import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
@@ -26,8 +27,7 @@ import ie.dcu.evalpir.elements.Topic;
 import ie.dcu.evalpir.exceptions.DifferentQueryException;
 import ie.dcu.evalpir.exceptions.DifferentSizeException;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
-import ie.dcu.evalpir.utilities.Pair;
-import ie.dcu.evalpir.utilities.Utilities;
+
 
 public class CalculateSessionMeasure {
 		
@@ -49,8 +49,8 @@ public class CalculateSessionMeasure {
 			
 			for (int i = 0; i < queryRel.size(); i++) {
 				if(queryRel.get(i).getId().equalsIgnoreCase(queryOutputPIR.get(i).getId())) {
-					sDCG += !ideal ? Math.pow(1 + Utilities.log(i + 1, logbase), -1) * CalculateMeasure.DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
-							  :	Math.pow(1 + Utilities.log(i + 1, logbase), -1) * CalculateMeasure.IDCG(queryRel.get(i), k);
+					sDCG += !ideal ? Math.pow(1 + CalculateMeasure.log(i + 1, logbase), -1) * CalculateMeasure.DCG(queryRel.get(i), queryOutputPIR.get(i), k) 
+							  :	Math.pow(1 + CalculateMeasure.log(i + 1, logbase), -1) * CalculateMeasure.IDCG(queryRel.get(i), k);
 				}else {
 					throw new DifferentQueryException("Different queries: \nQueryRelID: " + queryRel.get(i).getId() + ", QueryOutputPIR: " + queryOutputPIR.get(i).getId());
 				}
@@ -401,76 +401,78 @@ public class CalculateSessionMeasure {
 			throw new QueryNotInTheLogFileException("Query " + queriesSortedByTime + " QueryID: " + query.getId());
 		}
 		
+//		/**
+//		 * It computes the NDCG considering only the relevant docs that are not in the query performed before 
+//		 * 
+//		 * @return
+//		 */
+//		public static double calculateNDCGConsideringNewInformation(Query queryRel, Query queryOutputPIR, int p) {
+//			String key = queryRel.getUser().toLowerCase() +  "," +  queryRel.getTopic().toLowerCase() ;
+//			if(EvalEpir.getLOGS().get(key) == null) {
+//				throw new QueryNotInTheLogFileException("TopicID: " +queryRel.getTopic().toLowerCase() + " QueryID: " + queryRel.getId());
+//			}
+//			
+//			ArrayList<Log> queriesSortedByTime = EvalEpir.getLOGS().get(key).getQuery();
+//			int positionQueryInTopic = getPositionQuery(queryRel, queriesSortedByTime);
+//			if (positionQueryInTopic == 0) {
+//				return CalculateMeasure.calculateNDCG(queryRel, queryOutputPIR, p);
+//			}else {
+//				return CalculateMeasure.calculateNDCG(creatingQueryConsideringPreoviousOnes((QueryRelFile)queryRel, positionQueryInTopic, queriesSortedByTime, true), queryOutputPIR, p);
+//			}
+//		}
+		
+//		/**
+//		 * It computes the precision considering only the relevant document not relevant in the previous queries of the sessions
+//		 * @param queryRel
+//		 * @param queryOutputPIR
+//		 * @return
+//		 */
+//		public static double precisionConsideringNewInformation(Query queryRel, Query queryOutputPIR){
+//			String key = queryRel.getUser().toLowerCase() +  "," +  queryRel.getTopic().toLowerCase() ;
+//			if(EvalEpir.getLOGS().get(key) == null ) {
+//				throw new QueryNotInTheLogFileException("TopicID: " +queryRel.getTopic().toLowerCase() + " QueryID: " + queryRel.getId());
+//			}
+//			
+//			ArrayList<Log> queriesSortedByTime = EvalEpir.getLOGS().get(key).getQuery();
+//			int positionQueryInTopic = getPositionQuery(queryRel, queriesSortedByTime);
+//			if (positionQueryInTopic == 0) {
+//				return CalculateMeasure.calculatePKRK(queryRel, queryOutputPIR, queryOutputPIR.getDocs().size(), false);
+//			}else {
+//				return CalculateMeasure.calculatePKRK(creatingQueryConsideringPreoviousOnes((QueryRelFile)queryRel, positionQueryInTopic, queriesSortedByTime, true), queryOutputPIR, queryOutputPIR.getDocs().size(), false);
+//			}
+//			
+//		}
+		
+//		/**
+//		 * It computes the recall considering only the relevant document not relevant in the previous queries of the sessions
+//		 * @param queryRel
+//		 * @param queryOutputPIR
+//		 * @return
+//		 */
+//		public static double recallConsideringNewInformation(Query queryRel, Query queryOutputPIR){
+//			String key = queryRel.getUser().toLowerCase() +  "," +  queryRel.getTopic().toLowerCase() ;
+//			if(EvalEpir.getLOGS().get(key) == null ) {
+//				throw new QueryNotInTheLogFileException("TopicID: " +queryRel.getTopic().toLowerCase() + " QueryID: " + queryRel.getId());
+//			}
+//			
+//			ArrayList<Log> queriesSortedByTime = EvalEpir.getLOGS().get(key).getQuery();
+//			int positionQueryInTopic = getPositionQuery(queryRel, queriesSortedByTime);
+//			if (positionQueryInTopic == 0) {
+//				return CalculateMeasure.calculatePKRK(queryRel, queryOutputPIR, queryOutputPIR.getDocs().size(), true);
+//			}else {
+//				return CalculateMeasure.calculatePKRK(creatingQueryConsideringPreoviousOnes((QueryRelFile)queryRel, positionQueryInTopic, queriesSortedByTime, true), queryOutputPIR, queryOutputPIR.getDocs().size(), true);
+//			}
+//			
+//		}
+		
 		/**
-		 * It computes the NDCG considering only the relevant docs that are not in the query performed before 
+		 * It computes the average precision considering the relevant documents in the previous queries of the session
+		 * 1) if newRelDoc is true: it computes the AP considering the relevant documents which are relevant only in this query
+		 * 2) if newRelDoc is false: it computes the AP considering only the relevant document in the previous queries of the session
 		 * 
 		 * @return
 		 */
-		public static double calculateNDCGConsideringNewInformation(Query queryRel, Query queryOutputPIR, int p) {
-			String key = queryRel.getUser().toLowerCase() +  "," +  queryRel.getTopic().toLowerCase() ;
-			if(EvalEpir.getLOGS().get(key) == null) {
-				throw new QueryNotInTheLogFileException("TopicID: " +queryRel.getTopic().toLowerCase() + " QueryID: " + queryRel.getId());
-			}
-			
-			ArrayList<Log> queriesSortedByTime = EvalEpir.getLOGS().get(key).getQuery();
-			int positionQueryInTopic = getPositionQuery(queryRel, queriesSortedByTime);
-			if (positionQueryInTopic == 0) {
-				return CalculateMeasure.calculateNDCG(queryRel, queryOutputPIR, p);
-			}else {
-				return CalculateMeasure.calculateNDCG(creatingQueryConsideringPreoviousOnes((QueryRelFile)queryRel, positionQueryInTopic, queriesSortedByTime), queryOutputPIR, p);
-			}
-		}
-		
-		/**
-		 * It computes the precision considering only the relevant document not relevant in the previous queries of the sessions
-		 * @param queryRel
-		 * @param queryOutputPIR
-		 * @return
-		 */
-		public static double precisionConsideringNewInformation(Query queryRel, Query queryOutputPIR){
-			String key = queryRel.getUser().toLowerCase() +  "," +  queryRel.getTopic().toLowerCase() ;
-			if(EvalEpir.getLOGS().get(key) == null ) {
-				throw new QueryNotInTheLogFileException("TopicID: " +queryRel.getTopic().toLowerCase() + " QueryID: " + queryRel.getId());
-			}
-			
-			ArrayList<Log> queriesSortedByTime = EvalEpir.getLOGS().get(key).getQuery();
-			int positionQueryInTopic = getPositionQuery(queryRel, queriesSortedByTime);
-			if (positionQueryInTopic == 0) {
-				return CalculateMeasure.calculatePKRK(queryRel, queryOutputPIR, queryOutputPIR.getDocs().size(), false);
-			}else {
-				return CalculateMeasure.calculatePKRK(creatingQueryConsideringPreoviousOnes((QueryRelFile)queryRel, positionQueryInTopic, queriesSortedByTime), queryOutputPIR, queryOutputPIR.getDocs().size(), false);
-			}
-			
-		}
-		
-		/**
-		 * It computes the recall considering only the relevant document not relevant in the previous queries of the sessions
-		 * @param queryRel
-		 * @param queryOutputPIR
-		 * @return
-		 */
-		public static double recallConsideringNewInformation(Query queryRel, Query queryOutputPIR){
-			String key = queryRel.getUser().toLowerCase() +  "," +  queryRel.getTopic().toLowerCase() ;
-			if(EvalEpir.getLOGS().get(key) == null ) {
-				throw new QueryNotInTheLogFileException("TopicID: " +queryRel.getTopic().toLowerCase() + " QueryID: " + queryRel.getId());
-			}
-			
-			ArrayList<Log> queriesSortedByTime = EvalEpir.getLOGS().get(key).getQuery();
-			int positionQueryInTopic = getPositionQuery(queryRel, queriesSortedByTime);
-			if (positionQueryInTopic == 0) {
-				return CalculateMeasure.calculatePKRK(queryRel, queryOutputPIR, queryOutputPIR.getDocs().size(), true);
-			}else {
-				return CalculateMeasure.calculatePKRK(creatingQueryConsideringPreoviousOnes((QueryRelFile)queryRel, positionQueryInTopic, queriesSortedByTime), queryOutputPIR, queryOutputPIR.getDocs().size(), true);
-			}
-			
-		}
-		
-		/**
-		 * It computes the average precision considering only the relevant docs that are not relevant in the queries performed before 
-		 * 
-		 * @return
-		 */
-		public static double calculateAPConsideringNewInformation(Query queryRel, Query queryOutputPIR) {
+		public static double calculateAPConsideringNewInformation(Query queryRel, Query queryOutputPIR, boolean newRelDoc) {
 			String key = queryRel.getUser().toLowerCase() +  "," +  queryRel.getTopic().toLowerCase() ;
 			if(EvalEpir.getLOGS().get(key) == null ) {
 				throw new QueryNotInTheLogFileException("TopicID: " +queryRel.getTopic().toLowerCase() + " QueryID: " + queryRel.getId());
@@ -482,18 +484,20 @@ public class CalculateSessionMeasure {
 			if (positionQueryInTopic == 0) {
 				return CalculateMeasure.calculateAP(queryRel, queryOutputPIR);
 			}else {
-				return CalculateMeasure.calculateAP(creatingQueryConsideringPreoviousOnes((QueryRelFile)queryRel, positionQueryInTopic, queriesSortedByTime), queryOutputPIR);
+				return CalculateMeasure.calculateAP(creatingQueryConsideringPreoviousOnes((QueryRelFile)queryRel, positionQueryInTopic, queriesSortedByTime, newRelDoc), queryOutputPIR);
 			}
 		}
 		
 		/**
-		 * It creates a new queryRelFile with only the relevant documents that are not relevant docs in the previous queries
+		 * It creates a new queryRelFile considering the previous queries in the session:
+		 * 1) if newRelDoc is true: it creates a new query which the relevant documents are only the documents that was not relevant in the previous queries
+		 * 2) if newRelDoc is false: it creates a new query which the relevant documents are only the documents that was relevant in the previous queries
 		 * @param query
 		 * @param positionQueryInTopic
 		 * @param queriesSortedByTime
 		 * @return
 		 */
-		 public static Query creatingQueryConsideringPreoviousOnes(final QueryRelFile query, int positionQueryInTopic, ArrayList<Log>  queriesSortedByTime ){
+		 public static Query creatingQueryConsideringPreoviousOnes(final QueryRelFile query, int positionQueryInTopic, ArrayList<Log>  queriesSortedByTime, boolean newRelDoc ){
 			 Map<String, Document> docsInPreviousQuery = new HashMap<String, Document>();
 			 QueryRelFile previousQueryRel;	 
 			 for (int i = 0; i < queriesSortedByTime.size(); i++) {
@@ -507,17 +511,36 @@ public class CalculateSessionMeasure {
 				 }
 			 }
 		
-			 Map<String, Document> docsQuery = Utilities.copyMap(query.getDocs());
+			 Map<String, Document> docsQuery = copyMap(query.getDocs());
 			 for(Map.Entry<String, Document> entryDocs : docsQuery.entrySet()) {
-				 if(docsInPreviousQuery.containsKey(entryDocs.getKey().toLowerCase())){
-					 ((DocumentRelFile)entryDocs.getValue()).setRelevance(1); // if the document was relevant in a previous query, we do not consider it anymore
+				 if(newRelDoc) {
+					 if(docsInPreviousQuery.containsKey(entryDocs.getKey().toLowerCase())){
+						 ((DocumentRelFile)entryDocs.getValue()).setRelevance(1); // if the document was relevant in a previous query, we do not consider it anymore
+					 }
+				 }else {
+					 if(!docsInPreviousQuery.containsKey(entryDocs.getKey().toLowerCase())){
+						 ((DocumentRelFile)entryDocs.getValue()).setRelevance(1); // if the document was not relevant in a previous query, we do not consider it 
+					 }
 				 }
+				
 			 }
 			 
 			 return new QueryRelFile(query.getUser(), query.getTopic(), query.getId(), docsQuery, query.getMeasures());
 		 }
 		
-		 
+			
+			/**
+			 * 
+			 * @param map
+			 * @return
+			 */
+			public static  Map<String,Document> copyMap(Map<String, Document> mapToCopy) {
+				Map<String,Document> newMap = new HashMap<String,Document>();
+				for(Map.Entry<String, Document> entry: mapToCopy.entrySet()) {
+					newMap.put(entry.getKey(), new DocumentRelFile((DocumentRelFile)entry.getValue()));
+				}
+				return newMap;
+			}
 		
 		/**
 		 * It computes the session measures
@@ -556,9 +579,9 @@ public class CalculateSessionMeasure {
 						if(EvalEpir.SESSION_METHOD_2) {
 							rPCMet2 = rPC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath(topicsPir.get(topicRel.getKey()).getQueries()));
 							rRCMet2 = rRC(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getPath(topicsPir.get(topicRel.getKey()).getQueries()));
-							((Measure)topicRel.getValue().searchAddMeasure("Session_Precision_Method_2", false, true, false)).addPIR(pir.getName(), rPCMet2);
-							((Measure)topicRel.getValue().searchAddMeasure("Session_Recall_Method_2", false, true, false)).addPIR(pir.getName(), rRCMet2);
-							((MeasureCompound)topicRel.getValue().searchAddMeasure("Session_PrecisionRecallCurve_2", true, false, EvalEpir.MEASURES_FOR_CHART.contains("Session_PrecisionRecallCurve_NewInfo"))).addPIR(pir.getName(), precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath(topicsPir.get(topicRel.getKey()).getQueries())));	
+							((Measure)topicRel.getValue().searchAddMeasure("Session_Precision_UntilNotRelDocFound", false, true, false)).addPIR(pir.getName(), rPCMet2);
+							((Measure)topicRel.getValue().searchAddMeasure("Session_Recall_UntilNotRelDocFound", false, true, false)).addPIR(pir.getName(), rRCMet2);
+							((MeasureCompound)topicRel.getValue().searchAddMeasure("Session_PrecisionRecallCurve_UntilNotRelDocFound", true, false, EvalEpir.MEASURES_FOR_CHART.contains("Session_PrecisionRecallCurve_UntilNotRelDocFound"))).addPIR(pir.getName(), precisionRecallCurve(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session, session.getPath(topicsPir.get(topicRel.getKey()).getQueries())));	
 						}
 					}	
 				}

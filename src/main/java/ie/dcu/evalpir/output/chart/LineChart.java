@@ -17,7 +17,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
-import org.jfree.chart.axis.AxisSpace;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.axis.ValueAxis;
@@ -26,14 +25,12 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.RectangleInsets;
-
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
+import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
-import ie.dcu.evalpir.utilities.Pair;
 
 
 public class LineChart{
@@ -58,11 +55,11 @@ public class LineChart{
 		ChartFactory.setChartTheme(theme);
         try {
 			if(m.getName().contains("Precision@")) {
-				ChartUtilities.saveChartAsPNG(new File(path +"/Precision@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
+				ChartUtilities.saveChartAsPNG(new File(path +"/Precision@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, BarChart.getWidthScreen(), BarChart.getHeightScreen(), null, false, 9);
 			}else if (m.getName().contains("Recall@")) {
-				ChartUtilities.saveChartAsPNG(new File(path +"/Recall@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
+				ChartUtilities.saveChartAsPNG(new File(path +"/Recall@/"  + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, BarChart.getWidthScreen(), BarChart.getHeightScreen(), null, false, 9);
 			}else {
-				ChartUtilities.saveChartAsPNG(new File(path +"/" + m.getName() + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, 1366, 768);
+				ChartUtilities.saveChartAsPNG(new File(path +"/" + m.getName() + "/" + "User:" + user + "Topic:" + nameTopic + "_" + m.getName() +".png"), chart, BarChart.getWidthScreen(), BarChart.getHeightScreen(), null, false, 9);
 			}
         } catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -207,8 +204,7 @@ public class LineChart{
 		        ValueAxis yAxis = plot.getRangeAxis();
 				yAxis.setRange(0, 1.05);
 				try {
-				
-		        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measureName + "/" + "Query" + topic.get(i).getId() + "_" + measureName +".png"), chart, 1366, 768);
+		        	ChartUtilities.saveChartAsPNG(new File(path + "/" + measureName + "/" + "Query" + topic.get(i).getId() + "_" + measureName +".png"), chart, BarChart.getWidthScreen(), BarChart.getHeightScreen(), null, false, 9);
 		        } catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -301,7 +297,7 @@ public class LineChart{
 		yAxis.setRange(0, 1.05);
 	
 		try {
-        	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, 1366, 768);
+        	ChartUtilities.saveChartAsPNG(new File(path +"/" + measure.getName() +"/" + "User:" + user + "Topic:" + topic + "_" + measure.getName() +".png"), chart, BarChart.getWidthScreen(), BarChart.getHeightScreen(), null, false, 9);
         } catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

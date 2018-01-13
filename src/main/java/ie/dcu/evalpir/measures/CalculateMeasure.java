@@ -11,11 +11,11 @@ import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.MeasureCompound;
 import ie.dcu.evalpir.elements.PIR;
+import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.output.table.ConsolePrinter;
-import ie.dcu.evalpir.utilities.Pair;
-import ie.dcu.evalpir.utilities.Utilities;
+
 
 /**
  * @author Andrea Angiolillo
@@ -200,7 +200,7 @@ public class CalculateMeasure{
 			if(docOut.getRank() <= p) {	
 				docRel = (DocumentRelFile)queryRel.findDoc(docOut.getId());
 				value_relevance = (docRel == null) ? 1 : docRel.getRelevance();
-				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (Utilities.log(docOut.getRank(), 2));	
+				dcg += (docOut.getRank() == 1) ? value_relevance : value_relevance / (log(docOut.getRank(), 2));	
 			}
 		}
 		
@@ -234,17 +234,28 @@ public class CalculateMeasure{
 		int lenght = (p <= idcg.size()) ? p : idcg.size();
 		int rank = 2;
 		for (int i = 1; i < lenght; i++){	
-			idcgValue += idcg.get(i) / (Utilities.log(rank, 2));
+			idcgValue += idcg.get(i) / (log(rank, 2));
 			rank ++;	
 		}
 		
 		for(int j = idcg.size(); j < p; j++) {// if p > idcg.size the value of the documents after size is 1 
-			idcgValue += 1 / (Utilities.log(rank, 2));
+			idcgValue += 1 / (log(rank, 2));
 			rank++;
 		}
 		
 		return idcgValue;
 	}
+	
+	/**
+	 * Changing of base
+	 * 
+	 * @input value
+	 * @input base
+	 * */
+	public static double log(int value, int base) {
+		return Math.log(value) / Math.log(base);
+	}
+	
 	
 	/**
 	 * Normalized Discounted Cumulative Gain (NDCG) is a precision
@@ -315,10 +326,10 @@ public class CalculateMeasure{
 		double qRecallK = 0.0;
 		double qNDCG5, qNDCG10, qNDCG15, qNDCG20 = 0.0;
 //		double qNDCG5NewInfo, qNDCG10NewInfo, qNDCG15NewInfo, qNDCG20NewInfo = 0.0;
-		double precision, precisionNewInfo = 0.0;
+		double precision = 0.0;
 		double recall = 0.0;
 		double fMeasure = 0.0;
-		double ap, apNewInfo = 0.0;
+		double ap, apNewRelDoc, apOldRelDoc = 0.0;
 		int k = 0;
 		String zeroToSort = ""; // this variable adds 0 in case of k <= 9 (so we have 01, 02, 03, etc.. instead of 1, 2 ..) to allow to sort the measures by name
 		
@@ -358,22 +369,19 @@ public class CalculateMeasure{
 					
 					//Compound measure
 					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, false, EvalEpir.MEASURES_FOR_CHART.contains("PrecisionRecallCurve"))).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR, true));
-//					if(queryRel.getId().equalsIgnoreCase("110")) {
-//						System.out.println("F-Measure: " + fMeasure);
-//					}
 						
-					precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);
-					apNewInfo = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR);
-					if(precision != precisionNewInfo) {
+					//precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);
+					apOldRelDoc = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR, false);
+					apNewRelDoc = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR, true);
+					if(ap != apNewRelDoc) { 
 						//considering only the relevant docs not in the previous queries	
 						//System.out.println("TopicID: " + queryRel.getTopic() + " Query: " + queryRel.getId() );
 						//System.out.println("Precision " + precision  + " PrecisionNewInfo: " + precisionNewInfo + " diff: " + (precision - precisionNewInfo));
-						((Measure) queryRel.searchAddMeasure("Precision-NewInfo", false, false, false)).addPIR(pir.getName(), precisionNewInfo);
-						((Measure) queryRel.searchAddMeasure("AveragePrecision-NewInfo", false, false, false)).addPIR(pir.getName(), apNewInfo);
+						//((Measure) queryRel.searchAddMeasure("Precision-NewInfo", false, false, false)).addPIR(pir.getName(), precisionNewInfo);
+						((Measure) queryRel.searchAddMeasure("AveragePrecision-NewRelDoc", false, false, false)).addPIR(pir.getName(), apNewRelDoc);
+						((Measure) queryRel.searchAddMeasure("AveragePrecision-OldRelDoc", false, false, false)).addPIR(pir.getName(), apOldRelDoc);
 						//System.out.println("QUII LA SETTIAMO:" + queryRel.getMeasures().get("precision").getName() + " PRIMA: " + queryRel.getMeasures().get("precision").isStackedBar());
-						queryRel.getMeasures().get("precision").setStackedBar(true);
-						//System.out.println("QUII LA SETTIAMO:" + queryRel.getMeasures().get("precision").getName() + " PRIMA: " + queryRel.getMeasures().get("precision").isStackedBar());
-						
+					
 						queryRel.getMeasures().get("averageprecision").setStackedBar(true);	
 					}
 				

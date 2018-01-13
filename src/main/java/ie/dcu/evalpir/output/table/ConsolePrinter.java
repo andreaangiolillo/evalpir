@@ -18,7 +18,7 @@ public class ConsolePrinter {
 
 	public static void startEval() {
 		System.out.println();
-		System.out.println("Step: " + n + "\t"  + "Starting Evaluation ... ");
+		System.out.println("Step: " + n + " "  + "Starting Evaluation ... ");
 	}
 	public static void printMessage(String message) {
 		System.out.println(message);
@@ -27,7 +27,7 @@ public class ConsolePrinter {
 	
 	public static void startTask(String task) {
 		n++;
-		System.out.print("Step: " + n + "\t" + task + " ..."  );
+		System.out.print("Step: " + n + " " + task + " ..."  );
 		
 	}
 	

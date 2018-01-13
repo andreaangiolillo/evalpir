@@ -4,8 +4,8 @@ INFO COMMANDS
 Charts: 
 
 1) no_charts
-2) default
-3) all
+2) default (Recall", "Precision", "AveragePrecision","PrecisionRecallCurve", "NDCG@10")
+3) all	("Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", "NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve"
 
 Session Measures:
 

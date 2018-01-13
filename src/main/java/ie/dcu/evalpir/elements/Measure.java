@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import de.vandermeer.asciitable.AsciiTable;
-import ie.dcu.evalpir.utilities.Pair;
 
 public class Measure extends AbstractMeasure{
 	private ArrayList<Pair<String, Double>> PIRValue;	

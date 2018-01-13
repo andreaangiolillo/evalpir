@@ -86,7 +86,7 @@ public class InputReader{
 				EvalEpir.MEASURES_FOR_CHART.add("Session_PrecisionRecallCurve");
 			}
 			if(EvalEpir.SESSION_METHOD_2) {
-				EvalEpir.MEASURES_FOR_CHART.add("Session_PrecisionRecallCurve_2");
+				EvalEpir.MEASURES_FOR_CHART.add("Session_PrecisionRecallCurve_UntilNotRelDocFound");
 			}
 
 		}catch (NumberFormatException e) {

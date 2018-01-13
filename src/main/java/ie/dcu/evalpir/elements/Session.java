@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+
 import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.exceptions.QueryNotInTheLogFileException;
 
@@ -187,14 +189,9 @@ public class Session{
 			lastDocOpened = 100000; //
 			for (Map.Entry<String, Document> entryDocPir : pirDocs.entrySet()) {
 				if(((DocumentOutputPIR)entryDocPir.getValue()).getRank()> lastDocOpenedInLog) {
-//					System.out.println("1)QueryID: " + entryDocPir.getKey());
 					if(relDocs.containsKey(entryDocPir.getKey().trim().toLowerCase())){
-//						System.out.println("2)QueryID: " + entryDocPir.getKey());
 						if(!((DocumentRelFile)relDocs.get(entryDocPir.getKey().trim().toLowerCase())).getIsRelevance()) {
-//							System.out.println("3)QueryID: " + entryDocPir.getKey());
-//							System.out.println("3)lastDocOpened : " + lastDocOpened + " value: " + ((DocumentOutputPIR)entryDocPir.getValue()).getRank());
 							if(((DocumentOutputPIR)entryDocPir.getValue()).getRank() < lastDocOpened) {
-//								System.out.println("4)QueryID: " + entryDocPir.getKey() + " Value: " + ((DocumentOutputPIR)entryDocPir.getValue()).getRank());
 								lastDocOpened = ((DocumentOutputPIR)entryDocPir.getValue()).getRank();
 							}
 						}
@@ -209,6 +206,62 @@ public class Session{
 		
 		return path;
 	}	
+	
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public Map<String, Integer> getPathbyProb(int p){
+		Map<String, Integer> path = getPath();
+		for(Map.Entry<String, Integer> entryPath: path.entrySet()) {
+			entryPath.setValue(getLastDocOpenedByDistribution(p));
+		}
+		
+		return path;
+	}
+	
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public int getLastDocOpenedByDistribution(int p) {
+		boolean changeQuery = false;
+		Random random = new Random();
+		int i = 1;
+		double probChangeQuery = 0.0;
+		double randNumber = 0.0;
+		
+		while(!changeQuery) {
+			randNumber = random.nextFloat();//which returns the random float number between 0.0f (inclusive) and 1.0f(exclusive).
+			probChangeQuery = 1 - moffatZobelDistribution(p, i + 1);
+			
+			if(randNumber > probChangeQuery ) {
+				i++;
+			}else {
+				changeQuery = true;
+			}
+		}
+		
+		return i;
+	}
+	
+	/**
+	 * 
+	 * @param p
+	 * @param i
+	 * @return
+	 * @see https://pdfs.semanticscholar.org/471c/b4c2e5039bdaacb0274fee70c7fe2e93493e.pdf
+	 */
+	public static double  moffatZobelDistribution(int p, int i) {
+		if(i == 1) {
+			return 1;
+		}else {
+			return Math.pow(p, i-1);
+		}
+	}
+	
 	
 	public ArrayList<Log> getQuery() {
 		sortLog(query);

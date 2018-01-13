@@ -18,11 +18,11 @@ import ie.dcu.evalpir.elements.DocumentOutputPIR;
 import ie.dcu.evalpir.elements.DocumentRelFile;
 import ie.dcu.evalpir.elements.Log;
 import ie.dcu.evalpir.elements.PIR;
+import ie.dcu.evalpir.elements.Pair;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.extractor.InputReader;
-import ie.dcu.evalpir.utilities.Pair;
 
 public class TestCaseSessionMeasure {
 	static final String RELEVANCE_FILE_PATH =  "src/main/resources/relFile.csv";
@@ -182,7 +182,7 @@ public class TestCaseSessionMeasure {
 				System.out.println(entryQ.getValue().getDocs());
 				positionQuery = CalculateSessionMeasure.getPositionQuery((QueryRelFile)entryQ.getValue(), s.getQuery());
 				assertEquals(2, positionQuery);
-				qNew = CalculateSessionMeasure.creatingQueryConsideringPreoviousOnes((QueryRelFile)entryQ.getValue(), 1, s.getQuery());
+				qNew = CalculateSessionMeasure.creatingQueryConsideringPreoviousOnes((QueryRelFile)entryQ.getValue(), 1, s.getQuery(), true);
 			}
 		}
 		
