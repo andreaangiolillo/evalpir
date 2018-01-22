@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
 import ie.dcu.evalpir.EvalEpir;
 import ie.dcu.evalpir.elements.AbstractMeasure;
 import ie.dcu.evalpir.elements.Log;
@@ -30,7 +33,7 @@ public class CreatorChart {
 	final static String[] MEASURES_BARCHART = { "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
 			"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5"};
 	
-	final static String[] MEASURES_INDEPTH = {"AveragePrecision", "Precision@01", "Precision@02","Precision@03", "Precision@04","Precision@05", "Precision@06",
+	final static String[] MEASURES_INDEPTH = {"AveragePrecision", "Precision@", "Precision@01", "Precision@02","Precision@03", "Precision@04","Precision@05", "Precision@06",
 			"Precision@07", "Precision@08","Precision@09", "Precision@10"};
 
 	/**
@@ -101,6 +104,7 @@ public class CreatorChart {
 						LineChart.CreateLineChartPerTopic(pathL, topic, (Measure)measure);
 						BarChart.CreateBarChartPerTopic(pathB, topic, (Measure)measure, false);
 						if(measure.isStackedBar()) {
+							//System.out.println("Measure: " + measure.getName() + " topics: " + entry.getKey());
 							BarChart.CreateBarChartPerTopic(pathS, topic, (Measure)measure, true);
 						}
 					}else if(measure instanceof MeasureCompound) {
@@ -211,29 +215,25 @@ public class CreatorChart {
 	 * @return
 	 */
 	public static AbstractMeasure[] setStackedBar(AbstractMeasure[] measures, final ArrayList<Query> topic) {
-		Map<String, Boolean> dictionaryMeasure = new HashMap<String, Boolean>();
-		for(String measureStackedBar : MEASURES_INDEPTH) {
-			dictionaryMeasure.put(measureStackedBar.trim().toLowerCase(), false);
-		}
-		
+		Set<String> dictionaryMeasure = new HashSet<String>();
 		Map<String, AbstractMeasure> measuresTopic;
 		AbstractMeasure measureTopic;
 		for (Query query : topic) {
 			measuresTopic = ((QueryRelFile)query).getMeasures();
-			for(String measureStackedBar : MEASURES_INDEPTH) {
-				measureTopic = measuresTopic.get(measureStackedBar.trim().toLowerCase());
+			for(AbstractMeasure measureStackedBar : measures) {
+				measureTopic = measuresTopic.get(measureStackedBar.getName().trim().toLowerCase());
 				if(measureTopic != null && measureTopic.isStackedBar()) {
-					dictionaryMeasure.put(measureStackedBar.trim().toLowerCase(), true);
+					dictionaryMeasure.add(measureStackedBar.getName().trim().toLowerCase());
 				}
 			}
 		}
 		
-		for (AbstractMeasure measure : measures) {
-			if(dictionaryMeasure.containsKey(measure.getName().trim().toLowerCase())
-					&&  dictionaryMeasure.get(measure.getName().trim().toLowerCase())){
+		for (AbstractMeasure measure : measures) {			
+			if(dictionaryMeasure.contains(measure.getName().trim().toLowerCase())){
 					measure.setStackedBar(true);
 			}
 		}
+		
 		
 		return measures;
 	}

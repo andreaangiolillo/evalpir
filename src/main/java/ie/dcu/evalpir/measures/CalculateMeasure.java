@@ -385,6 +385,7 @@ public class CalculateMeasure{
 							((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort+ k + "-NewRelDoc", false, false, false)).addPIR(pir.getName(), qPrecisionKNewRelDoc);
 							((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort + k + "-OldRelDoc", false, false, false)).addPIR(pir.getName(), qPrecisionKOldRelDoc);	
 							queryRel.getMeasures().get("precision@"+ zeroToSort + k).setStackedBar(true);	
+							//System.out.print("\nUser: " + queryRel.getUser() + " Topic: " + queryRel.getTopic() + " query: " + queryRel.getId());
 						}
 					}
 				
