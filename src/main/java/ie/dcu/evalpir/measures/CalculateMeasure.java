@@ -322,10 +322,9 @@ public class CalculateMeasure{
 		ConsolePrinter.startTask("Calculating Measures");
 		Query queryPIR;
 		QueryRelFile queryRel;
-		double qPrecisionK = 0.0;
+		double qPrecisionK, qPrecisionKNewRelDoc, qPrecisionKOldRelDoc = 0.0;
 		double qRecallK = 0.0;
 		double qNDCG5, qNDCG10, qNDCG15, qNDCG20 = 0.0;
-//		double qNDCG5NewInfo, qNDCG10NewInfo, qNDCG15NewInfo, qNDCG20NewInfo = 0.0;
 		double precision = 0.0;
 		double recall = 0.0;
 		double fMeasure = 0.0;
@@ -370,19 +369,23 @@ public class CalculateMeasure{
 					//Compound measure
 					((MeasureCompound)queryRel.searchAddMeasure("PrecisionRecallCurve", true, false, EvalEpir.MEASURES_FOR_CHART.contains("PrecisionRecallCurve"))).addPIR(pir.getName(), precisionRecallCurve(queryRel, queryPIR, true));
 						
-					//precisionNewInfo = CalculateSessionMeasure.precisionConsideringNewInformation(queryRel, queryPIR);
 					apOldRelDoc = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR, false);
 					apNewRelDoc = CalculateSessionMeasure.calculateAPConsideringNewInformation(queryRel, queryPIR, true);
 					if(ap != apNewRelDoc) { 
-						//considering only the relevant docs not in the previous queries	
-						//System.out.println("TopicID: " + queryRel.getTopic() + " Query: " + queryRel.getId() );
-						//System.out.println("Precision " + precision  + " PrecisionNewInfo: " + precisionNewInfo + " diff: " + (precision - precisionNewInfo));
-						//((Measure) queryRel.searchAddMeasure("Precision-NewInfo", false, false, false)).addPIR(pir.getName(), precisionNewInfo);
+						//Considering only the New/Old relevant docs 	
 						((Measure) queryRel.searchAddMeasure("AveragePrecision-NewRelDoc", false, false, false)).addPIR(pir.getName(), apNewRelDoc);
 						((Measure) queryRel.searchAddMeasure("AveragePrecision-OldRelDoc", false, false, false)).addPIR(pir.getName(), apOldRelDoc);
-						//System.out.println("QUII LA SETTIAMO:" + queryRel.getMeasures().get("precision").getName() + " PRIMA: " + queryRel.getMeasures().get("precision").isStackedBar());
-					
 						queryRel.getMeasures().get("averageprecision").setStackedBar(true);	
+						//Computing the Precision@k considering old/new Relevant Docs
+						k =  (queryRel.getNRelevantDoc() > 10) ? 10 : queryRel.getNRelevantDoc();
+						for (; k != 0; k --) {
+							zeroToSort = (k > 9) ? "" : "0";
+							qPrecisionKNewRelDoc = CalculateSessionMeasure.precisionKConsideringNewInformation(queryRel, queryPIR, k, true);
+							qPrecisionKOldRelDoc = CalculateSessionMeasure.precisionKConsideringNewInformation(queryRel, queryPIR, k, false);
+							((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort+ k + "-NewRelDoc", false, false, false)).addPIR(pir.getName(), qPrecisionKNewRelDoc);
+							((Measure) queryRel.searchAddMeasure("Precision@"+ zeroToSort + k + "-OldRelDoc", false, false, false)).addPIR(pir.getName(), qPrecisionKOldRelDoc);	
+							queryRel.getMeasures().get("precision@"+ zeroToSort + k).setStackedBar(true);	
+						}
 					}
 				
 				}
