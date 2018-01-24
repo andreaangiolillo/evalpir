@@ -26,12 +26,12 @@ import ie.dcu.evalpir.output.table.ConsolePrinter;
 public class CreatorChart {
 
 	final static String[] MEASURES_LINECHART = {"Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
-										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve",
+										"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure", "PrecisionRecallCurve" , "Session_PrecisionRecallCurve",
 										"Session_PrecisionRecallCurve_UntilNotRelDocFound", "Session_PrecisionRecallCurve_Moffat&ZobelDistribution"};
 	
 	
 	final static String[] MEASURES_BARCHART = { "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
-			"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure0.5"};
+			"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure"};
 	
 	final static String[] MEASURES_INDEPTH = {"AveragePrecision", "Precision@", "Precision@01", "Precision@02","Precision@03", "Precision@04","Precision@05", "Precision@06",
 			"Precision@07", "Precision@08","Precision@09", "Precision@10"};
@@ -228,7 +228,7 @@ public class CreatorChart {
 			}
 		}
 		
-		for (AbstractMeasure measure : measures) {			
+		for (AbstractMeasure measure : measures) {	
 			if(dictionaryMeasure.contains(measure.getName().trim().toLowerCase())){
 					measure.setStackedBar(true);
 			}

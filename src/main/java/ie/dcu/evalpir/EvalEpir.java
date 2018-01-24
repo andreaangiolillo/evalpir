@@ -14,17 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.antlr.v4.codegen.model.ThrowNoViableAlt;
-import org.antlr.v4.parse.BlockSetTransformer.setAlt_return;
-
-import java.util.Random;
 import java.util.Set;
-
-import ie.dcu.evalpir.elements.AbstractMeasure;
-import ie.dcu.evalpir.elements.Document;
-import ie.dcu.evalpir.elements.DocumentOutputPIR;
-import ie.dcu.evalpir.elements.Measure;
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;

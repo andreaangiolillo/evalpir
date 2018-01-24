@@ -363,7 +363,7 @@ public class CalculateMeasure{
 					((Measure) queryRel.searchAddMeasure("NDCG@20", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@20") )).addPIR(pir.getName(), qNDCG20);
 					((Measure) queryRel.searchAddMeasure("Precision", false, true, EvalEpir.MEASURES_FOR_CHART.contains("Precision"))).addPIR(pir.getName(), precision);
 					((Measure) queryRel.searchAddMeasure("Recall", false, true, EvalEpir.MEASURES_FOR_CHART.contains("Recall"))).addPIR(pir.getName(), recall);
-					((Measure) queryRel.searchAddMeasure("fMeasure0.5", false, true, EvalEpir.MEASURES_FOR_CHART.contains("fMeasure0.5"))).addPIR(pir.getName(), fMeasure);
+					((Measure) queryRel.searchAddMeasure("fMeasure", false, true, EvalEpir.MEASURES_FOR_CHART.contains("fMeasure"))).addPIR(pir.getName(), fMeasure);
 					((Measure) queryRel.searchAddMeasure("AveragePrecision", false, true, EvalEpir.MEASURES_FOR_CHART.contains("AveragePrecision"))).addPIR(pir.getName(), ap);
 					
 					//Compound measure
