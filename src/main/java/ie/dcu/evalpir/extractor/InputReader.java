@@ -57,8 +57,9 @@ public class InputReader{
 					case "logsFile":
 						EvalEpir.SESSION_METHOD_1 = true;
 						break;
-					case "moffat&mobeldistribution":
+					case "moffat&zobeldistribution":
 						EvalEpir.SESSION_METHOD_3 = true;
+						break;
 					case "allapproaches":
 						EvalEpir.SESSION_METHOD_1 = true;
 						EvalEpir.SESSION_METHOD_2 = true;
@@ -73,6 +74,8 @@ public class InputReader{
 							break;
 					case "nocharts":
 						EvalEpir.MEASURES_FOR_CHART = new HashSet<>();
+						EvalEpir.CHART = false;
+						break;
 					default:
 						throw new IllegalArgumentException("Invalid command: " + row[j]);
 				}

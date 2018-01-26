@@ -1,16 +1,7 @@
 package ie.dcu.evalpir;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,7 +11,6 @@ import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
 import ie.dcu.evalpir.elements.Session;
 import ie.dcu.evalpir.elements.Topic;
-import ie.dcu.evalpir.exceptions.InvalidInputException;
 import ie.dcu.evalpir.extractor.InputReader;
 import ie.dcu.evalpir.measures.CalculateMeasure;
 import ie.dcu.evalpir.measures.CalculateSessionMeasure;
@@ -39,14 +29,14 @@ import ie.dcu.evalpir.output.table.TableGenerator;
  */
 //clean package assembly:single
 public class EvalEpir {
-	public static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
-	public static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
-	public static final String COMMANDS_FILE_PATH = "src/main/resources/commands.txt";
-	
+//	public static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
+//	public static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
+//	public static final String COMMANDS_FILE_PATH = "src/main/resources/commands.txt";
+
 	public static Set<String> MEASURES_FOR_CHART;
 	
 	/**Commands**/
-	public static String CHART = "default";
+	public static boolean CHART = true;
 	public static boolean SESSION_METHOD_1 = false;
 	public static boolean SESSION_METHOD_2 = false;
 	public static boolean SESSION_METHOD_3 = false;
@@ -57,38 +47,24 @@ public class EvalEpir {
 	public static  ArrayList<PIR> MODELS = null;
 	
     public static void main(String[] args ) {
-    	
-//    	File relevanceFile = new File(RELEVANCE_FILE_PATH);
-//    	File logsFile = new File(LOGS_FILE_PATH);
-//    	File outputPIR = new File("src/main/resources/ar.csv");
-//    	
+//    	String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/model1.csv","src/main/resources/model2.csv","src/main/resources/model3.csv"};
+
     	ConsolePrinter.startEval();
-    	
-    	String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/model1.csv","src/main/resources/model2.csv","src/main/resources/model3.csv"};
-    	
-//    	if(args.length < 4) {
-//    		throw new InvalidInputException("The input file must be 4 at least: \n1)Commands \n2) Relevance Documents \n3) LogsFile \n4) System to be evaluated ");
-//    	}
-//    	
-    	File commandsFile = new File(args1[0]);
-    	File relevanceFile = new File(args1[1]);
-    	File logsFile = new File(args1[2]);
+    	  	
+    	File commandsFile = new File(args[0]);
+    	File relevanceFile = new File(args[1]);
+    	File logsFile = new File(args[2]);
 
     	InputReader.extractCommands(commandsFile);
     	setQUERYREL(InputReader.extractRelevanceFile(relevanceFile));
     	setLOGS(InputReader.extracLogFile(logsFile));
-    	setMODELS(extractingModels(args1));
-    	
-    //	setMODELS(InputReaderImpl.extractOutputPIR(outputPIR));
-   	  	
-//    	System.out.println("CHART: "  + CHART);
-//    	System.out.println("Method1: "  + SESSION_METHOD_1);
-//    	System.out.println("Method2: "  + SESSION_METHOD_2);
+    	setMODELS(extractingModels(args));
+  
     	
 		CalculateMeasure.calculateMeasures();
     	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
       		
-    	if(!CHART.equalsIgnoreCase("no_charts")) {
+    	if(CHART) {
     		CreatorChart.createChart(QUERYREL);
     		CreatorChart.createChartSession(measures);		
     	

@@ -83,7 +83,7 @@ public class CalculateSessionMeasure {
 			double map = 0.0;
 			int size = queryRel.size();		
 			if (size != queryOutputPIR.size()) {
-				throw new DifferentSizeException();
+				throw new DifferentSizeException("Size relfile: " + size + " Size QueryOutput: " + queryOutputPIR.size());
 			}
 			
 			for(Map.Entry<String, Query> entryQueryRel: queryRel.entrySet()) {
@@ -529,6 +529,8 @@ public class CalculateSessionMeasure {
 						nsDCGMax = NsDCG(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries(), session.getMaxK(), 4, EvalEpir.LOGS);
 						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_AverageK@" + session.getAverageK(), false, true, false)).addPIR(pir.getName(), nsDCGAverage);
 						((Measure)topicRel.getValue().searchAddMeasure("nSDCG_MaxK@" +  session.getMaxK(), false, true, false)).addPIR(pir.getName(), nsDCGMax);	
+						
+						//System.out.println("TOPIC REL: " + topicRel.getKey());
 						manDf = calculateMAP(topicRel.getValue().getQueries(), topicsPir.get(topicRel.getKey()).getQueries());
 						((Measure)topicRel.getValue().searchAddMeasure("MeanAveragePrecision", false, true, false)).addPIR(pir.getName(), manDf);
 						if(EvalEpir.SESSION_METHOD_1) {
