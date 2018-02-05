@@ -329,7 +329,7 @@ public class CalculateMeasure{
 		double recall = 0.0;
 		double fMeasure = 0.0;
 		double ap, apNewRelDoc, apOldRelDoc = 0.0;
-		int k = 0;
+		double rPrecision = 0.0;
 		String zeroToSort = ""; // this variable adds 0 in case of k <= 9 (so we have 01, 02, 03, etc.. instead of 1, 2 ..) to allow to sort the measures by name
 		
 		for(Map.Entry<String, Query> entry :  EvalEpir.QUERYREL.entrySet()) {
@@ -338,8 +338,8 @@ public class CalculateMeasure{
 				queryPIR = pir.getQuery(queryRel.getId());
 				if(queryPIR != null) {
 					queryRel.setToConsiderForChart(true); // not all the queries in the collection are used to create charts
-					k =  queryRel.getNRelevantDoc();
-					for (; k != 0; k --) {
+					//k =  queryRel.getNRelevantDoc();
+					for (int k = 5; k <= 20; k+=5 ) {
 						qPrecisionK = calculatePKRK(queryRel, queryPIR, k, false);
 						qRecallK = calculatePKRK(queryRel, queryPIR, k, true);
 						zeroToSort = (k > 9) ? "" : "0";
@@ -347,7 +347,7 @@ public class CalculateMeasure{
 						((Measure) queryRel.searchAddMeasure("Recall@"+ zeroToSort + k, false, true, EvalEpir.MEASURES_FOR_CHART.contains("Recall@"))).addPIR(pir.getName(), qRecallK);
 						
 					}
-					
+					rPrecision = calculatePKRK(queryRel, queryPIR, queryRel.getNRelevantDoc(), false);
 					qNDCG5 = calculateNDCG(queryRel, queryPIR, 5);
 					qNDCG10 = calculateNDCG(queryRel, queryPIR, 10);
 					qNDCG15 = calculateNDCG(queryRel, queryPIR, 15);
@@ -356,7 +356,7 @@ public class CalculateMeasure{
 					recall = recall(queryRel, queryPIR);
 					fMeasure = fMeasure(precision, recall);
 					ap = calculateAP(queryRel, queryPIR);
-	
+					((Measure) queryRel.searchAddMeasure("R-Precision", false, true, EvalEpir.MEASURES_FOR_CHART.contains("R-Precision"))).addPIR(pir.getName(), rPrecision);
 					((Measure) queryRel.searchAddMeasure("NDCG@05", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@05"))).addPIR(pir.getName(), qNDCG5);
 					((Measure) queryRel.searchAddMeasure("NDCG@10",false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@10"))).addPIR(pir.getName(), qNDCG10);
 					((Measure) queryRel.searchAddMeasure("NDCG@15", false, true, EvalEpir.MEASURES_FOR_CHART.contains("NDCG@15"))).addPIR(pir.getName(), qNDCG15);
@@ -377,8 +377,8 @@ public class CalculateMeasure{
 						((Measure) queryRel.searchAddMeasure("AveragePrecision-OldRelDoc", false, false, false)).addPIR(pir.getName(), apOldRelDoc);
 						queryRel.getMeasures().get("averageprecision").setStackedBar(true);	
 						//Computing the Precision@k considering old/new Relevant Docs
-						k =  (queryRel.getNRelevantDoc() > 10) ? 10 : queryRel.getNRelevantDoc();
-						for (; k != 0; k --) {
+						//k =  (queryRel.getNRelevantDoc() > 10) ? 10 : queryRel.getNRelevantDoc();
+						for (int k = 5; k <= 20; k+=5) {
 							zeroToSort = (k > 9) ? "" : "0";
 							qPrecisionKNewRelDoc = CalculateSessionMeasure.precisionKConsideringNewInformation(queryRel, queryPIR, k, true);
 							qPrecisionKOldRelDoc = CalculateSessionMeasure.precisionKConsideringNewInformation(queryRel, queryPIR, k, false);

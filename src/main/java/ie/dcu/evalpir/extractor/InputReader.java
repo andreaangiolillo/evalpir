@@ -67,7 +67,7 @@ public class InputReader{
 						break;
 					case "allcharts":
 						EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision", "NDCG@05", "NDCG@10", 
-							"NDCG@15", "NDCG@20", "Precision@", "Recall@", "fMeasure", "PrecisionRecallCurve"));
+							"NDCG@15", "NDCG@20", "Precision@", "Recall@","R-Precision", "fMeasure", "PrecisionRecallCurve"));
 						break;
 					case "default":
 						EvalEpir.MEASURES_FOR_CHART = new HashSet<>(Arrays.asList( "Recall", "Precision", "AveragePrecision","PrecisionRecallCurve", "NDCG@10"));

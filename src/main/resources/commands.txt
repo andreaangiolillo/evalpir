@@ -16,4 +16,4 @@ Session Approaches:
 
 **/
 
-noCharts, Moffat&ZobelDistribution
+allCharts, allApproaches

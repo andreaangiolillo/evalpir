@@ -29,9 +29,9 @@ import ie.dcu.evalpir.output.table.TableGenerator;
  */
 //clean package assembly:single
 public class EvalEpir {
-//	public static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
-//	public static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
-//	public static final String COMMANDS_FILE_PATH = "src/main/resources/commands.txt";
+	public static final String RELEVANCE_FILE_PATH = "src/main/resources/relFile.csv";
+	public static final String LOGS_FILE_PATH = "src/main/resources/logSFile.csv";
+	public static final String COMMANDS_FILE_PATH = "src/main/resources/commands.txt";
 
 	public static Set<String> MEASURES_FOR_CHART;
 	
@@ -47,18 +47,18 @@ public class EvalEpir {
 	public static  ArrayList<PIR> MODELS = null;
 	
     public static void main(String[] args ) {
-//    	String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/model1.csv","src/main/resources/model2.csv","src/main/resources/model3.csv"};
+    	String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/NewData100.csv","src/main/resources/resultChanged.csv"};
 
     	ConsolePrinter.startEval();
     	  	
-    	File commandsFile = new File(args[0]);
-    	File relevanceFile = new File(args[1]);
-    	File logsFile = new File(args[2]);
+    	File commandsFile = new File(args1[0]);
+    	File relevanceFile = new File(args1[1]);
+    	File logsFile = new File(args1[2]);
 
     	InputReader.extractCommands(commandsFile);
     	setQUERYREL(InputReader.extractRelevanceFile(relevanceFile));
     	setLOGS(InputReader.extracLogFile(logsFile));
-    	setMODELS(extractingModels(args));
+    	setMODELS(extractingModels(args1));
   
     	
 		CalculateMeasure.calculateMeasures();
