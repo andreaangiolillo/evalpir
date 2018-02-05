@@ -47,18 +47,18 @@ public class EvalEpir {
 	public static  ArrayList<PIR> MODELS = null;
 	
     public static void main(String[] args ) {
-    	String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/NewData100.csv","src/main/resources/resultChanged.csv"};
+    	//String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/NewData100.csv","src/main/resources/resultChanged.csv"};
 
     	ConsolePrinter.startEval();
     	  	
-    	File commandsFile = new File(args1[0]);
-    	File relevanceFile = new File(args1[1]);
-    	File logsFile = new File(args1[2]);
+    	File commandsFile = new File(args[0]);
+    	File relevanceFile = new File(args[1]);
+    	File logsFile = new File(args[2]);
 
     	InputReader.extractCommands(commandsFile);
     	setQUERYREL(InputReader.extractRelevanceFile(relevanceFile));
     	setLOGS(InputReader.extracLogFile(logsFile));
-    	setMODELS(extractingModels(args1));
+    	setMODELS(extractingModels(args));
   
     	
 		CalculateMeasure.calculateMeasures();

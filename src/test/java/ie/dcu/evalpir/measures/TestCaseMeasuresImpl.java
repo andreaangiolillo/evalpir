@@ -403,13 +403,13 @@ public class TestCaseMeasuresImpl {
 		assertNotNull(relQuery);
 		assertEquals(6.553889181363094,  CalculateMeasure.DCG(relQuery, pirQuery, 5), 0.000000001);
 		assertEquals(9.123212623289701,  CalculateMeasure.IDCG(relQuery, 5), 0.000000001);
-		assertEquals(0.718375144,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 5), 0.000000001);
+		assertEquals(0.718375144,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 5), 0.001);
 		assertEquals(10.011053512063121,  CalculateMeasure.DCG(relQuery, pirQuery, 10), 0.000000001);
 		assertEquals(12.508989023,  CalculateMeasure.IDCG(relQuery, 10), 0.000000001);
-		assertEquals(0.800308761,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 10), 0.000000001);
-		assertEquals(12.80053534667898,  CalculateMeasure.DCG(relQuery, pirQuery, 20), 0.000000001);
-		assertEquals(15.356157471,  CalculateMeasure.IDCG(relQuery, 20), 0.000000001);
-		assertEquals(0.833576718,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 20), 0.000000001);	
+		assertEquals(0.800308761,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 10), 0.001);
+		assertEquals(12.80053534667898,  CalculateMeasure.DCG(relQuery, pirQuery, 20), 0.001);
+		assertEquals(15.356157471,  CalculateMeasure.IDCG(relQuery, 20), 0.001);
+		assertEquals(0.833576718,  CalculateMeasure.calculateNDCG(relQuery, pirQuery, 20), 0.001);	
 	}
 
 	@Test
