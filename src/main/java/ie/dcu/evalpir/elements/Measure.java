@@ -123,7 +123,7 @@ public class Measure extends AbstractMeasure{
 		sortbyValue();
 		ArrayList<Pair<String, Double>> m = getPIRvalue();
 		int nMeasure = m.size();
-		DecimalFormat df = new DecimalFormat("#.######");
+		DecimalFormat df = new DecimalFormat("#.###");
 		df.setRoundingMode(RoundingMode.CEILING);
 		for (int i = 0; i < nMeasure; i++) {
 			if (i == 0) {

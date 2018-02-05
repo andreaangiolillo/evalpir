@@ -180,10 +180,7 @@ public class CreatorChart {
 	}
 	
 	/**
-	 * We calculated the k (for the metric precision@k, etc..) dynamically, consequently we have a 
-	 * different number of measures for each query performed in a topic. As result of this we need to know the min number of measures 
-	 * calculated for a query in the topic to create the chart.
-	 * This method returns the name of the measures of the query with the min number of measures calculated in the topic.
+	 * This method returns the name of the measures computed.
 	 * 
 	 * @input  Topic
 	 * @return Measures
@@ -192,15 +189,15 @@ public class CreatorChart {
 	public static AbstractMeasure[] getNameMeasures(final ArrayList<Query> topic) {
 		AbstractMeasure [] nameMeasures = null;
 		if (topic.get(0) instanceof QueryRelFile) {
-			Map<String, AbstractMeasure> minMeasures = ((QueryRelFile)topic.get(0)).getMeasures();
-			for (Query q : topic) {
-				Map<String, AbstractMeasure> measure = ((QueryRelFile)q).getMeasures();
-				if( measure.size() < minMeasures.size()) {
-					minMeasures = measure;
-				}
-			}
-			
-		Collection<AbstractMeasure> value = minMeasures.values();
+//			Map<String, AbstractMeasure> minMeasures = ((QueryRelFile)topic.get(0)).getMeasures();
+//			for (Query q : topic) {
+//				Map<String, AbstractMeasure> measure = ((QueryRelFile)q).getMeasures();
+//				if( measure.size() < minMeasures.size()) {
+//					minMeasures = measure;
+//				}
+//			}
+
+		Collection<AbstractMeasure> value = ((QueryRelFile)topic.get(0)).getMeasures().values();
 		nameMeasures = value.toArray(new AbstractMeasure[value.size()]);
 		}
 		

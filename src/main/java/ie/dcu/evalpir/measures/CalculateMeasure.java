@@ -1,5 +1,7 @@
 package ie.dcu.evalpir.measures;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -256,6 +258,19 @@ public class CalculateMeasure{
 		return Math.log(value) / Math.log(base);
 	}
 	
+	/**
+	 * It rounds the input double
+	 * @param value
+	 * @param places
+	 * @return
+	 */
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_UP);
+	    return bd.doubleValue();
+	}
 	
 	/**
 	 * Normalized Discounted Cumulative Gain (NDCG) is a precision
@@ -270,7 +285,7 @@ public class CalculateMeasure{
 	 *@Complexity O(n)
 	 */
 	public static double calculateNDCG(Query queryRel, Query queryOutputPIR, int p) {
-		return DCG(queryRel, queryOutputPIR, p) / IDCG(queryRel, p);
+		return round(DCG(queryRel, queryOutputPIR, p), 3) / round(IDCG(queryRel, p),3);
 	}	
 
 	/**
