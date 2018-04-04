@@ -27,7 +27,7 @@ public class Session{
 	private String user;
 	private String topic;
 	private ArrayList<Log> logs;
-	private ArrayList<Log> query;
+	private Map<String, Log> queries;
 	private ArrayList<Log> docOpened;
 	
 	/**
@@ -40,7 +40,7 @@ public class Session{
 		this.user = user;
 		this.topic = topic;
 		this.logs = new ArrayList<Log>();
-		this.query = new ArrayList<Log>();
+		this.queries = new HashMap<String,Log>();
 		this.docOpened = new ArrayList<Log>();
 	}
 	
@@ -55,7 +55,7 @@ public class Session{
 		this.user = user;
 		this.topic = topic;
 		this.logs = logs;
-		this.query = new ArrayList<Log>();
+		this.queries = new HashMap<String,Log>();
 		this.docOpened = new ArrayList<Log>();
 	}
 	
@@ -73,7 +73,7 @@ public class Session{
 	 */
 	public void addLog(Log l) {
 		if(l.getType().equalsIgnoreCase(QUERY_SUBMISSION)) {
-			query.add(l); 
+			queries.put(l.getQuery().trim().toLowerCase(), l); 
 		}else if(l.getType().equalsIgnoreCase(OPEN_DOCUMENT)) {
 			docOpened.add(l);
 		}
@@ -263,8 +263,9 @@ public class Session{
 	
 	
 	public ArrayList<Log> getQuery() {
-		sortLog(query);
-		return query;
+		ArrayList<Log> valuesList = new ArrayList<Log>(queries.values());
+		sortLog(valuesList);
+		return valuesList;
 	}
 
 	public ArrayList<Log> getDocOpened() {
@@ -299,7 +300,7 @@ public class Session{
 			logs += l.toString() + "\n";
 		}
 		
-		return "Session [id=" + id + ", user=" + getUser() + ", topic=" + getTopic() + ", nQuery=" + query.size()  + ", logs=\n" + logs + "]";
+		return "Session [id=" + id + ", user=" + getUser() + ", topic=" + getTopic() + ", nQuery=" + queries.size()  + ", logs=\n" + logs + "]";
 	}
 
 	

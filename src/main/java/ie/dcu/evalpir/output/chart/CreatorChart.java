@@ -169,7 +169,7 @@ public class CreatorChart {
 				if(query == null) {
 					throw new QueryNotInTheLogFileException("QueryID: " + querySorted.get(i).getQuery().toLowerCase().trim());
 				}
-				
+
 				topicQueries.add(query);
 			}
 			
@@ -189,14 +189,6 @@ public class CreatorChart {
 	public static AbstractMeasure[] getNameMeasures(final ArrayList<Query> topic) {
 		AbstractMeasure [] nameMeasures = null;
 		if (topic.get(0) instanceof QueryRelFile) {
-//			Map<String, AbstractMeasure> minMeasures = ((QueryRelFile)topic.get(0)).getMeasures();
-//			for (Query q : topic) {
-//				Map<String, AbstractMeasure> measure = ((QueryRelFile)q).getMeasures();
-//				if( measure.size() < minMeasures.size()) {
-//					minMeasures = measure;
-//				}
-//			}
-
 		Collection<AbstractMeasure> value = ((QueryRelFile)topic.get(0)).getMeasures().values();
 		nameMeasures = value.toArray(new AbstractMeasure[value.size()]);
 		}

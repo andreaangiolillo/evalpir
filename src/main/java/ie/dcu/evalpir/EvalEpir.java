@@ -60,7 +60,6 @@ public class EvalEpir {
     	setLOGS(InputReader.extracLogFile(logsFile));
     	setMODELS(extractingModels(args));
   
-    	
 		CalculateMeasure.calculateMeasures();
     	Map<String, Topic> measures = CalculateSessionMeasure.calculateSessionMeasure(); 
       		

@@ -158,7 +158,7 @@ public class InputReader{
 	/**
 	 * This method extract the data from the input CSV to create a data structure. 
 	 * @param csvFile
-	 * @return Arraylist<User>
+	 * @return Map<String, Query> where string is the Key of the query.
 	 * 
 	 */
 	public static Map<String, Query> extractRelevanceFile(File file) {

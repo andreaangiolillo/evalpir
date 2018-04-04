@@ -81,8 +81,9 @@ public class LineChart{
 		XYSeries[] series = new XYSeries[nPIR];
 		Measure measure; 
 		Double value = 0.0;
-		for (int i = 0; i < nQuery; i++) {			
-			for (int j = 0; j < nPIR; j++) { 
+		for (int i = 0; i < nQuery; i++){
+
+			for (int j = 0; j < nPIR; j++){ 
 				if(i == 0) {
 					//System.out.println("Series name: " +m.getPIR(j).getKey());
 					series[j] = new XYSeries(m.getPIR(j).getKey());
