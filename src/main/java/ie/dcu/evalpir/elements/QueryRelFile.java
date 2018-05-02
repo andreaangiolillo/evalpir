@@ -3,21 +3,22 @@ package ie.dcu.evalpir.elements;
 /**
  * @author Andrea Angiolillo
  * 
- * It represents the query in the relevantFile. It contains a Map with all the measures computed for the query.
+ *         It represents the query in the relevantFile. It contains a Map with all the measures computed for the query.
  * 
  */
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestLine;
 
-public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
-	
+public class QueryRelFile extends ie.dcu.evalpir.elements.Query {
+
 	private Map<String, AbstractMeasure> measures; // key = measure's name, value = ie.dcu.evalpir.elements.AbstractMeasure
-	private boolean mustBeDrawn; 
-	
+	private boolean mustBeDrawn;
+
 	/***
 	 * 
 	 */
@@ -35,7 +36,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		this.measures = new HashMap<String, AbstractMeasure>();
 		this.mustBeDrawn = false;
 	}
-	
+
 	/**
 	 * 
 	 * @param query
@@ -49,14 +50,16 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	/**
 	 * @param measures
 	 */
-	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs, Map<String, AbstractMeasure> measures) {
+	public QueryRelFile(String user, String topic, String id, Map<String, Document> docs,
+			Map<String, AbstractMeasure> measures) {
 		super(user, topic, id, docs);
 		this.measures = measures;
 		this.mustBeDrawn = false;
 	}
-	
+
 	/**
 	 * It adds a measure in measures
+	 * 
 	 * @param m
 	 */
 	public void addMeasure(AbstractMeasure m, boolean printOutput, boolean drawable) {
@@ -64,40 +67,42 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		m.setMustBeDrawn(drawable);
 		getMeasures().put(m.getName().trim().toLowerCase(), m);
 	}
-	
+
 	/**
 	 * It remove a measure from measures
 	 */
 	public void removeMeasure(String name) {
 		getMeasures().remove(name.trim().toLowerCase());
 	}
-	
+
 	/**
 	 * It search a measure. In case of it doesn't find the measure, it create new measure.
+	 * 
 	 * @param name
 	 * @return
 	 */
-	public AbstractMeasure searchAddMeasure(String name, boolean compound, boolean printOutput, boolean drawable) {	
-		if(getMeasures().get(name.trim().toLowerCase()) == null) {
-			if(compound) {
+	public AbstractMeasure searchAddMeasure(String name, boolean compound, boolean printOutput, boolean drawable) {
+		if (getMeasures().get(name.trim().toLowerCase()) == null) {
+			if (compound) {
 				addMeasure(new MeasureCompound(name.trim()), printOutput, drawable);
-			}else {
+			} else {
 				addMeasure(new Measure(name.trim()), printOutput, drawable);
 			}
 		}
-		
+
 		return getMeasures().get(name.trim().toLowerCase());
 	}
-	
+
 	/***
 	 * it search the measure
+	 * 
 	 * @param name
 	 * @return
 	 */
 	public AbstractMeasure searchMeasure(String name) {
 		return getMeasures().get(name.trim().toLowerCase());
 	}
-	
+
 	/**
 	 * @return the mustBeDrawn
 	 */
@@ -106,7 +111,7 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 	}
 
 	/**
-	 * @param 
+	 * @param
 	 */
 	public void setToConsiderForChart(boolean toConsiderForChart) {
 		this.mustBeDrawn = toConsiderForChart;
@@ -121,42 +126,44 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 
 	/**
 	 * This method return the number of relevant documents of this query.
+	 * 
 	 * @return nRelDoc
-	 * */
+	 */
 	public int getNRelevantDoc() {
 		int nRelDoc = 0;
 		boolean instance = true;
-		for(Map.Entry<String, Document> entryDoc : this.getDocs().entrySet()) {
+		for (Map.Entry<String, Document> entryDoc : this.getDocs().entrySet()) {
 			if (!(entryDoc.getValue() instanceof DocumentRelFile)) {
 				instance = false;
 			}
-			nRelDoc += (instance && ((DocumentRelFile)entryDoc.getValue()).getIsRelevance()) ? 1 : 0;
+			nRelDoc += (instance && ((DocumentRelFile) entryDoc.getValue()).getIsRelevance()) ? 1 : 0;
 		}
-		
+
 		return nRelDoc;
 	}
-	
+
 	/**
 	 * It computes the sorting of the measures by key (Measures' names)
 	 */
-	public TreeMap<String, AbstractMeasure>  sortMeasureForKey() {
+	public TreeMap<String, AbstractMeasure> sortMeasureForKey() {
 		TreeMap<String, AbstractMeasure> measureSorted = new TreeMap<String, AbstractMeasure>(getMeasures());
-		return measureSorted;	
+		return measureSorted;
 	}
-	
+
 	/**
 	 * It returns a list contains all the relevant documents
+	 * 
 	 * @return
 	 */
-	public Map<String, Document>getRelevantDocs(){
+	public Map<String, Document> getRelevantDocs() {
 		Map<String, Document> docs = getDocs();
 		Map<String, Document> relDocs = new HashMap<String, Document>();
-		for(Map.Entry<String, Document> entryDoc : docs.entrySet()) {
-			if(((DocumentRelFile)entryDoc.getValue()).getIsRelevance()) {
+		for (Map.Entry<String, Document> entryDoc : docs.entrySet()) {
+			if (((DocumentRelFile) entryDoc.getValue()).getIsRelevance()) {
 				relDocs.put(entryDoc.getKey(), entryDoc.getValue());
 			}
 		}
-		
+
 		return relDocs;
 	}
 
@@ -172,13 +179,13 @@ public class QueryRelFile extends ie.dcu.evalpir.elements.Query{
 		tb.getRenderer().setCWC(cwc);
 		tb.addRule();
 		tb.addRow("User: " + getUser(), "Topic: " + getTopic(), "Query: " + getId(), "S1 - Si", "(Si-1) - Si");
-		tb.addRule();		
-		for(Map.Entry<String, AbstractMeasure> entryMeasure: sortMeasureForKey().entrySet()) {
-			if(entryMeasure.getValue().isPrintOutput()) {
-				stringDoc = ((Measure)entryMeasure.getValue()).printMeasure(tb) + "\n";
+		tb.addRule();
+		for (Map.Entry<String, AbstractMeasure> entryMeasure : sortMeasureForKey().entrySet()) {
+			if (entryMeasure.getValue().isPrintOutput()) {
+				stringDoc = ((Measure) entryMeasure.getValue()).printMeasure(tb) + "\n";
 			}
 		}
-		
+
 		return stringDoc;
 	}
 }

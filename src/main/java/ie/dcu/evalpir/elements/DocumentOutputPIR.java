@@ -6,20 +6,20 @@ package ie.dcu.evalpir.elements;
 /**
  * @author Andrea Angiolillo
  *
- *This class represents the documents in the file with the systems' output 
+ *         This class represents the documents in the file with the systems' output
  */
-public class DocumentOutputPIR extends Document{
+public class DocumentOutputPIR extends Document {
 
 	private int rank;
 	private double similarity;
-		
+
 	/**
 	 * @param id
 	 */
 	public DocumentOutputPIR(String id) {
 		super(id);
 	}
-	
+
 	/**
 	 * @param rank
 	 * @param similarity
@@ -45,10 +45,9 @@ public class DocumentOutputPIR extends Document{
 	public void setSimilarity(double similarity) {
 		this.similarity = similarity;
 	}
-		
+
 	public String toString() {
-		return "Document [id=" + this.getId() + ", rank=" + rank + ", similarity=" + similarity
-				+"]";
+		return "Document [id=" + this.getId() + ", rank=" + rank + ", similarity=" + similarity + "]";
 	}
-	
+
 }

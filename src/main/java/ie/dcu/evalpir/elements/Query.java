@@ -7,17 +7,16 @@ import java.util.Map;
  * @author Andrea Angiolillo
  * @version 1.0
  * 
- * It represent a query in the systems' files
- * */
-
+ *          It represent a query in the systems' files
+ */
 
 public class Query {
-	
+
 	private String user;
 	private String topic;
 	private String id;
-	private Map<String,Document> docs; // key = docID, value = Document
-	
+	private Map<String, Document> docs; // key = docID, value = Document
+
 	/**
 	 * 
 	 */
@@ -49,9 +48,9 @@ public class Query {
 		this.topic = topic;
 		this.user = user;
 		this.docs = new HashMap<String, Document>();
-				
-	}	
-	
+
+	}
+
 	/**
 	 * @param docId
 	 * @return
@@ -59,11 +58,11 @@ public class Query {
 	public Document findDoc(String docId) {
 		return docs.get(docId);
 	}
-	
+
 	public void addDoc(Document doc) {
 		docs.put(doc.getId(), doc);
 	}
-	
+
 	public void removeDoc(String docId) {
 		docs.remove(docId);
 	}
@@ -76,7 +75,7 @@ public class Query {
 		return docs;
 	}
 
-	public void setDocs(Map <String, Document> docs) {
+	public void setDocs(Map<String, Document> docs) {
 		this.docs = docs;
 	}
 
@@ -99,19 +98,15 @@ public class Query {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	public String toString() {
 		String stringDoc = "";
-		for(Map.Entry<String, Document> entry: docs.entrySet()) {
-			stringDoc += ((Document)entry.getValue()).toString() + "\n";
+		for (Map.Entry<String, Document> entry : docs.entrySet()) {
+			stringDoc += ((Document) entry.getValue()).toString() + "\n";
 		}
-		
+
 		stringDoc += "] \nNumber of documents: " + docs.size() + " ]";
-		return "\nUser = " + user + " Topic = " + topic + " Query [id = " + id + ", docs =\n" + stringDoc ;
-	} 
-	
-	
-	
-	
+		return "\nUser = " + user + " Topic = " + topic + " Query [id = " + id + ", docs =\n" + stringDoc;
+	}
 
 }

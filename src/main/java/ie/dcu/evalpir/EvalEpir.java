@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import ie.dcu.evalpir.elements.PIR;
 import ie.dcu.evalpir.elements.Query;
 import ie.dcu.evalpir.elements.QueryRelFile;
@@ -47,7 +48,7 @@ public class EvalEpir {
 	public static  ArrayList<PIR> MODELS = null;
 	
     public static void main(String[] args ) {
-    	//String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/NewData100.csv","src/main/resources/resultChanged.csv"};
+		//String[] args1 = {COMMANDS_FILE_PATH, RELEVANCE_FILE_PATH, LOGS_FILE_PATH, "src/main/resources/NewData100.csv","src/main/resources/resultChanged.csv"};
 
     	ConsolePrinter.startEval();
     	  	

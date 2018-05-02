@@ -1,7 +1,7 @@
 package ie.dcu.evalpir.exceptions;
 
 public class DifferentSizeException extends RuntimeException {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public DifferentSizeException() {

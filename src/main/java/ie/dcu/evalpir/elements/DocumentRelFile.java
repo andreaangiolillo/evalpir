@@ -6,22 +6,22 @@ package ie.dcu.evalpir.elements;
 /**
  * @author Andrea Angiolillo
  *
- *It represents the documents in the relevantFile
+ *         It represents the documents in the relevantFile
  */
-public class DocumentRelFile extends Document{
-	
-	static final int  THRESHOLD = 3; //it is used to set isRelevance
-	
+public class DocumentRelFile extends Document {
+
+	static final int THRESHOLD = 3; // it is used to set isRelevance
+
 	private int relevance;
 	private boolean isRelevance;
-	
+
 	/**
 	 * @param id
 	 */
 	public DocumentRelFile(String id) {
 		super(id);
-	}	
-	
+	}
+
 	/**
 	 * 
 	 * @param doc
@@ -31,7 +31,7 @@ public class DocumentRelFile extends Document{
 		this.relevance = doc.relevance;
 		this.isRelevance = doc.isRelevance;
 	}
-	
+
 	/**
 	 * @param id
 	 * @param relevance
@@ -41,7 +41,7 @@ public class DocumentRelFile extends Document{
 		this.relevance = relevance;
 		setIsRelevance();
 	}
-	
+
 	public int getRelevance() {
 		return relevance;
 	}
@@ -49,7 +49,7 @@ public class DocumentRelFile extends Document{
 	public void setRelevance(int relevance) {
 		this.relevance = relevance;
 		setIsRelevance();
-	
+
 	}
 
 	public boolean getIsRelevance() {
@@ -60,14 +60,14 @@ public class DocumentRelFile extends Document{
 	 * set the IsRelevance according to THRESHOLD
 	 */
 	public void setIsRelevance() {
-		if( getRelevance() >= THRESHOLD) {
+		if (getRelevance() >= THRESHOLD) {
 			this.isRelevance = true;
-		}else {
+		} else {
 			this.isRelevance = false;
 		}
 	}
-	
+
 	public String toString() {
-		return "Document [id=" + this.getId() + ", relevance=" + relevance + ", isRelevance=" + isRelevance +"]";
+		return "Document [id=" + this.getId() + ", relevance=" + relevance + ", isRelevance=" + isRelevance + "]";
 	}
 }

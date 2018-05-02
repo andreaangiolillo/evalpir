@@ -3,11 +3,11 @@ package ie.dcu.evalpir.elements;
 /**
  * @author Andrea Angiolillo
  *
- *This class defines the common properties of the measures
+ *         This class defines the common properties of the measures
  *
  */
 public abstract class Document {
-	
+
 	private String id;
 
 	public Document(String id) {

@@ -1,7 +1,6 @@
 package ie.dcu.evalpir.exceptions;
 
-
-public class QueryNotInTheLogFileException extends RuntimeException{
+public class QueryNotInTheLogFileException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
@@ -30,7 +29,5 @@ public class QueryNotInTheLogFileException extends RuntimeException{
 		super(cause);
 		// TODO Auto-generated constructor stub
 	}
-	
-	
 
 }

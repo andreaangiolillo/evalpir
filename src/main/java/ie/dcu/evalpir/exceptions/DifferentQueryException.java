@@ -1,7 +1,7 @@
 package ie.dcu.evalpir.exceptions;
 
 public class DifferentQueryException extends RuntimeException {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public DifferentQueryException() {

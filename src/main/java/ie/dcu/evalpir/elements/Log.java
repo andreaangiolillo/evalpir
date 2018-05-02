@@ -3,7 +3,7 @@ package ie.dcu.evalpir.elements;
 /**
  * @author Andrea Angiolillo
  * 
- * It represents a row in the logFile
+ *         It represents a row in the logFile
  */
 
 import java.sql.Timestamp;
@@ -15,7 +15,7 @@ public class Log {
 	private Timestamp timestamp;
 	private String query;
 	private String rank;
-	
+
 	/**
 	 * @param document
 	 * @param type
@@ -55,5 +55,5 @@ public class Log {
 		return "Log [document=" + document + ", type=" + type + ", timestamp=" + timestamp + ", query=" + query
 				+ ", rank=" + rank + "]";
 	}
-	
+
 }
